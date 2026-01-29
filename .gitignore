@@ -1,6 +1,5 @@
 /.phpunit.cache
 /node_modules
-/public/build
 /public/hot
 /public/storage
 /storage/*.key
@@ -26,3 +25,5 @@ yarn-error.log
 docs/
 stuff/
 temp/
+
+# Note: /public/build is included in git for production deployment
