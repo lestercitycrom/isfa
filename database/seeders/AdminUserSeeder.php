@@ -12,8 +12,8 @@ final class AdminUserSeeder extends Seeder
 {
 	public function run(): void
 	{
-		$email = (string) (env('ADMIN_EMAIL') ?: 'admin@example.com');
-		$password = (string) (env('ADMIN_PASSWORD') ?: 'password');
+		$email = (string) (env('ADMIN_EMAIL') ?: 'admin@gmail.com');
+		$password = (string) (env('ADMIN_PASSWORD') ?: 'admin123');
 
 		User::query()->updateOrCreate(
 			['email' => $email],

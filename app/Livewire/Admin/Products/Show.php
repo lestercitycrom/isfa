@@ -35,7 +35,7 @@ final class Show extends Component
 		$this->product = $product->load(['category', 'suppliers']);
 
 		foreach ($this->product->suppliers as $supplier) {
-			$this->pivotStatus[(int) $supplier->id] = $supplier->pivot->status->value;
+			$this->pivotStatus[(int) $supplier->id] = (string) $supplier->pivot->status;
 			$this->pivotTerms[(int) $supplier->id] = $supplier->pivot->terms;
 		}
 	}
@@ -56,17 +56,6 @@ final class Show extends Component
 		]);
 
 		$this->product->refresh()->load('suppliers');
-
-		// Update pivot arrays
-		foreach ($this->product->suppliers as $supplier) {
-			$this->pivotStatus[(int) $supplier->id] = $supplier->pivot->status->value;
-			$this->pivotTerms[(int) $supplier->id] = $supplier->pivot->terms;
-		}
-
-		// Reset form
-		$this->attachSupplierId = 0;
-		$this->attachStatus = 'reserve';
-		$this->attachTerms = null;
 
 		session()->flash('status', 'Supplier linked.');
 

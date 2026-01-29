@@ -1,43 +1,69 @@
 <div class="space-y-6">
-	<div class="flex items-center justify-between gap-4">
-		<h1 class="text-2xl font-semibold">Товары</h1>
+	<x-admin.page-header
+		title="Товары"
+		subtitle="Список всех товаров с возможностью поиска и фильтрации."
+	>
+		<x-slot name="actions">
+			<x-admin.button variant="primary" :href="route('admin.products.create')">
+				<x-admin.icon name="plus" class="h-4 w-4" />
+				Добавить товар
+			</x-admin.button>
+		</x-slot>
+	</x-admin.page-header>
 
-		<div class="flex items-center gap-2">
-			<div class="w-80">
-				<input wire:model.live="search" class="w-full rounded border px-3 py-2" placeholder="Поиск товара...">
-			</div>
-
-			<a class="rounded bg-zinc-900 px-3 py-2 text-white hover:bg-zinc-800" href="{{ route('admin.products.create') }}">
-				+ Добавить
-			</a>
+	<x-admin.filters-bar>
+		<div class="lg:col-span-4">
+			<x-admin.filter-input
+				wire:model.live="search"
+				placeholder="Поиск товара..."
+				icon="search"
+			/>
 		</div>
-	</div>
+	</x-admin.filters-bar>
 
-	<div class="rounded border bg-white">
-		<table class="w-full text-sm">
-			<thead>
-			<tr class="border-b bg-zinc-50 text-left">
-				<th class="p-3">Название</th>
-				<th class="p-3">Категория</th>
-				<th class="p-3 w-56"></th>
-			</tr>
-			</thead>
-			<tbody>
-			@foreach ($products as $product)
-				<tr class="border-b">
-					<td class="p-3">{{ $product->name }}</td>
-					<td class="p-3">{{ $product->category?->name }}</td>
-					<td class="p-3 text-right space-x-2">
-						<a class="rounded border px-2 py-1 hover:bg-zinc-50" href="{{ route('admin.products.show', $product) }}">Open</a>
-						<a class="rounded border px-2 py-1 hover:bg-zinc-50" href="{{ route('admin.products.edit', $product) }}">Edit</a>
-					</td>
+	<x-admin.card>
+		<x-admin.table :zebra="true" :sticky="true">
+			<x-slot name="head">
+				<tr>
+					<x-admin.th>Название</x-admin.th>
+					<x-admin.th>Категория</x-admin.th>
+					<x-admin.th align="right" nowrap>Действия</x-admin.th>
 				</tr>
-			@endforeach
-			</tbody>
-		</table>
+			</x-slot>
 
-		<div class="p-3">
-			{{ $products->links() }}
+			@forelse ($products as $product)
+				<tr class="hover:bg-slate-50/70">
+					<x-admin.td>
+						<div class="font-medium text-slate-900">{{ $product->name }}</div>
+						@if($product->description)
+							<div class="mt-1 text-xs text-slate-500 line-clamp-1">{{ $product->description }}</div>
+						@endif
+					</x-admin.td>
+					<x-admin.td>
+						@if($product->category)
+							<x-admin.badge variant="blue">{{ $product->category->name }}</x-admin.badge>
+						@else
+							<span class="text-slate-400">—</span>
+						@endif
+					</x-admin.td>
+					<x-admin.td align="right" nowrap>
+						<x-admin.table-actions
+							:viewHref="route('admin.products.show', $product)"
+							:editHref="route('admin.products.edit', $product)"
+						/>
+					</x-admin.td>
+				</tr>
+			@empty
+				<tr>
+					<x-admin.td colspan="3" class="text-center py-8 text-slate-500">
+						Товары не найдены
+					</x-admin.td>
+				</tr>
+			@endforelse
+		</x-admin.table>
+
+		<div class="mt-4">
+			{{ $products->links('pagination.admin') }}
 		</div>
-	</div>
+	</x-admin.card>
 </div>

@@ -14,13 +14,32 @@ use App\Livewire\Admin\Suppliers\Index as SuppliersIndex;
 use App\Livewire\Admin\Suppliers\Show as SupplierShow;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * Public entrypoint:
+ * - Guest: redirect to login
+ * - Authenticated: redirect to admin products
+ */
 Route::get('/', function () {
-    return view('welcome');
+	if (auth()->check()) {
+		return redirect()->route('admin.products.index');
+	}
+
+	return redirect()->route('login');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Auth routes
+Route::middleware('guest')->group(function () {
+	Route::livewire('login', App\Livewire\Auth\Login::class)->name('login');
+});
+
+Route::middleware('auth')->group(function () {
+	Route::post('/logout', function () {
+		auth()->logout();
+		session()->invalidate();
+		session()->regenerateToken();
+		return redirect('/');
+	})->name('logout');
+});
 
 require __DIR__.'/settings.php';
 
