@@ -35,7 +35,9 @@ final class Show extends Component
 		$this->product = $product->load(['category', 'suppliers']);
 
 		foreach ($this->product->suppliers as $supplier) {
-			$this->pivotStatus[(int) $supplier->id] = (string) $supplier->pivot->status;
+			$this->pivotStatus[(int) $supplier->id] = $supplier->pivot->status instanceof ProductSupplierStatus 
+				? $supplier->pivot->status->value 
+				: (string) $supplier->pivot->status;
 			$this->pivotTerms[(int) $supplier->id] = $supplier->pivot->terms;
 		}
 	}

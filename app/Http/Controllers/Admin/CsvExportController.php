@@ -111,14 +111,18 @@ final class CsvExportController extends Controller
 				->orderBy('id')
 				->chunk(200, static function ($products) use ($handle): void {
 					foreach ($products as $product) {
-						foreach ($product->suppliers as $supplier) {
-							fputcsv($handle, [
-								$product->id,
-								$supplier->id,
-								(string) $supplier->pivot->status,
-								$supplier->pivot->terms,
-							]);
-						}
+					foreach ($product->suppliers as $supplier) {
+						$status = $supplier->pivot->status instanceof \App\Enums\ProductSupplierStatus
+							? $supplier->pivot->status->value
+							: (string) $supplier->pivot->status;
+						
+						fputcsv($handle, [
+							$product->id,
+							$supplier->id,
+							$status,
+							$supplier->pivot->terms,
+						]);
+					}
 					}
 				});
 

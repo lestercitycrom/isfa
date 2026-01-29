@@ -69,14 +69,60 @@ final class CsvImportController extends Controller
 					)->id;
 				}
 
-				Product::query()->updateOrCreate(
-					['id' => (int) ($data['id'] ?? 0) ?: null],
+				$productId = (int) ($data['id'] ?? 0) ?: null;
+
+				$product = Product::query()->updateOrCreate(
+					['id' => $productId],
 					[
 						'category_id' => $categoryId,
 						'name' => $name,
 						'description' => $data['description'] ?? null,
 					]
 				);
+
+				// Import supplier links if provided in CSV
+				// Format: supplier_ids can be comma-separated, or supplier_id_1, supplier_id_2, etc.
+				// Or supplier_names can be comma-separated
+				if (isset($data['supplier_ids']) && trim((string) $data['supplier_ids']) !== '') {
+					$supplierIds = array_map('trim', explode(',', (string) $data['supplier_ids']));
+					$supplierIds = array_filter($supplierIds, fn ($id) => $id !== '' && is_numeric($id));
+
+					foreach ($supplierIds as $supplierId) {
+						$supplier = Supplier::query()->find((int) $supplierId);
+						if ($supplier !== null) {
+							$statusRaw = (string) ($data['supplier_status_' . $supplierId] ?? $data['status'] ?? 'reserve');
+							$status = ProductSupplierStatus::tryFrom($statusRaw) ?? ProductSupplierStatus::Reserve;
+							$terms = $data['supplier_terms_' . $supplierId] ?? $data['terms'] ?? null;
+
+							$product->suppliers()->syncWithoutDetaching([
+								(int) $supplierId => [
+									'status' => $status->value,
+									'terms' => $terms,
+								],
+							]);
+						}
+					}
+				} elseif (isset($data['supplier_names']) && trim((string) $data['supplier_names']) !== '') {
+					// Import by supplier names
+					$supplierNames = array_map('trim', explode(',', (string) $data['supplier_names']));
+					$supplierNames = array_filter($supplierNames, fn ($name) => $name !== '');
+
+					foreach ($supplierNames as $supplierName) {
+						$supplier = Supplier::query()->where('name', $supplierName)->first();
+						if ($supplier !== null) {
+							$statusRaw = (string) ($data['status'] ?? 'reserve');
+							$status = ProductSupplierStatus::tryFrom($statusRaw) ?? ProductSupplierStatus::Reserve;
+							$terms = $data['terms'] ?? null;
+
+							$product->suppliers()->syncWithoutDetaching([
+								$supplier->id => [
+									'status' => $status->value,
+									'terms' => $terms,
+								],
+							]);
+						}
+					}
+				}
 			}
 		});
 
@@ -125,8 +171,23 @@ final class CsvImportController extends Controller
 					continue;
 				}
 
+				$supplierId = (int) ($data['id'] ?? 0) ?: null;
+
+				// Check for duplicate name if creating new supplier (optional - no unique constraint in DB)
+				// But we'll skip if exact duplicate exists to avoid confusion
+				if ($supplierId === null) {
+					$existing = Supplier::query()
+						->where('name', $name)
+						->where('phone', $data['phone'] ?? null)
+						->where('email', $data['email'] ?? null)
+						->first();
+					if ($existing !== null) {
+						continue; // Skip exact duplicate
+					}
+				}
+
 				Supplier::query()->updateOrCreate(
-					['id' => (int) ($data['id'] ?? 0) ?: null],
+					['id' => $supplierId],
 					[
 						'name' => $name,
 						'contact_name' => $data['contact_name'] ?? null,
@@ -184,8 +245,18 @@ final class CsvImportController extends Controller
 					continue;
 				}
 
+				$categoryId = (int) ($data['id'] ?? 0) ?: null;
+
+				// Check for duplicate name if creating new category
+				if ($categoryId === null) {
+					$existing = ProductCategory::query()->where('name', $name)->first();
+					if ($existing !== null) {
+						continue; // Skip duplicate
+					}
+				}
+
 				ProductCategory::query()->updateOrCreate(
-					['id' => (int) ($data['id'] ?? 0) ?: null],
+					['id' => $categoryId],
 					[
 						'name' => $name,
 						'description' => $data['description'] ?? null,

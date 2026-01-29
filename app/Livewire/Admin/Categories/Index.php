@@ -48,8 +48,15 @@ final class Index extends Component
 	public function save(): void
 	{
 		$this->validate([
-			'name' => ['required', 'string', 'max:255'],
+			'name' => [
+				'required',
+				'string',
+				'max:255',
+				'unique:product_categories,name,' . ($this->editingId ?? 'NULL') . ',id',
+			],
 			'description' => ['nullable', 'string'],
+		], [
+			'name.unique' => __('common.category_name_already_exists'),
 		]);
 
 		ProductCategory::query()->updateOrCreate(

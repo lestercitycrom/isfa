@@ -166,4 +166,10 @@ return [
 	'pagination_prev' => 'Предыдущая',
 	'pagination_next' => 'Следующая',
 	'pagination_go_to_page' => 'Перейти на страницу :page',
+
+	// Validation errors
+	'name_already_exists' => 'Запись с таким названием уже существует.',
+	'category_name_already_exists' => 'Категория с таким названием уже существует.',
+	'product_name_already_exists' => 'Товар с таким названием уже существует.',
+	'supplier_name_already_exists' => 'Поставщик с таким названием уже существует.',
 ];

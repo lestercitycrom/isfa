@@ -166,4 +166,10 @@ return [
 	'pagination_prev' => 'Əvvəlki',
 	'pagination_next' => 'Növbəti',
 	'pagination_go_to_page' => 'Səhifəyə keç: :page',
+
+	// Validation errors
+	'name_already_exists' => 'Bu adla qeyd artıq mövcuddur.',
+	'category_name_already_exists' => 'Bu adla kateqoriya artıq mövcuddur.',
+	'product_name_already_exists' => 'Bu adla məhsul artıq mövcuddur.',
+	'supplier_name_already_exists' => 'Bu adla təchizatçı artıq mövcuddur.',
 ];
