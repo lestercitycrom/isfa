@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('layouts.admin')]
 new class extends Component {
     use ProfileValidationRules;
 
@@ -41,7 +43,7 @@ new class extends Component {
 
         $user->save();
 
-        $this->dispatch('profile-updated', name: $user->name);
+        session()->flash('status', __('common.profile_updated'));
     }
 
     /**
@@ -52,7 +54,7 @@ new class extends Component {
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {
-            $this->redirectIntended(default: route('dashboard', absolute: false));
+            $this->redirect(route('admin.products.index'));
 
             return;
         }
@@ -76,52 +78,57 @@ new class extends Component {
     }
 }; ?>
 
-<section class="w-full">
-    @include('partials.settings-heading')
+<div class="space-y-6">
+	<x-admin.page-header
+		:title="__('common.profile')"
+		:subtitle="__('common.profile_subtitle')"
+	/>
 
-    <flux:heading class="sr-only">{{ __('Profile Settings') }}</flux:heading>
+	<x-admin.card>
+		<form wire:submit="updateProfileInformation" class="space-y-6">
+			<x-admin.input
+				:label="__('common.name')"
+				type="text"
+				wire:model="name"
+				required
+				autofocus
+				autocomplete="name"
+				:error="$errors->first('name')"
+			/>
 
-    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
-        <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+			<div>
+				<x-admin.input
+					:label="__('common.email')"
+					type="email"
+					wire:model="email"
+					required
+					autocomplete="email"
+					:error="$errors->first('email')"
+				/>
 
-            <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
+				@if ($this->hasUnverifiedEmail)
+					<div class="mt-4">
+						<x-admin.alert variant="warning">
+							{{ __('common.email_unverified') }}
+							<button wire:click.prevent="resendVerificationNotification" class="underline">
+								{{ __('common.resend_verification') }}
+							</button>
+						</x-admin.alert>
 
-                @if ($this->hasUnverifiedEmail)
-                    <div>
-                        <flux:text class="mt-4">
-                            {{ __('Your email address is unverified.') }}
+						@if (session('status') === 'verification-link-sent')
+							<x-admin.alert variant="success" class="mt-2">
+								{{ __('common.verification_link_sent') }}
+							</x-admin.alert>
+						@endif
+					</div>
+				@endif
+			</div>
 
-                            <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
-                                {{ __('Click here to re-send the verification email.') }}
-                            </flux:link>
-                        </flux:text>
-
-                        @if (session('status') === 'verification-link-sent')
-                            <flux:text class="mt-2 font-medium !dark:text-green-400 !text-green-600">
-                                {{ __('A new verification link has been sent to your email address.') }}
-                            </flux:text>
-                        @endif
-                    </div>
-                @endif
-            </div>
-
-            <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
-                        {{ __('Save') }}
-                    </flux:button>
-                </div>
-
-                <x-action-message class="me-3" on="profile-updated">
-                    {{ __('Saved.') }}
-                </x-action-message>
-            </div>
-        </form>
-
-        @if ($this->showDeleteUser)
-            <livewire:pages::settings.delete-user-form />
-        @endif
-    </x-pages::settings.layout>
-</section>
+			<div class="flex items-center gap-4">
+				<x-admin.button variant="primary" type="submit">
+					{{ __('common.save') }}
+				</x-admin.button>
+			</div>
+		</form>
+	</x-admin.card>
+</div>

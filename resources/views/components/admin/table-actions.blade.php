@@ -6,15 +6,15 @@
 
 <div class="inline-flex items-center justify-end gap-2">
 	@if($viewHref)
-		<x-admin.icon-button :href="$viewHref" icon="eye" title="Open" variant="secondary" />
+		<x-admin.icon-button :href="$viewHref" icon="eye" :title="__('common.view')" variant="secondary" />
 	@endif
 
 	@if($editHref)
-		<x-admin.icon-button :href="$editHref" icon="pencil" title="Edit" variant="secondary" />
+		<x-admin.icon-button :href="$editHref" icon="pencil" :title="__('common.edit')" variant="secondary" />
 	@endif
 
 	@if($deleteHref)
-		<x-admin.icon-button :href="$deleteHref" icon="trash" title="Delete" variant="danger" />
+		<x-admin.icon-button :href="$deleteHref" icon="trash" :title="__('common.delete')" variant="danger" />
 	@endif
 
 	@if(trim($slot) !== '')

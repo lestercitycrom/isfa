@@ -57,9 +57,18 @@ final class Show extends Component
 
 		$this->product->refresh()->load('suppliers');
 
-		session()->flash('status', 'Supplier linked.');
+		// Update pivot arrays
+		foreach ($this->product->suppliers as $supplier) {
+			$this->pivotStatus[(int) $supplier->id] = $supplier->pivot->status->value;
+			$this->pivotTerms[(int) $supplier->id] = $supplier->pivot->terms;
+		}
 
-		$this->redirectRoute('admin.products.show', ['product' => $this->product->id]);
+		// Reset form
+		$this->attachSupplierId = 0;
+		$this->attachStatus = 'reserve';
+		$this->attachTerms = null;
+
+		session()->flash('status', __('common.supplier_linked'));
 	}
 
 	public function savePivot(int $supplierId): void
@@ -71,18 +80,19 @@ final class Show extends Component
 			'terms' => $this->pivotTerms[$supplierId] ?? null,
 		]);
 
-		session()->flash('status', 'Link updated.');
-
-		$this->redirectRoute('admin.products.show', ['product' => $this->product->id]);
+		session()->flash('status', __('common.link_updated'));
 	}
 
 	public function detach(int $supplierId): void
 	{
 		$this->product->suppliers()->detach($supplierId);
 
-		session()->flash('status', 'Supplier unlinked.');
+		// Remove from arrays
+		unset($this->pivotStatus[$supplierId], $this->pivotTerms[$supplierId]);
 
-		$this->redirectRoute('admin.products.show', ['product' => $this->product->id]);
+		$this->product->refresh()->load('suppliers');
+
+		session()->flash('status', __('common.supplier_unlinked'));
 	}
 
 	public function render(): View

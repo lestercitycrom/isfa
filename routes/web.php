@@ -60,10 +60,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 
 	Route::get('/import-export', ImportExportIndex::class)->name('import_export.index');
 
+	Route::get('/export/categories', [CsvExportController::class, 'categories'])->name('export.categories');
 	Route::get('/export/products', [CsvExportController::class, 'products'])->name('export.products');
 	Route::get('/export/suppliers', [CsvExportController::class, 'suppliers'])->name('export.suppliers');
 	Route::get('/export/links', [CsvExportController::class, 'links'])->name('export.links');
 
+	Route::post('/import/categories', [CsvImportController::class, 'importCategories'])->name('import.categories');
 	Route::post('/import/products', [CsvImportController::class, 'importProducts'])->name('import.products');
 	Route::post('/import/suppliers', [CsvImportController::class, 'importSuppliers'])->name('import.suppliers');
 	Route::post('/import/links', [CsvImportController::class, 'importLinks'])->name('import.links');

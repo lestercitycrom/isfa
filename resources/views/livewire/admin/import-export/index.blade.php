@@ -1,48 +1,60 @@
 <div class="space-y-6">
-	<h1 class="text-2xl font-semibold">Импорт / Экспорт</h1>
+	<x-admin.page-header
+		:title="__('common.import_export')"
+		:subtitle="__('common.import_export_subtitle')"
+	/>
 
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-		<div class="rounded border bg-white p-4 space-y-3">
-			<div class="text-lg font-semibold">Экспорт CSV</div>
-
-			<div class="space-y-2">
-				<a class="block rounded border px-3 py-2 hover:bg-zinc-50" href="{{ route('admin.export.products') }}">Скачать товары (products.csv)</a>
-				<a class="block rounded border px-3 py-2 hover:bg-zinc-50" href="{{ route('admin.export.suppliers') }}">Скачать поставщиков (suppliers.csv)</a>
-				<a class="block rounded border px-3 py-2 hover:bg-zinc-50" href="{{ route('admin.export.links') }}">Скачать связи (product_supplier.csv)</a>
+		<x-admin.card :title="__('common.export_csv')">
+			<div class="space-y-3">
+				<a class="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition" href="{{ route('admin.export.products') }}">
+					<x-admin.icon name="upload" class="h-4 w-4 inline mr-2" />
+					{{ __('common.download_products') }} (products.csv)
+				</a>
+				<a class="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition" href="{{ route('admin.export.suppliers') }}">
+					<x-admin.icon name="upload" class="h-4 w-4 inline mr-2" />
+					{{ __('common.download_suppliers') }} (suppliers.csv)
+				</a>
+				<a class="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition" href="{{ route('admin.export.links') }}">
+					<x-admin.icon name="upload" class="h-4 w-4 inline mr-2" />
+					{{ __('common.download_links') }} (product_supplier.csv)
+				</a>
 			</div>
 
-			<div class="text-sm text-zinc-600">
-				Импорт принимает те же колонки, что экспорт.
+			<div class="mt-4 text-xs text-slate-500">
+				{{ __('common.import_accepts_same_columns') }}
 			</div>
-		</div>
+		</x-admin.card>
 
-		<div class="rounded border bg-white p-4 space-y-6">
-			<div>
-				<div class="text-lg font-semibold mb-2">Импорт товаров CSV</div>
-				<form class="space-y-2" method="POST" action="{{ route('admin.import.products') }}" enctype="multipart/form-data">
-					@csrf
-					<input class="block w-full" type="file" name="file" accept=".csv,text/csv">
-					<button class="rounded bg-zinc-900 px-3 py-2 text-white hover:bg-zinc-800" type="submit">Импорт</button>
-				</form>
-			</div>
+		<x-admin.card :title="__('common.import_csv')">
+			<div class="space-y-6">
+				<div>
+					<div class="mb-2 text-sm font-semibold text-slate-900">{{ __('common.import_products_csv') }}</div>
+					<form class="space-y-2" method="POST" action="{{ route('admin.import.products') }}" enctype="multipart/form-data">
+						@csrf
+						<input class="block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" type="file" name="file" accept=".csv,text/csv">
+						<x-admin.button variant="primary" type="submit">{{ __('common.import') }}</x-admin.button>
+					</form>
+				</div>
 
-			<div>
-				<div class="text-lg font-semibold mb-2">Импорт поставщиков CSV</div>
-				<form class="space-y-2" method="POST" action="{{ route('admin.import.suppliers') }}" enctype="multipart/form-data">
-					@csrf
-					<input class="block w-full" type="file" name="file" accept=".csv,text/csv">
-					<button class="rounded bg-zinc-900 px-3 py-2 text-white hover:bg-zinc-800" type="submit">Импорт</button>
-				</form>
-			</div>
+				<div>
+					<div class="mb-2 text-sm font-semibold text-slate-900">{{ __('common.import_suppliers_csv') }}</div>
+					<form class="space-y-2" method="POST" action="{{ route('admin.import.suppliers') }}" enctype="multipart/form-data">
+						@csrf
+						<input class="block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" type="file" name="file" accept=".csv,text/csv">
+						<x-admin.button variant="primary" type="submit">{{ __('common.import') }}</x-admin.button>
+					</form>
+				</div>
 
-			<div>
-				<div class="text-lg font-semibold mb-2">Импорт связей CSV</div>
-				<form class="space-y-2" method="POST" action="{{ route('admin.import.links') }}" enctype="multipart/form-data">
-					@csrf
-					<input class="block w-full" type="file" name="file" accept=".csv,text/csv">
-					<button class="rounded bg-zinc-900 px-3 py-2 text-white hover:bg-zinc-800" type="submit">Импорт</button>
-				</form>
+				<div>
+					<div class="mb-2 text-sm font-semibold text-slate-900">{{ __('common.import_links_csv') }}</div>
+					<form class="space-y-2" method="POST" action="{{ route('admin.import.links') }}" enctype="multipart/form-data">
+						@csrf
+						<input class="block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" type="file" name="file" accept=".csv,text/csv">
+						<x-admin.button variant="primary" type="submit">{{ __('common.import') }}</x-admin.button>
+					</form>
+				</div>
 			</div>
-		</div>
+		</x-admin.card>
 	</div>
 </div>

@@ -58,7 +58,7 @@ final class Edit extends Component
 			]
 		);
 
-		session()->flash('status', 'Supplier saved.');
+		session()->flash('status', __('common.supplier_saved'));
 
 		$this->redirectRoute('admin.suppliers.show', ['supplier' => $supplier->id]);
 	}

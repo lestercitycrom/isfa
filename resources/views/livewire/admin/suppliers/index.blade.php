@@ -1,46 +1,116 @@
 <div class="space-y-6">
-	<div class="flex items-center justify-between gap-4">
-		<h1 class="text-2xl font-semibold">Поставщики</h1>
-
-		<div class="flex items-center gap-2">
-			<div class="w-80">
-				<input wire:model.live="search" class="w-full rounded border px-3 py-2" placeholder="Поиск поставщика...">
-			</div>
-
-			<a class="rounded bg-zinc-900 px-3 py-2 text-white hover:bg-zinc-800" href="{{ route('admin.suppliers.create') }}">
-				+ Добавить
+	<x-admin.page-header
+		:title="__('common.suppliers')"
+		:subtitle="__('common.suppliers_subtitle')"
+	>
+		<x-slot name="actions">
+			<a class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 transition"
+				href="{{ route('admin.export.suppliers') }}">
+				<x-admin.icon name="upload" class="h-4 w-4" />
+				{{ __('common.export_csv') }}
 			</a>
+
+			<form method="POST" action="{{ route('admin.import.suppliers') }}" enctype="multipart/form-data" class="inline-flex">
+				@csrf
+				<input id="suppliersImportFile" name="file" type="file" accept=".csv,.txt" class="hidden"
+					onchange="this.form.submit()">
+
+				<label for="suppliersImportFile" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
+					<x-admin.icon name="download" class="h-4 w-4" />
+					{{ __('common.import_csv') }}
+				</label>
+			</form>
+
+			<x-admin.button variant="primary" :href="route('admin.suppliers.create')">
+				<x-admin.icon name="plus" class="h-4 w-4" />
+				{{ __('common.add_supplier') }}
+			</x-admin.button>
+		</x-slot>
+	</x-admin.page-header>
+
+	<x-admin.filters-bar>
+		<div class="lg:col-span-4">
+			<x-admin.filter-input
+				wire:model.live="search"
+				:placeholder="__('common.search_supplier')"
+				icon="search"
+			/>
 		</div>
-	</div>
+	</x-admin.filters-bar>
 
-	<div class="rounded border bg-white">
-		<table class="w-full text-sm">
-			<thead>
-			<tr class="border-b bg-zinc-50 text-left">
-				<th class="p-3">Название</th>
-				<th class="p-3">Контакты</th>
-				<th class="p-3 w-56"></th>
-			</tr>
-			</thead>
-			<tbody>
-			@foreach ($suppliers as $supplier)
-				<tr class="border-b">
-					<td class="p-3">{{ $supplier->name }}</td>
-					<td class="p-3 text-zinc-700">
-						<div>{{ $supplier->contact_name }}</div>
-						<div class="text-xs text-zinc-600">{{ $supplier->phone }} {{ $supplier->email }}</div>
-					</td>
-					<td class="p-3 text-right space-x-2">
-						<a class="rounded border px-2 py-1 hover:bg-zinc-50" href="{{ route('admin.suppliers.show', $supplier) }}">Open</a>
-						<a class="rounded border px-2 py-1 hover:bg-zinc-50" href="{{ route('admin.suppliers.edit', $supplier) }}">Edit</a>
-					</td>
+	<x-admin.card>
+		<x-admin.table :zebra="true" :sticky="true">
+			<x-slot name="head">
+				<tr>
+					<x-admin.th>{{ __('common.name') }}</x-admin.th>
+					<x-admin.th>{{ __('common.contacts') }}</x-admin.th>
+					<x-admin.th align="right" nowrap>{{ __('common.actions') }}</x-admin.th>
 				</tr>
-			@endforeach
-			</tbody>
-		</table>
+			</x-slot>
 
-		<div class="p-3">
-			{{ $suppliers->links() }}
+			@forelse ($suppliers as $supplier)
+				<tr class="hover:bg-slate-50/70">
+					<x-admin.td>
+						<div class="font-medium text-slate-900">{{ $supplier->name }}</div>
+					</x-admin.td>
+					<x-admin.td>
+						@if($supplier->contact_name)
+							<div class="text-slate-900">{{ $supplier->contact_name }}</div>
+						@endif
+						@if($supplier->phone || $supplier->email)
+							<div class="mt-1 text-xs text-slate-500">
+								@if($supplier->phone){{ $supplier->phone }}@endif
+								@if($supplier->phone && $supplier->email) • @endif
+								@if($supplier->email){{ $supplier->email }}@endif
+							</div>
+						@endif
+					</x-admin.td>
+					<x-admin.td align="right" nowrap>
+						<x-admin.table-actions
+							:viewHref="route('admin.suppliers.show', $supplier)"
+							:editHref="route('admin.suppliers.edit', $supplier)"
+						>
+							<x-admin.icon-button
+								icon="trash"
+								:title="__('common.delete')"
+								variant="danger"
+								wire:click="delete({{ $supplier->id }})"
+								onclick="if(!confirm('{{ __('common.confirm_delete_supplier', ['name' => $supplier->name]) }}')){event.preventDefault();event.stopImmediatePropagation();}"
+							/>
+						</x-admin.table-actions>
+					</x-admin.td>
+				</tr>
+			@empty
+				<tr>
+					<x-admin.td colspan="3" class="text-center py-8 text-slate-500">
+						{{ __('common.no_suppliers') }}
+					</x-admin.td>
+				</tr>
+			@endforelse
+		</x-admin.table>
+
+		<div class="mt-4">
+			{{ $suppliers->links('pagination.admin') }}
+		</div>
+	</x-admin.card>
+
+	<!-- Danger Zone -->
+	<div class="rounded-2xl border-2 border-red-200 bg-red-50 p-6">
+		<div class="flex items-start justify-between gap-4">
+			<div class="flex-1">
+				<h3 class="text-lg font-semibold text-red-900">{{ __('common.danger_zone') }}</h3>
+				<p class="mt-1 text-sm text-red-700">
+					{{ __('common.delete_all_suppliers_warning') }}
+				</p>
+			</div>
+			<x-admin.button
+				variant="danger"
+				size="md"
+				wire:click="deleteAllSuppliers"
+				onclick="if(!confirm('{{ __('common.confirm_delete_all_suppliers') }}')){event.preventDefault();event.stopImmediatePropagation();}"
+			>
+				{{ __('common.delete_all_suppliers') }}
+			</x-admin.button>
 		</div>
 	</div>
 </div>

@@ -23,7 +23,7 @@ return [
 		'enabled' => false,
 		'route' => 'admin.products.index',
 		'query_key' => 'q',
-		'placeholder' => 'Поиск товара...',
+		'placeholder' => 'common.search_product', // Will be translated in view
 	],
 
 	'quick_actions' => [],

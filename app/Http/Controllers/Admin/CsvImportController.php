@@ -82,7 +82,7 @@ final class CsvImportController extends Controller
 
 		return redirect()
 			->back()
-			->with('status', 'Products imported.');
+			->with('status', __('common.products_imported'));
 	}
 
 	public function importSuppliers(Request $request): RedirectResponse
@@ -141,7 +141,7 @@ final class CsvImportController extends Controller
 
 		return redirect()
 			->back()
-			->with('status', 'Suppliers imported.');
+			->with('status', __('common.suppliers_imported'));
 	}
 
 	public function importLinks(Request $request): RedirectResponse
@@ -208,6 +208,6 @@ final class CsvImportController extends Controller
 
 		return redirect()
 			->back()
-			->with('status', 'Links imported.');
+			->with('status', __('common.links_imported'));
 	}
 }

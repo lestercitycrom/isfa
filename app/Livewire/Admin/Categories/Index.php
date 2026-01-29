@@ -59,14 +59,21 @@ final class Index extends Component
 
 		$this->startCreate();
 
-		session()->flash('status', 'Category saved.');
+		session()->flash('status', __('common.category_saved'));
 	}
 
 	public function delete(int $id): void
 	{
 		ProductCategory::query()->whereKey($id)->delete();
 
-		session()->flash('status', 'Category deleted.');
+		session()->flash('status', __('common.category_deleted'));
+	}
+
+	public function deleteAllCategories(): void
+	{
+		ProductCategory::query()->delete();
+		session()->flash('status', __('common.all_categories_deleted'));
+		$this->resetPage();
 	}
 
 	public function render(): View

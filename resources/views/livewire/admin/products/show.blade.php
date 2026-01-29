@@ -1,102 +1,124 @@
 <div class="space-y-6">
-	<div class="flex items-center justify-between gap-4">
-		<div>
-			<h1 class="text-2xl font-semibold">{{ $product->name }}</h1>
-			<div class="text-sm text-zinc-600">
-				Категория: {{ $product->category?->name ?? '—' }}
-			</div>
-		</div>
-
-		<div class="flex gap-2">
-			<a class="rounded border px-3 py-2 hover:bg-zinc-50" href="{{ route('admin.products.index') }}">← Назад</a>
-			<a class="rounded bg-zinc-900 px-3 py-2 text-white hover:bg-zinc-800" href="{{ route('admin.products.edit', $product) }}">Edit</a>
-		</div>
-	</div>
+	<x-admin.page-header
+		:title="$product->name"
+		:subtitle="__('common.product_suppliers_management')"
+	>
+		<x-slot name="actions">
+			<x-admin.button variant="secondary" :href="route('admin.products.index')">
+				{{ __('common.back') }}
+			</x-admin.button>
+			<x-admin.button variant="primary" :href="route('admin.products.edit', $product)">
+				<x-admin.icon name="pencil" class="h-4 w-4" />
+				{{ __('common.edit') }}
+			</x-admin.button>
+		</x-slot>
+	</x-admin.page-header>
 
 	@if ($product->description)
-		<div class="rounded border bg-white p-4">
-			<div class="text-sm text-zinc-700 whitespace-pre-line">{{ $product->description }}</div>
-		</div>
+		<x-admin.card>
+			<div class="text-sm text-slate-700 whitespace-pre-line">{{ $product->description }}</div>
+		</x-admin.card>
 	@endif
 
-	<div class="rounded border bg-white p-4 space-y-4">
-		<div class="text-lg font-semibold">Поставщики по этому товару</div>
+	<x-admin.card :title="__('common.suppliers_for_product')">
+		<div class="space-y-4">
+			<div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
+				<div class="lg:col-span-2">
+					<x-admin.select
+						:label="__('common.supplier')"
+						wire:model="attachSupplierId"
+						:error="$errors->first('attachSupplierId')"
+					>
+						<option value="0">—</option>
+						@foreach ($suppliers as $s)
+							<option value="{{ $s->id }}">{{ $s->name }}</option>
+						@endforeach
+					</x-admin.select>
+				</div>
 
-		<div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-			<div class="lg:col-span-2">
-				<label class="mb-1 block text-sm font-medium">Поставщик</label>
-				<select wire:model="attachSupplierId" class="w-full rounded border px-3 py-2">
-					<option value="0">—</option>
-					@foreach ($suppliers as $s)
-						<option value="{{ $s->id }}">{{ $s->name }}</option>
-					@endforeach
-				</select>
-				@error('attachSupplierId') <div class="mt-1 text-sm text-red-600">{{ $message }}</div> @enderror
+				<div>
+					<x-admin.select
+						:label="__('common.status')"
+						wire:model="attachStatus"
+						:error="$errors->first('attachStatus')"
+					>
+						<option value="primary">{{ __('common.status_primary') }}</option>
+						<option value="reserve">{{ __('common.status_reserve') }}</option>
+					</x-admin.select>
+				</div>
+
+				<div class="flex items-end">
+					<x-admin.button variant="primary" wire:click="attach" class="w-full">
+						{{ __('common.link') }}
+					</x-admin.button>
+				</div>
+
+				<div class="lg:col-span-4">
+					<x-admin.input
+						:label="__('common.price_terms')"
+						type="textarea"
+						wire:model="attachTerms"
+						:error="$errors->first('attachTerms')"
+					/>
+				</div>
 			</div>
 
-			<div>
-				<label class="mb-1 block text-sm font-medium">Статус</label>
-				<select wire:model="attachStatus" class="w-full rounded border px-3 py-2">
-					<option value="primary">Основной</option>
-					<option value="reserve">Резервный</option>
-				</select>
-				@error('attachStatus') <div class="mt-1 text-sm text-red-600">{{ $message }}</div> @enderror
-			</div>
+			<x-admin.table :zebra="true">
+				<x-slot name="head">
+					<tr>
+						<x-admin.th>{{ __('common.supplier') }}</x-admin.th>
+						<x-admin.th>{{ __('common.status') }}</x-admin.th>
+						<x-admin.th>{{ __('common.price_terms') }}</x-admin.th>
+						<x-admin.th align="right" nowrap>{{ __('common.actions') }}</x-admin.th>
+					</tr>
+				</x-slot>
 
-			<div class="flex items-end">
-				<button wire:click="attach" class="w-full rounded bg-zinc-900 px-3 py-2 text-white hover:bg-zinc-800">
-					Привязать
-				</button>
-			</div>
-
-			<div class="lg:col-span-4">
-				<label class="mb-1 block text-sm font-medium">Цена / условия (текстом)</label>
-				<textarea wire:model="attachTerms" class="w-full rounded border px-3 py-2" rows="3"></textarea>
-				@error('attachTerms') <div class="mt-1 text-sm text-red-600">{{ $message }}</div> @enderror
-			</div>
-		</div>
-
-		<div class="overflow-x-auto">
-			<table class="w-full text-sm">
-				<thead>
-				<tr class="border-b bg-zinc-50 text-left">
-					<th class="p-2">Поставщик</th>
-					<th class="p-2 w-40">Статус</th>
-					<th class="p-2">Условия</th>
-					<th class="p-2 w-40"></th>
-				</tr>
-				</thead>
-				<tbody>
 				@forelse ($product->suppliers as $s)
-					<tr class="border-b align-top">
-						<td class="p-2">
-							<a class="underline" href="{{ route('admin.suppliers.show', $s) }}">{{ $s->name }}</a>
-						</td>
+					<tr class="hover:bg-slate-50/70">
+						<x-admin.td>
+							<a class="font-medium text-slate-900 underline hover:text-slate-700" href="{{ route('admin.suppliers.show', $s) }}">
+								{{ $s->name }}
+							</a>
+						</x-admin.td>
 
-						<td class="p-2">
-							<select wire:model="pivotStatus.{{ $s->id }}" class="w-full rounded border px-2 py-1">
-								<option value="primary">Основной</option>
-								<option value="reserve">Резервный</option>
-							</select>
-						</td>
+						<x-admin.td>
+							<x-admin.select wire:model="pivotStatus.{{ $s->id }}" size="sm">
+								<option value="primary">{{ __('common.status_primary') }}</option>
+								<option value="reserve">{{ __('common.status_reserve') }}</option>
+							</x-admin.select>
+						</x-admin.td>
 
-						<td class="p-2">
-							<textarea wire:model="pivotTerms.{{ $s->id }}" class="w-full rounded border px-2 py-1" rows="2"></textarea>
-						</td>
+						<x-admin.td>
+							<x-admin.input
+								type="textarea"
+								wire:model="pivotTerms.{{ $s->id }}"
+								size="sm"
+							/>
+						</x-admin.td>
 
-						<td class="p-2 text-right space-x-2">
-							<button wire:click="savePivot({{ $s->id }})" class="rounded border px-2 py-1 hover:bg-zinc-50">Save</button>
-							<button wire:click="detach({{ $s->id }})" class="rounded border px-2 py-1 hover:bg-zinc-50"
-								onclick="return confirm('Отвязать поставщика?')">Del</button>
-						</td>
+						<x-admin.td align="right" nowrap>
+							<div class="inline-flex items-center gap-2">
+								<x-admin.button variant="secondary" size="sm" wire:click="savePivot({{ $s->id }})">
+									{{ __('common.save') }}
+								</x-admin.button>
+								<x-admin.icon-button
+									icon="trash"
+									:title="__('common.detach')"
+									variant="danger"
+									wire:click="detach({{ $s->id }})"
+									onclick="if(!confirm('{{ __('common.confirm_detach') }}')){event.preventDefault();event.stopImmediatePropagation();}"
+								/>
+							</div>
+						</x-admin.td>
 					</tr>
 				@empty
 					<tr>
-						<td class="p-3 text-zinc-600" colspan="4">Нет привязанных поставщиков.</td>
+						<x-admin.td colspan="4" class="text-center py-8 text-slate-500">
+							{{ __('common.no_linked_suppliers') }}
+						</x-admin.td>
 					</tr>
 				@endforelse
-				</tbody>
-			</table>
+			</x-admin.table>
 		</div>
-	</div>
+	</x-admin.card>
 </div>

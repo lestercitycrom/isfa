@@ -22,6 +22,20 @@ final class Index extends Component
 		$this->resetPage();
 	}
 
+	public function delete(int $id): void
+	{
+		Supplier::query()->whereKey($id)->delete();
+		session()->flash('status', __('common.supplier_deleted'));
+		$this->resetPage();
+	}
+
+	public function deleteAllSuppliers(): void
+	{
+		Supplier::query()->delete();
+		session()->flash('status', __('common.all_suppliers_deleted'));
+		$this->resetPage();
+	}
+
 	public function render(): View
 	{
 		$suppliers = Supplier::query()

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Supplier;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -61,6 +62,32 @@ final class CsvExportController extends Controller
 							$supplier->email,
 							$supplier->website,
 							$supplier->comment,
+						]);
+					}
+				});
+
+			fclose($handle);
+		}, $fileName, $this->csvHeaders());
+	}
+
+	public function categories(): StreamedResponse
+	{
+		$fileName = 'categories.csv';
+
+		return response()->streamDownload(function (): void {
+			$handle = fopen('php://output', 'wb');
+
+			// Header
+			fputcsv($handle, ['id', 'name', 'description']);
+
+			ProductCategory::query()
+				->orderBy('id')
+				->chunk(500, static function ($categories) use ($handle): void {
+					foreach ($categories as $category) {
+						fputcsv($handle, [
+							$category->id,
+							$category->name,
+							$category->description,
 						]);
 					}
 				});

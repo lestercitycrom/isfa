@@ -2,10 +2,10 @@
 	<!-- Заголовок -->
 	<div>
 		<h2 class="text-2xl font-bold text-center text-slate-900">
-			Вход в систему
+			{{ __('login.title') }}
 		</h2>
 		<p class="mt-2 text-center text-sm text-slate-600">
-			Введите свои учетные данные для доступа к админ-панели
+			{{ __('login.description') }}
 		</p>
 	</div>
 
@@ -14,7 +14,7 @@
 		<!-- Email -->
 		<div class="space-y-1">
 			<label for="email" class="block text-sm font-medium text-slate-700">
-				Email
+				{{ __('login.email') }}
 			</label>
 			<input
 				wire:model="email"
@@ -33,7 +33,7 @@
 		<!-- Password -->
 		<div class="space-y-1">
 			<label for="password" class="block text-sm font-medium text-slate-700">
-				Пароль
+				{{ __('login.password') }}
 			</label>
 			<input
 				wire:model="password"
@@ -57,7 +57,7 @@
 					type="checkbox"
 					class="rounded border-slate-300 text-slate-600 focus:ring-slate-500"
 				>
-				<span class="ml-2 text-sm text-slate-600">Запомнить меня</span>
+				<span class="ml-2 text-sm text-slate-600">{{ __('login.remember') }}</span>
 			</label>
 		</div>
 
@@ -66,15 +66,15 @@
 			wire:loading.attr="disabled"
 			class="w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-50"
 		>
-			<span wire:loading.remove>Войти</span>
-			<span wire:loading>Вход...</span>
+			<span wire:loading.remove>{{ __('login.submit') }}</span>
+			<span wire:loading>{{ __('login.submitting') }}</span>
 		</button>
 	</form>
 
 	<!-- Дополнительная информация -->
 	<div class="text-center">
 		<p class="text-xs text-slate-500">
-			Используйте учетные данные администратора для доступа к системе
+			{{ __('login.footer_text') }}
 		</p>
 	</div>
 </div>
