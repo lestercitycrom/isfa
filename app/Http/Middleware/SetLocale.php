@@ -15,12 +15,12 @@ final class SetLocale
 	{
 		$lang = $request->query('lang');
 		if (in_array($lang, ['az', 'ru'], true)) {
+			// Если есть явный параметр lang в URL, используем его и сохраняем в сессию
 			App::setLocale($lang);
 			session()->put('locale', $lang);
-		} elseif (session()->has('locale')) {
-			App::setLocale(session()->get('locale'));
 		} else {
-			// Устанавливаем локаль по умолчанию из конфига
+			// Если нет параметра lang, всегда используем локаль по умолчанию из конфига
+			// Это гарантирует, что по умолчанию будет использоваться APP_LOCALE из .env
 			$defaultLocale = config('app.locale', 'az');
 			App::setLocale($defaultLocale);
 		}

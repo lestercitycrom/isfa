@@ -60,7 +60,7 @@ final class Edit extends Component
 
 		session()->flash('status', __('common.supplier_saved'));
 
-		$this->redirectRoute('admin.suppliers.show', ['supplier' => $supplier->id]);
+		$this->redirectRoute('admin.suppliers.index');
 	}
 
 	public function render(): View

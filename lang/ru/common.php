@@ -15,6 +15,7 @@ return [
 	'delete' => 'Удалить',
 	'save' => 'Сохранить',
 	'cancel' => 'Отмена',
+	'back' => '← Назад',
 	'actions' => 'Действия',
 	'name' => 'Название',
 	'description' => 'Описание',
@@ -121,11 +122,21 @@ return [
 
 	// Profile
 	'profile' => 'Профиль',
-	'profile_subtitle' => 'Обновление информации профиля',
+	'profile_subtitle' => 'Редактирование данных аккаунта и смена пароля.',
+	'account_data' => 'Данные аккаунта',
+	'change_password' => 'Смена пароля',
+	'profile_information' => 'Информация профиля',
 	'profile_updated' => 'Профиль обновлен.',
-	'email_unverified' => 'Ваш email не подтвержден.',
-	'resend_verification' => 'Нажмите здесь, чтобы отправить письмо подтверждения повторно.',
+	'email_unverified' => 'Email не подтверждён',
+	'resend_verification' => 'Отправить письмо подтверждения повторно',
 	'verification_link_sent' => 'Новая ссылка подтверждения отправлена на ваш email.',
+	'update_password' => 'Обновить пароль',
+	'update_password_subtitle' => 'Убедитесь, что ваш аккаунт использует длинный, случайный пароль для безопасности',
+	'current_password' => 'Текущий пароль',
+	'new_password' => 'Новый пароль',
+	'confirm_password' => 'Подтвердите пароль',
+	'password_updated' => 'Пароль обновлен.',
+	'saved' => 'Сохранено.',
 
 	// Import/Export
 	'import_export' => 'Импорт / Экспорт',

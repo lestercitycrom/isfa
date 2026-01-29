@@ -49,7 +49,7 @@ final class Edit extends Component
 
 		session()->flash('status', __('common.product_saved'));
 
-		$this->redirectRoute('admin.products.show', ['product' => $product->id]);
+		$this->redirectRoute('admin.products.index');
 	}
 
 	public function render(): View

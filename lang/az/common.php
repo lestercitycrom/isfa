@@ -15,6 +15,7 @@ return [
 	'delete' => 'Sil',
 	'save' => 'Saxla',
 	'cancel' => 'Ləğv et',
+	'back' => '← Geri',
 	'actions' => 'Əməliyyatlar',
 	'name' => 'Ad',
 	'description' => 'Təsvir',
@@ -121,11 +122,21 @@ return [
 
 	// Profile
 	'profile' => 'Profil',
-	'profile_subtitle' => 'Profil məlumatlarının yenilənməsi',
+	'profile_subtitle' => 'Hesab məlumatlarının redaktəsi və şifrə dəyişikliyi.',
+	'account_data' => 'Hesab məlumatları',
+	'change_password' => 'Şifrə dəyişikliyi',
+	'profile_information' => 'Profil məlumatları',
 	'profile_updated' => 'Profil yeniləndi.',
-	'email_unverified' => 'Emailiniz təsdiqlənməyib.',
-	'resend_verification' => 'Təsdiqləmə məktubunu yenidən göndərmək üçün buraya klikləyin.',
+	'email_unverified' => 'Email təsdiqlənməyib',
+	'resend_verification' => 'Təsdiqləmə məktubunu yenidən göndərmək',
 	'verification_link_sent' => 'Yeni təsdiqləmə linki emailinizə göndərildi.',
+	'update_password' => 'Şifrəni yenilə',
+	'update_password_subtitle' => 'Hesabınızın uzun, təsadüfi şifrə istifadə etdiyinə əmin olun',
+	'current_password' => 'Cari şifrə',
+	'new_password' => 'Yeni şifrə',
+	'confirm_password' => 'Şifrəni təsdiqlə',
+	'password_updated' => 'Şifrə yeniləndi.',
+	'saved' => 'Yadda saxlanıldı.',
 
 	// Import/Export
 	'import_export' => 'İmport / Eksport',
