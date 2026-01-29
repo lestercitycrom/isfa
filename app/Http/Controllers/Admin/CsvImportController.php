@@ -144,6 +144,61 @@ final class CsvImportController extends Controller
 			->with('status', __('common.suppliers_imported'));
 	}
 
+	public function importCategories(Request $request): RedirectResponse
+	{
+		$request->validate([
+			'file' => ['required', 'file', 'mimes:csv,txt'],
+		]);
+
+		$filePath = $request->file('file')?->getRealPath();
+
+		if ($filePath === false || $filePath === null) {
+			throw new RuntimeException('Cannot read uploaded file.');
+		}
+
+		$csv = new SplFileObject($filePath);
+		$csv->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY);
+
+		$header = null;
+
+		DB::transaction(static function () use ($csv, &$header): void {
+			foreach ($csv as $row) {
+				if (!is_array($row) || count($row) === 1 && $row[0] === null) {
+					continue;
+				}
+
+				if ($header === null) {
+					$header = array_map(static fn ($v) => Str::of((string) $v)->trim()->toString(), $row);
+					continue;
+				}
+
+				$data = array_combine($header, $row);
+
+				if (!is_array($data)) {
+					continue;
+				}
+
+				$name = trim((string) ($data['name'] ?? ''));
+
+				if ($name === '') {
+					continue;
+				}
+
+				ProductCategory::query()->updateOrCreate(
+					['id' => (int) ($data['id'] ?? 0) ?: null],
+					[
+						'name' => $name,
+						'description' => $data['description'] ?? null,
+					]
+				);
+			}
+		});
+
+		return redirect()
+			->back()
+			->with('status', __('common.categories_imported'));
+	}
+
 	public function importLinks(Request $request): RedirectResponse
 	{
 		$request->validate([

@@ -16,6 +16,7 @@ return [
 	'save' => 'Saxla',
 	'cancel' => 'Ləğv et',
 	'back' => '← Geri',
+	'reset' => 'Sıfırla',
 	'actions' => 'Əməliyyatlar',
 	'name' => 'Ad',
 	'description' => 'Təsvir',
@@ -149,6 +150,9 @@ return [
 	'import_suppliers_csv' => 'Təchizatçıların CSV importu',
 	'import_links_csv' => 'Əlaqələrin CSV importu',
 	'import' => 'İmport',
+	'products_imported' => 'Məhsullar import edildi.',
+	'suppliers_imported' => 'Təchizatçılar import edildi.',
+	'categories_imported' => 'Kateqoriyalar import edildi.',
 	'links_imported' => 'Əlaqələr import edildi.',
 
 	// View

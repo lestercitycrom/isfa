@@ -18,6 +18,7 @@ final class Index extends Component
 	public string $search = '';
 
 	public ?int $editingId = null;
+	public bool $showModal = false;
 	public string $name = '';
 	public ?string $description = null;
 
@@ -31,6 +32,7 @@ final class Index extends Component
 		$this->editingId = null;
 		$this->name = '';
 		$this->description = null;
+		$this->showModal = true;
 	}
 
 	public function startEdit(int $id): void
@@ -40,6 +42,7 @@ final class Index extends Component
 		$this->editingId = $category->id;
 		$this->name = $category->name;
 		$this->description = $category->description;
+		$this->showModal = true;
 	}
 
 	public function save(): void
@@ -57,6 +60,7 @@ final class Index extends Component
 			]
 		);
 
+		$this->showModal = false;
 		$this->startCreate();
 
 		session()->flash('status', __('common.category_saved'));

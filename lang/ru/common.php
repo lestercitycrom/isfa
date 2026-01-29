@@ -16,6 +16,7 @@ return [
 	'save' => 'Сохранить',
 	'cancel' => 'Отмена',
 	'back' => '← Назад',
+	'reset' => 'Сбросить',
 	'actions' => 'Действия',
 	'name' => 'Название',
 	'description' => 'Описание',
@@ -149,6 +150,9 @@ return [
 	'import_suppliers_csv' => 'Импорт поставщиков CSV',
 	'import_links_csv' => 'Импорт связей CSV',
 	'import' => 'Импорт',
+	'products_imported' => 'Товары импортированы.',
+	'suppliers_imported' => 'Поставщики импортированы.',
+	'categories_imported' => 'Категории импортированы.',
 	'links_imported' => 'Связи импортированы.',
 
 	// View
