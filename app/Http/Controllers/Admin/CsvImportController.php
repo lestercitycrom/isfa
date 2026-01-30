@@ -71,55 +71,89 @@ final class CsvImportController extends Controller
 
 				$productId = (int) ($data['id'] ?? 0) ?: null;
 
-				$product = Product::query()->updateOrCreate(
-					['id' => $productId],
-					[
+				// Find or create product
+				// If ID is provided, use it; otherwise try to find by name to merge duplicates
+				$product = null;
+				if ($productId !== null && $productId > 0) {
+					$product = Product::query()->find($productId);
+				}
+
+				// If not found by ID, try to find by name to merge duplicates
+				if ($product === null) {
+					$product = Product::query()->where('name', $name)->first();
+				}
+
+				// If still not found, create new product
+				if ($product === null) {
+					$product = Product::query()->create([
 						'category_id' => $categoryId,
 						'name' => $name,
 						'description' => $data['description'] ?? null,
-					]
-				);
+					]);
+				} else {
+					// Update existing product (merge category and description if provided)
+					$updateData = [];
+					if ($categoryId !== null) {
+						$updateData['category_id'] = $categoryId;
+					}
+					if (isset($data['description']) && $data['description'] !== null && $data['description'] !== '') {
+						$updateData['description'] = $data['description'];
+					}
+					if (!empty($updateData)) {
+						$product->update($updateData);
+					}
+				}
 
 				// Import supplier links if provided in CSV
-				// Format: supplier_ids can be comma-separated, or supplier_id_1, supplier_id_2, etc.
-				// Or supplier_names can be comma-separated
+				// Format: supplier_ids or supplier_names can be comma-separated
+				// Can contain both IDs (numeric) and names (text) mixed together
+				$supplierInput = null;
 				if (isset($data['supplier_ids']) && trim((string) $data['supplier_ids']) !== '') {
-					$supplierIds = array_map('trim', explode(',', (string) $data['supplier_ids']));
-					$supplierIds = array_filter($supplierIds, fn ($id) => $id !== '' && is_numeric($id));
-
-					foreach ($supplierIds as $supplierId) {
-						$supplier = Supplier::query()->find((int) $supplierId);
-						if ($supplier !== null) {
-							$statusRaw = (string) ($data['supplier_status_' . $supplierId] ?? $data['status'] ?? 'reserve');
-							$status = ProductSupplierStatus::tryFrom($statusRaw) ?? ProductSupplierStatus::Reserve;
-							$terms = $data['supplier_terms_' . $supplierId] ?? $data['terms'] ?? null;
-
-							$product->suppliers()->syncWithoutDetaching([
-								(int) $supplierId => [
-									'status' => $status->value,
-									'terms' => $terms,
-								],
-							]);
-						}
-					}
+					$supplierInput = trim((string) $data['supplier_ids']);
 				} elseif (isset($data['supplier_names']) && trim((string) $data['supplier_names']) !== '') {
-					// Import by supplier names
-					$supplierNames = array_map('trim', explode(',', (string) $data['supplier_names']));
-					$supplierNames = array_filter($supplierNames, fn ($name) => $name !== '');
+					$supplierInput = trim((string) $data['supplier_names']);
+				}
 
-					foreach ($supplierNames as $supplierName) {
-						$supplier = Supplier::query()->where('name', $supplierName)->first();
+				if ($supplierInput !== null && $supplierInput !== '') {
+					$supplierItems = array_map('trim', explode(',', $supplierInput));
+					$supplierItems = array_filter($supplierItems, fn ($item) => $item !== '');
+
+					foreach ($supplierItems as $supplierItem) {
+						$supplier = null;
+
+						// Try to find by ID if numeric
+						if (is_numeric($supplierItem)) {
+							$supplier = Supplier::query()->find((int) $supplierItem);
+						}
+
+						// If not found by ID, try to find by name
+						if ($supplier === null) {
+							$supplier = Supplier::query()->where('name', $supplierItem)->first();
+						}
+
 						if ($supplier !== null) {
 							$statusRaw = (string) ($data['status'] ?? 'reserve');
 							$status = ProductSupplierStatus::tryFrom($statusRaw) ?? ProductSupplierStatus::Reserve;
 							$terms = $data['terms'] ?? null;
 
-							$product->suppliers()->syncWithoutDetaching([
-								$supplier->id => [
+							// Check if supplier is already linked to this product
+							$existingPivot = $product->suppliers()
+								->where('suppliers.id', $supplier->id)
+								->first();
+
+							if ($existingPivot !== null) {
+								// Update existing link (allows different status/terms from different CSV rows)
+								$product->suppliers()->updateExistingPivot($supplier->id, [
 									'status' => $status->value,
 									'terms' => $terms,
-								],
-							]);
+								]);
+							} else {
+								// Add new link
+								$product->suppliers()->attach($supplier->id, [
+									'status' => $status->value,
+									'terms' => $terms,
+								]);
+							}
 						}
 					}
 				}
