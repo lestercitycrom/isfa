@@ -68,13 +68,19 @@ class EtenderEventSyncService
 			$eventStatusCode,
 			$documentViewTypeCode
 		): Tender {
+			// Ensure we always have a non-empty title for UI/UX.
+			$title = trim((string) ($event['tenderName'] ?? $base['eventName'] ?? ''));
+			if ($title === '') {
+				$title = "Event #{$eventId}";
+			}
+
 			$tender = Tender::query()->updateOrCreate(
 				['event_id' => $eventId],
 				[
 					'rfx_id' => $event['rfxId'] ?? null,
 					'inner_event_id' => $event['eventId'] ?? null,
 
-					'title' => (string) ($event['tenderName'] ?? $base['eventName'] ?? ''),
+					'title' => $title,
 					'organization_name' => $event['organizationName'] ?? null,
 					'organization_voen' => $event['organizationVoen'] ?? null,
 					'address' => $event['address'] ?? null,
@@ -89,14 +95,15 @@ class EtenderEventSyncService
 					'estimated_amount' => $event['estimatedAmount'] ?? null,
 					'min_number_of_suppliers' => $event['minNumberOfSuppliers'] ?? null,
 
-					'published_at' => $this->fromUnixSeconds($event['publishDate'] ?? null, $tz),
-					'start_at' => $this->fromUnixSeconds($event['startDate'] ?? null, $tz),
-					'end_at' => $this->fromUnixSeconds($event['endDate'] ?? null, $tz),
-					'envelope_at' => $this->fromUnixSeconds($event['envelopeDate'] ?? null, $tz),
+					'published_at' => $this->fromUnixSeconds($event['publishDate'] ?? null),
+					'start_at' => $this->fromUnixSeconds($event['startDate'] ?? null),
+					'end_at' => $this->fromUnixSeconds($event['endDate'] ?? null),
+					'envelope_at' => $this->fromUnixSeconds($event['envelopeDate'] ?? null),
 
 					'view_fee' => $info['viewFee'] ?? null,
 					'participation_fee' => $info['participationFee'] ?? null,
 
+					// Store raw payload for debugging/reprocessing.
 					'raw' => [
 						'base' => $base,
 						'event' => $event,
@@ -127,6 +134,11 @@ class EtenderEventSyncService
 		while (true) {
 			$page = $this->client->getBomLines($eventId, $pageNumber, $pageSize);
 
+			if (!is_array($page)) {
+				// Safety guard: unexpected response type.
+				break;
+			}
+
 			$items = $page['items'] ?? [];
 			if (is_array($items)) {
 				foreach ($items as $row) {
@@ -143,7 +155,7 @@ class EtenderEventSyncService
 
 			$pageNumber++;
 			if ($pageNumber > 200) {
-				// Safety guard
+				// Safety guard: avoid infinite loops.
 				break;
 			}
 		}
@@ -156,6 +168,11 @@ class EtenderEventSyncService
 		$existingIds = [];
 
 		foreach ($items as $item) {
+			if (!is_array($item)) {
+				// Safety guard: unexpected element type.
+				continue;
+			}
+
 			$externalId = $item['id'] ?? null;
 			if ($externalId === null) {
 				continue;
@@ -178,7 +195,7 @@ class EtenderEventSyncService
 			);
 		}
 
-		// Delete removed items
+		// Delete removed items.
 		if (!empty($existingIds)) {
 			TenderItem::query()
 				->where('tender_id', $tender->id)
@@ -267,8 +284,13 @@ class EtenderEventSyncService
 				continue;
 			}
 
-			// API returns ISO string here
-			$dt = CarbonImmutable::parse($publishedAt, $tz);
+			try {
+				// API returns ISO-like string here (may be inconsistent).
+				$dt = CarbonImmutable::parse($publishedAt, $tz);
+			} catch (Throwable) {
+				// Safety guard: invalid date format should not break sync.
+				continue;
+			}
 
 			TenderPublishHistory::query()->create([
 				'tender_id' => $tender->id,
@@ -277,9 +299,14 @@ class EtenderEventSyncService
 		}
 	}
 
-	private function fromUnixSeconds(mixed $value, string $tz): ?CarbonImmutable
+	private function fromUnixSeconds(mixed $value): ?CarbonImmutable
 	{
 		if ($value === null || $value === '') {
+			return null;
+		}
+
+		if (is_array($value) || is_object($value)) {
+			// Safety guard: unexpected type.
 			return null;
 		}
 
@@ -288,10 +315,9 @@ class EtenderEventSyncService
 			return null;
 		}
 
-		// Store timestamps in UTC to avoid timezone double-shifts
+		// Store timestamps in UTC to avoid timezone double-shifts.
 		return CarbonImmutable::createFromTimestampUTC($seconds);
 	}
-
 
 	private function toCode(mixed $value): ?string
 	{
@@ -299,8 +325,12 @@ class EtenderEventSyncService
 			return null;
 		}
 
-		$code = (string) $value;
-		$code = trim($code);
+		if (is_array($value) || is_object($value)) {
+			// Safety guard: unexpected type.
+			return null;
+		}
+
+		$code = trim((string) $value);
 
 		return $code === '' ? null : $code;
 	}

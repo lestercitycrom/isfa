@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Products;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -34,7 +35,17 @@ final class Edit extends Component
 	{
 		$this->validate([
 			'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
-			'name' => ['required', 'string', 'max:255'],
+			'name' => [
+				'required',
+				'string',
+				'max:255',
+				Rule::unique('products', 'name')
+					->where(fn ($q) => $this->category_id
+						? $q->where('category_id', $this->category_id)
+						: $q->whereNull('category_id')
+					)
+					->ignore($this->product?->id),
+			],
 			'description' => ['nullable', 'string'],
 		]);
 

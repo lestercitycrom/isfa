@@ -78,9 +78,13 @@ final class CsvImportController extends Controller
 					$product = Product::query()->find($productId);
 				}
 
-				// If not found by ID, try to find by name to merge duplicates
+				// If not found by ID, try to find by name + category to merge duplicates
 				if ($product === null) {
-					$product = Product::query()->where('name', $name)->first();
+					$product = Product::query()
+						->where('name', $name)
+						->when($categoryId !== null, fn ($q) => $q->where('category_id', $categoryId))
+						->when($categoryId === null, fn ($q) => $q->whereNull('category_id'))
+						->first();
 				}
 
 				// If still not found, create new product
