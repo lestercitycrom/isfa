@@ -172,4 +172,51 @@ return [
 	'category_name_already_exists' => 'Категория с таким названием уже существует.',
 	'product_name_already_exists' => 'Товар с таким названием уже существует.',
 	'supplier_name_already_exists' => 'Поставщик с таким названием уже существует.',
+	
+	
+	// Тендеры (eTender)
+	'open_original' => 'Открыть оригинал',
+	'summary' => 'Сводка',
+
+	'event_id' => 'eventId',
+	'document_number' => 'Номер документа',
+	'organization' => 'Организация',
+	'voen' => 'VOEN',
+
+	'amount' => 'Сумма',
+	'event_type' => 'Тип',
+	'document_view_type' => 'Вид документа',
+
+	'dates' => 'Даты',
+	'published_at' => 'Опубликован',
+	'start_at' => 'Старт',
+	'end_at' => 'Окончание',
+	'envelope_at' => 'Вскрытие',
+
+	'fees' => 'Сборы',
+	'view_fee' => 'Сбор за просмотр',
+	'participation_fee' => 'Сбор за участие',
+	'min_suppliers' => 'Мин. поставщиков',
+
+	'address' => 'Адрес',
+
+	'items' => 'Позиции',
+	'unit' => 'Ед.',
+	'quantity' => 'Количество',
+	'category_code' => 'Код категории',
+
+	'full_name' => 'ФИО',
+	'position' => 'Должность',
+	'contact' => 'Контакт',
+
+	'announcements' => 'Объявления',
+	'announcement_id' => 'ID объявления',
+	'version' => 'Версия',
+
+	'publish_history' => 'История публикаций',
+	'utc' => 'UTC',
+
+	'no_records' => 'Записей нет.',
+	'required' => 'Обязательное поле.',
+	
 ];

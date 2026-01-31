@@ -58,10 +58,7 @@ final class Index extends Component
 		$eventId = $this->extractEventId($import);
 
 		if ($eventId === null) {
-			$this->addError(
-				'importUrl',
-				'Не удалось извлечь eventId. Ожидаю ссылку вида https://etender.gov.az/main/competition/detail/346012 или просто число 346012.'
-			);
+			$this->addError('importUrl', __('tenders.errors.cant_extract_event_id'));
 
 			return;
 		}
@@ -69,16 +66,13 @@ final class Index extends Component
 		try {
 			$tender = $syncService->sync($eventId);
 
-			session()->flash('status', 'Тендер синхронизирован: #' . $tender->event_id);
+			session()->flash('status', __('tenders.flash.synced', ['id' => $tender->event_id]));
 
 			$this->redirectRoute('admin.tenders.show', ['tender' => $tender->getKey()]);
 		} catch (Throwable $e) {
 			report($e);
 
-			$this->addError(
-				'importUrl',
-				'Ошибка синхронизации: ' . $e->getMessage()
-			);
+			$this->addError('importUrl', __('tenders.errors.sync_error', ['message' => $e->getMessage()]));
 		}
 	}
 
@@ -105,7 +99,7 @@ final class Index extends Component
 			return $asInt > 0 ? $asInt : null;
 		}
 
-		// Fallback: last numeric segment
+		// Fallback: last numeric segment.
 		$last = (string) Str::of(parse_url($value, PHP_URL_PATH) ?: '')
 			->trim('/')
 			->explode('/')

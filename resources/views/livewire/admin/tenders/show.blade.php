@@ -39,7 +39,7 @@
 				</div>
 
 				@if($tender->organization_voen)
-					<div class="mt-2 text-xs text-slate-500">VOEN</div>
+					<div class="mt-2 text-xs text-slate-500">{{ __('common.voen') }}</div>
 					<div class="mt-1 text-sm font-medium text-slate-800">{{ $tender->organization_voen }}</div>
 				@endif
 			</div>
@@ -239,7 +239,7 @@
 			@forelse ($tender->publishHistories as $h)
 				<div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3">
 					<div class="text-sm font-medium text-slate-900">{{ $h->published_at?->format('Y-m-d H:i') ?? '—' }}</div>
-					<div class="text-xs text-slate-500">UTC</div>
+					<div class="text-xs text-slate-500">{{ __('common.utc') }}</div>
 				</div>
 			@empty
 				<div class="text-sm text-slate-500">{{ __('common.no_records') }}</div>

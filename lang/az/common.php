@@ -172,4 +172,51 @@ return [
 	'category_name_already_exists' => 'Bu adla kateqoriya artıq mövcuddur.',
 	'product_name_already_exists' => 'Bu adla məhsul artıq mövcuddur.',
 	'supplier_name_already_exists' => 'Bu adla təchizatçı artıq mövcuddur.',
+	
+	
+	// Tenders (eTender)
+	'open_original' => 'Orijinalı aç',
+	'summary' => 'Xülasə',
+
+	'event_id' => 'eventId',
+	'document_number' => 'Sənəd nömrəsi',
+	'organization' => 'Təşkilat',
+	'voen' => 'VOEN',
+
+	'amount' => 'Məbləğ',
+	'event_type' => 'Növ',
+	'document_view_type' => 'Sənəd görünüşü',
+
+	'dates' => 'Tarixlər',
+	'published_at' => 'Dərc olunub',
+	'start_at' => 'Başlanğıc',
+	'end_at' => 'Bitmə',
+	'envelope_at' => 'Zərfin açılması',
+
+	'fees' => 'Rüsumlar',
+	'view_fee' => 'Baxış rüsumu',
+	'participation_fee' => 'İştirak rüsumu',
+	'min_suppliers' => 'Min. təchizatçı',
+
+	'address' => 'Ünvan',
+
+	'items' => 'Mövqelər',
+	'unit' => 'Vahid',
+	'quantity' => 'Miqdar',
+	'category_code' => 'Kateqoriya kodu',
+
+	'full_name' => 'Ad və soyad',
+	'position' => 'Vəzifə',
+	'contact' => 'Əlaqə',
+
+	'announcements' => 'Elanlar',
+	'announcement_id' => 'Elan ID',
+	'version' => 'Versiya',
+
+	'publish_history' => 'Dərc tarixçəsi',
+	'utc' => 'UTC',
+
+	'no_records' => 'Qeyd yoxdur.',
+	'required' => 'Bu sahə mütləqdir.',
+	
 ];

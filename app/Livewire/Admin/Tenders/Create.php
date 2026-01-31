@@ -42,7 +42,8 @@ final class Create extends Component
 			$this->lastOutput = trim((string) Artisan::output());
 
 			if ($exitCode !== 0) {
-				$this->addError('eventId', 'Sync failed (non-zero exit code). Check logs/output.');
+				$this->addError('eventId', __('tenders.errors.sync_failed'));
+
 				return;
 			}
 
@@ -51,22 +52,22 @@ final class Create extends Component
 				->first();
 
 			if ($tender === null) {
-				// Fallback: in case event_id is primary key or mapped differently
 				$tender = Tender::query()->whereKey($eventId)->first();
 			}
 
 			if ($tender === null) {
-				$this->addError('eventId', 'Sync finished, but tender was not found in DB.');
+				$this->addError('eventId', __('tenders.errors.tender_not_found'));
+
 				return;
 			}
 
-			session()->flash('status', 'Tender synced successfully.');
+			session()->flash('status', __('tenders.flash.synced', ['id' => $tender->event_id]));
 
 			$this->redirectRoute('admin.tenders.show', ['tender' => $tender]);
 		} catch (Throwable $e) {
 			report($e);
 
-			$this->addError('eventId', 'Unexpected error during sync. Check logs.');
+			$this->addError('eventId', __('tenders.errors.unexpected_error'));
 			$this->lastOutput = $this->lastOutput ?: ($e->getMessage() ?: 'Unknown error');
 		} finally {
 			$this->isSyncing = false;
