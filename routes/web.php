@@ -12,6 +12,7 @@ use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Admin\Suppliers\Edit as SupplierEdit;
 use App\Livewire\Admin\Suppliers\Index as SuppliersIndex;
 use App\Livewire\Admin\Suppliers\Show as SupplierShow;
+use App\Livewire\Admin\Tenders\Create as TenderCreate;
 use App\Livewire\Admin\Tenders\Index as TendersIndex;
 use App\Livewire\Admin\Tenders\Show as TenderShow;
 use Illuminate\Support\Facades\Route;
@@ -43,10 +44,14 @@ Route::middleware('auth')->group(function () {
 	})->name('logout');
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function (): void {
 	Route::get('/', static fn () => redirect()->route('admin.products.index'))->name('home');
+
+	Route::middleware('auth')->get('/dashboard', static function () {
+		return redirect()->route('admin.products.index');
+	})->name('dashboard');
 
 	Route::get('/categories', CategoriesIndex::class)->name('categories.index');
 
@@ -62,6 +67,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 
 	// eTender pages
 	Route::get('/tenders', TendersIndex::class)->name('tenders.index');
+	Route::get('/tenders/create', TenderCreate::class)->name('tenders.create');
 	Route::get('/tenders/{tender}/show', TenderShow::class)->name('tenders.show');
 
 	Route::get('/import-export', ImportExportIndex::class)->name('import_export.index');
