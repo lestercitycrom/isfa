@@ -12,6 +12,8 @@ use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Admin\Suppliers\Edit as SupplierEdit;
 use App\Livewire\Admin\Suppliers\Index as SuppliersIndex;
 use App\Livewire\Admin\Suppliers\Show as SupplierShow;
+use App\Livewire\Admin\Tenders\Index as TendersIndex;
+use App\Livewire\Admin\Tenders\Show as TenderShow;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -57,6 +59,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 	Route::get('/suppliers/create', SupplierEdit::class)->name('suppliers.create');
 	Route::get('/suppliers/{supplier}/show', SupplierShow::class)->name('suppliers.show');
 	Route::get('/suppliers/{supplier}/edit', SupplierEdit::class)->name('suppliers.edit');
+
+	// eTender pages
+	Route::get('/tenders', TendersIndex::class)->name('tenders.index');
+	Route::get('/tenders/{tender}/show', TenderShow::class)->name('tenders.show');
 
 	Route::get('/import-export', ImportExportIndex::class)->name('import_export.index');
 
