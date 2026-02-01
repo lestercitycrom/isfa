@@ -58,16 +58,19 @@ final class Edit extends Component
 			$categoryRule->where('company_id', $this->company_id);
 		}
 
+		// Уникальность: компания + название + категория (в рамках компании — только свои товары)
 		$nameRule = Rule::unique('products', 'name')
-			->where(fn ($q) => $this->category_id
-				? $q->where('category_id', $this->category_id)
-				: $q->whereNull('category_id')
-			)
+			->where(function ($q): void {
+				if ($this->company_id !== null) {
+					$q->where('company_id', $this->company_id);
+				}
+				if ($this->category_id !== null) {
+					$q->where('category_id', $this->category_id);
+				} else {
+					$q->whereNull('category_id');
+				}
+			})
 			->ignore($this->product?->id);
-
-		if ($this->company_id !== null) {
-			$nameRule->where('company_id', $this->company_id);
-		}
 
 		$this->validate([
 			'company_id' => ['nullable', 'integer', 'exists:users,id'],
