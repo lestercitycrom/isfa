@@ -37,6 +37,7 @@ return [
 		['label' => 'common.suppliers', 'route' => 'admin.suppliers.index', 'icon' => 'users'],
 		['label' => 'common.categories', 'route' => 'admin.categories.index', 'icon' => 'database'],
 		['label' => 'common.tenders', 'route' => 'admin.tenders.index', 'icon' => 'list'],
+		['label' => 'common.activity_log', 'route' => 'admin.activity_logs.index', 'icon' => 'list'],
 		['label' => 'common.companies', 'route' => 'admin.companies.index', 'icon' => 'building', 'admin_only' => true],
 	],
 ];

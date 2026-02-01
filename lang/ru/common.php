@@ -6,6 +6,7 @@ return [
 	'suppliers' => 'Поставщики',
 	'categories' => 'Категории',
 	'tenders' => 'Тендеры',
+	'activity_log' => 'Журнал действий',
 	'logout' => 'Выйти',
 
 	// Common actions
@@ -21,6 +22,8 @@ return [
 	'actions' => 'Действия',
 	'name' => 'Название',
 	'description' => 'Описание',
+	'product' => 'Товар',
+	'tender' => 'Тендер',
 
 	// Export/Import
 	'export_csv' => 'Экспорт CSV',
@@ -29,6 +32,8 @@ return [
 	// Search
 	'search_by_name' => 'Поиск по названию...',
 	'search_product' => 'Поиск товара...',
+	'search' => 'Поиск',
+	'search_activity' => 'Поиск по событиям...',
 
 	// Table headers
 	'category' => 'Категория',
@@ -37,6 +42,7 @@ return [
 	'no_products' => 'Товары не найдены',
 	'no_suppliers' => 'Поставщики не найдены',
 	'no_categories' => 'Категории не найдены',
+	'no_linked_products' => 'Нет привязанных товаров',
 
 	// Danger zone
 	'danger_zone' => 'Опасная зона',
@@ -80,6 +86,15 @@ return [
 	'contacts' => 'Контакты',
 	'suppliers_subtitle' => 'Список всех поставщиков',
 	'search_supplier' => 'Поиск поставщика...',
+	'filters' => 'Фильтры',
+	'event' => 'Событие',
+	'all_events' => 'Все события',
+	'subject' => 'Объект',
+	'all_subjects' => 'Все объекты',
+	'user' => 'Пользователь',
+	'time' => 'Время',
+	'changes' => 'Изменения',
+	'activity_log_subtitle' => 'История действий пользователей и изменения в сущностях.',
 
 	// Product/Supplier fields
 	'contact_name' => 'Контактное лицо',
@@ -121,6 +136,12 @@ return [
 	'product_saved' => 'Товар сохранен.',
 	'supplier_saved' => 'Поставщик сохранен.',
 	'confirm_detach' => 'Отвязать поставщика?',
+	'product_linking' => 'Привязка товаров',
+	'product_linking_hint' => 'Начните вводить название товара, чтобы найти его в базе вашей компании и привязать к тендеру.',
+	'linked_products' => 'Привязанные товары',
+	'product_attached' => 'Товар привязан.',
+	'product_detached' => 'Товар отвязан.',
+	'category_not_set' => 'Категория не задана',
 
 	// Profile
 	'profile' => 'Профиль',
@@ -178,6 +199,10 @@ return [
 	// Тендеры (eTender)
 	'open_original' => 'Открыть оригинал',
 	'summary' => 'Сводка',
+	'tab_details' => 'Данные',
+	'tab_products' => 'Товары',
+	'tab_history' => 'История',
+	'activity_history' => 'История изменений',
 
 	'event_id' => 'eventId',
 	'document_number' => 'Номер документа',
@@ -216,6 +241,15 @@ return [
 
 	'publish_history' => 'История публикаций',
 	'utc' => 'UTC',
+	'tender_item' => 'Позиция тендера',
+	'tender_contact' => 'Контакт тендера',
+	'tender_announcement' => 'Объявление тендера',
+	'tender_publish_history' => 'Публикация тендера',
+	'event_created' => 'Создано',
+	'event_updated' => 'Обновлено',
+	'event_deleted' => 'Удалено',
+	'event_attached' => 'Привязано',
+	'event_detached' => 'Отвязано',
 
 	'no_records' => 'Записей нет.',
 	'required' => 'Обязательное поле.',

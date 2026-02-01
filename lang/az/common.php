@@ -6,6 +6,7 @@ return [
 	'suppliers' => 'Təchizatçılar',
 	'categories' => 'Kateqoriyalar',
 	'tenders' => 'Tenderlər',
+	'activity_log' => 'Fəaliyyət jurnalı',
 	'logout' => 'Çıxış',
 
 	// Common actions
@@ -21,6 +22,8 @@ return [
 	'actions' => 'Əməliyyatlar',
 	'name' => 'Ad',
 	'description' => 'Təsvir',
+	'product' => 'Məhsul',
+	'tender' => 'Tender',
 
 	// Export/Import
 	'export_csv' => 'CSV eksport',
@@ -29,6 +32,8 @@ return [
 	// Search
 	'search_by_name' => 'Ada görə axtar...',
 	'search_product' => 'Məhsul axtar...',
+	'search' => 'Axtarış',
+	'search_activity' => 'Hadisələr üzrə axtar...',
 
 	// Table headers
 	'category' => 'Kateqoriya',
@@ -37,6 +42,7 @@ return [
 	'no_products' => 'Məhsul tapılmadı',
 	'no_suppliers' => 'Təchizatçı tapılmadı',
 	'no_categories' => 'Kateqoriya tapılmadı',
+	'no_linked_products' => 'Əlaqələndirilmiş məhsul yoxdur',
 
 	// Danger zone
 	'danger_zone' => 'Təhlükəli zona',
@@ -80,6 +86,15 @@ return [
 	'contacts' => 'Əlaqə',
 	'suppliers_subtitle' => 'Bütün təchizatçıların siyahısı',
 	'search_supplier' => 'Təchizatçı axtar...',
+	'filters' => 'Filtrlər',
+	'event' => 'Hadisə',
+	'all_events' => 'Bütün hadisələr',
+	'subject' => 'Obyekt',
+	'all_subjects' => 'Bütün obyektlər',
+	'user' => 'İstifadəçi',
+	'time' => 'Vaxt',
+	'changes' => 'Dəyişikliklər',
+	'activity_log_subtitle' => 'İstifadəçi əməliyyatları və dəyişikliklər tarixi.',
 
 	// Product/Supplier fields
 	'contact_name' => 'Əlaqədar şəxs',
@@ -121,6 +136,12 @@ return [
 	'product_saved' => 'Məhsul saxlanıldı.',
 	'supplier_saved' => 'Təchizatçı saxlanıldı.',
 	'confirm_detach' => 'Təchizatçını ayırmaq istəyirsiniz?',
+	'product_linking' => 'Məhsul əlaqələndirmə',
+	'product_linking_hint' => 'Şirkətinizin bazasından məhsulu tapmaq üçün adı yazın və tenderə əlavə edin.',
+	'linked_products' => 'Əlaqələndirilmiş məhsullar',
+	'product_attached' => 'Məhsul əlaqələndirildi.',
+	'product_detached' => 'Məhsul ayrıldı.',
+	'category_not_set' => 'Kateqoriya təyin edilməyib',
 
 	// Profile
 	'profile' => 'Profil',
@@ -178,6 +199,10 @@ return [
 	// Tenders (eTender)
 	'open_original' => 'Orijinalı aç',
 	'summary' => 'Xülasə',
+	'tab_details' => 'Məlumatlar',
+	'tab_products' => 'Məhsullar',
+	'tab_history' => 'Tarixçə',
+	'activity_history' => 'Dəyişikliklər tarixi',
 
 	'event_id' => 'eventId',
 	'document_number' => 'Sənəd nömrəsi',
@@ -216,6 +241,15 @@ return [
 
 	'publish_history' => 'Dərc tarixçəsi',
 	'utc' => 'UTC',
+	'tender_item' => 'Tender mövqeyi',
+	'tender_contact' => 'Tender əlaqə',
+	'tender_announcement' => 'Tender elanı',
+	'tender_publish_history' => 'Tender dərci',
+	'event_created' => 'Yaradıldı',
+	'event_updated' => 'Yeniləndi',
+	'event_deleted' => 'Silindi',
+	'event_attached' => 'Əlaqələndirildi',
+	'event_detached' => 'Ayrıldı',
 
 	'no_records' => 'Qeyd yoxdur.',
 	'required' => 'Bu sahə mütləqdir.',

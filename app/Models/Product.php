@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Concerns\LogsCompanyActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 final class Product extends Model
 {
 	use HasFactory;
+	use LogsActivity;
+	use LogsCompanyActivity;
 
 	protected $fillable = [
 		'company_id',
@@ -45,5 +50,25 @@ final class Product extends Model
 			->using(ProductSupplier::class)
 			->withPivot(['status', 'terms'])
 			->withTimestamps();
+	}
+
+	/**
+	 * @return BelongsToMany<Tender>
+	 */
+	public function tenders(): BelongsToMany
+	{
+		return $this->belongsToMany(Tender::class, 'tender_product')
+			->withPivot(['company_id'])
+			->withTimestamps();
+	}
+
+	public function getActivitylogOptions(): LogOptions
+	{
+		return LogOptions::defaults()
+			->useLogName('product')
+			->logFillable()
+			->logOnlyDirty()
+			->dontLogIfAttributesChangedOnly(['updated_at'])
+			->dontSubmitEmptyLogs();
 	}
 }

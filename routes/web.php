@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\CsvExportController;
 use App\Http\Controllers\Admin\CsvImportController;
+use App\Livewire\Admin\ActivityLogs\Index as ActivityLogsIndex;
 use App\Livewire\Admin\Categories\Index as CategoriesIndex;
 use App\Livewire\Admin\Companies\Edit as CompaniesEdit;
 use App\Livewire\Admin\Companies\Index as CompaniesIndex;
@@ -74,6 +75,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 	Route::get('/tenders/{tender}/show', TenderShow::class)->name('tenders.show');
 
 	Route::get('/import-export', ImportExportIndex::class)->name('import_export.index');
+	Route::get('/activity-logs', ActivityLogsIndex::class)->name('activity_logs.index');
 
 	Route::get('/export/categories', [CsvExportController::class, 'categories'])->name('export.categories');
 	Route::get('/export/products', [CsvExportController::class, 'products'])->name('export.products');

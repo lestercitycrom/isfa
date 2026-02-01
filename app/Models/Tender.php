@@ -2,12 +2,19 @@
 
 namespace App\Models;
 
+use App\Concerns\LogsCompanyActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Tender extends Model
 {
+	use LogsActivity;
+	use LogsCompanyActivity;
+
 	protected $fillable = [
 		'company_id',
 		'event_id',
@@ -67,5 +74,26 @@ class Tender extends Model
 	public function publishHistories(): HasMany
 	{
 		return $this->hasMany(TenderPublishHistory::class);
+	}
+
+	/**
+	 * @return BelongsToMany<Product>
+	 */
+	public function products(): BelongsToMany
+	{
+		return $this->belongsToMany(Product::class, 'tender_product')
+			->withPivot(['company_id'])
+			->withTimestamps();
+	}
+
+	public function getActivitylogOptions(): LogOptions
+	{
+		return LogOptions::defaults()
+			->useLogName('tender')
+			->logFillable()
+			->logOnlyDirty()
+			->logExcept(['raw'])
+			->dontLogIfAttributesChangedOnly(['updated_at'])
+			->dontSubmitEmptyLogs();
 	}
 }

@@ -2,17 +2,22 @@
 
 namespace App\Models;
 
+use App\Concerns\LogsCompanyActivity;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use LogsActivity;
+    use LogsCompanyActivity;
 
     public const ROLE_ADMIN = 'admin';
     public const ROLE_COMPANY = 'company';
@@ -104,4 +109,30 @@ class User extends Authenticatable
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
+
+	protected function resolveActivityCompanyId(): ?int
+	{
+		if ($this->isAdmin()) {
+			return null;
+		}
+
+		return (int) $this->id;
+	}
+
+	public function getActivitylogOptions(): LogOptions
+	{
+		return LogOptions::defaults()
+			->useLogName('user')
+			->logFillable()
+			->logOnlyDirty()
+			->logExcept([
+				'password',
+				'password_plain',
+				'remember_token',
+				'two_factor_secret',
+				'two_factor_recovery_codes',
+			])
+			->dontLogIfAttributesChangedOnly(['updated_at'])
+			->dontSubmitEmptyLogs();
+	}
 }
