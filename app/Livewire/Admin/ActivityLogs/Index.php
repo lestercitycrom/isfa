@@ -17,6 +17,7 @@ use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Activitylog\Models\Activity;
@@ -26,11 +27,17 @@ final class Index extends Component
 {
 	use WithPagination;
 
+	#[Url(as: 'search')]
 	public string $search = '';
 
+	#[Url(as: 'event')]
 	public string $event = '';
 
+	#[Url(as: 'subject')]
 	public string $subjectType = '';
+
+	#[Url(as: 'subjectId')]
+	public string $subjectId = '';
 
 	public int $perPage = 20;
 
@@ -45,6 +52,11 @@ final class Index extends Component
 	}
 
 	public function updatedSubjectType(): void
+	{
+		$this->resetPage();
+	}
+
+	public function updatedSubjectId(): void
 	{
 		$this->resetPage();
 	}
@@ -111,6 +123,10 @@ final class Index extends Component
 
 		if ($this->subjectType !== '') {
 			$query->where('subject_type', $this->subjectType);
+		}
+
+		if ($this->subjectId !== '') {
+			$query->where('subject_id', (int) $this->subjectId);
 		}
 
 		$search = trim($this->search);

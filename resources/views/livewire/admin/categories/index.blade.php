@@ -21,10 +21,12 @@
 				</label>
 			</form>
 
-			<x-admin.button variant="primary" wire:click="startCreate">
-				<x-admin.icon name="plus" class="h-4 w-4" />
-				{{ __('common.new_category') }}
-			</x-admin.button>
+			@if(\Illuminate\Support\Facades\Route::has('admin.categories.create'))
+				<x-admin.button variant="primary" :href="route('admin.categories.create')">
+					<x-admin.icon name="plus" class="h-4 w-4" />
+					{{ __('common.new_category') }}
+				</x-admin.button>
+			@endif
 		</x-slot>
 	</x-admin.page-header>
 
@@ -79,7 +81,7 @@
 					@endif
 					<x-admin.td align="right" nowrap>
 						<div class="inline-flex items-center gap-2">
-							<x-admin.icon-button wire:click="startEdit({{ $cat->id }})" icon="pencil" :title="__('common.edit')" variant="secondary" />
+							<x-admin.icon-button :href="route('admin.categories.edit', $cat)" icon="pencil" :title="__('common.edit')" variant="secondary" />
 							<x-admin.icon-button wire:click="delete({{ $cat->id }})" onclick="return confirm('{{ __('common.confirm_delete_category') }}')" icon="trash" :title="__('common.delete')" variant="danger" />
 						</div>
 					</x-admin.td>
@@ -117,53 +119,4 @@
 			</x-admin.button>
 		</div>
 	</div>
-
-	<!-- Modal for create/edit -->
-	@if ($showModal)
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" wire:click="$set('showModal', false)">
-			<div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl" wire:click.stop>
-				<x-admin.card :title="$editingId ? __('common.editing_category') : __('common.creating_category')">
-					<form wire:submit="save" class="space-y-4">
-						@if ($isAdmin)
-							<x-admin.select
-								:label="__('common.company')"
-								wire:model="company_id"
-								:error="$errors->first('company_id')"
-							>
-								<option value="">{{ __('common.company_not_set') }}</option>
-								@foreach ($companies as $company)
-									<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
-								@endforeach
-							</x-admin.select>
-						@endif
-
-						<x-admin.input
-							:label="__('common.name')"
-							type="text"
-							wire:model="name"
-							required
-							autofocus
-							:error="$errors->first('name')"
-						/>
-
-						<x-admin.input
-							:label="__('common.description')"
-							type="textarea"
-							wire:model="description"
-							:error="$errors->first('description')"
-						/>
-
-						<div class="flex items-center gap-4">
-							<x-admin.button variant="primary" type="submit">
-								{{ __('common.save') }}
-							</x-admin.button>
-							<x-admin.button variant="secondary" wire:click="$set('showModal', false)">
-								{{ __('common.cancel') }}
-							</x-admin.button>
-						</div>
-					</form>
-				</x-admin.card>
-			</div>
-		</div>
-	@endif
 </div>

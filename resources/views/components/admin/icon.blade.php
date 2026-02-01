@@ -64,6 +64,40 @@
 			<path d="M7 10l5 5 5-5"/>
 			<path d="M12 15V3"/>
 		</svg>
+	@elseif($n === 'box')
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<path d="M3 7l9 5 9-5"/>
+			<path d="M3 7v10l9 5 9-5V7"/>
+			<path d="M12 12v10"/>
+		</svg>
+	@elseif($n === 'tag')
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<path d="M20.5 13.5l-7 7a2 2 0 0 1-2.8 0L3 12.8V3h9.8l7.7 7.7a2 2 0 0 1 0 2.8z"/>
+			<circle cx="7.5" cy="7.5" r="1.5"/>
+		</svg>
+	@elseif($n === 'truck')
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<path d="M3 7h11v10H3z"/>
+			<path d="M14 9h4l3 3v5h-7z"/>
+			<circle cx="7" cy="19" r="2"/>
+			<circle cx="18" cy="19" r="2"/>
+		</svg>
+	@elseif($n === 'file-text')
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+			<path d="M14 2v6h6"/>
+			<path d="M8 13h8"/>
+			<path d="M8 17h8"/>
+			<path d="M8 9h2"/>
+		</svg>
+	@elseif($n === 'activity')
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<path d="M3 12h4l2-5 4 10 2-5h6"/>
+		</svg>
+	@elseif($n === 'chevron-down')
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<path d="M6 9l6 6 6-6"/>
+		</svg>
 	@elseif($n === 'list')
 		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 			<path d="M8 6h13"/>

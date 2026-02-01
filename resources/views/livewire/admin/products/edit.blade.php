@@ -30,7 +30,7 @@
 				wire:model="category_id"
 				:error="$errors->first('category_id')"
 			>
-				<option value="">—</option>
+				<option value="">{{ __('common.category_not_set') }}</option>
 				@foreach ($categories as $cat)
 					<option value="{{ $cat->id }}">{{ $cat->name }}</option>
 				@endforeach

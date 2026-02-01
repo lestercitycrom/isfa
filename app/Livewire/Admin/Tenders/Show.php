@@ -22,6 +22,7 @@ final class Show extends Component
 	public string $tab = 'details';
 
 	public string $productSearch = '';
+	public int $attachProductId = 0;
 
 	/**
 	 * @var array<string, array<string, string>>
@@ -104,6 +105,14 @@ final class Show extends Component
 		session()->flash('status', __('common.product_attached'));
 	}
 
+	public function attachSelectedProduct(): void
+	{
+		if ($this->attachProductId > 0) {
+			$this->attachProduct($this->attachProductId);
+			$this->attachProductId = 0;
+		}
+	}
+
 	public function detachProduct(int $productId): void
 	{
 		$companyId = $this->tender->company_id !== null ? (int) $this->tender->company_id : null;
@@ -154,24 +163,23 @@ final class Show extends Component
 	{
 		$search = trim($this->productSearch);
 
-		if ($search === '') {
-			return collect();
-		}
-
 		if ($this->tender->company_id === null) {
 			return collect();
 		}
 
-		return Product::query()
+		$query = Product::query()
 			->where('company_id', $this->tender->company_id)
-			->where('name', 'like', '%' . $search . '%')
 			->whereDoesntHave('tenders', function ($query): void {
 				$query->whereKey($this->tender->getKey());
 			})
 			->with('category')
-			->orderBy('name')
-			->limit(8)
-			->get();
+			->orderBy('name');
+
+		if ($search !== '') {
+			$query->where('name', 'like', '%' . $search . '%');
+		}
+
+		return $query->limit(12)->get();
 	}
 
 	/**

@@ -21,6 +21,7 @@ return [
 	'reset' => 'Sıfırla',
 	'actions' => 'Əməliyyatlar',
 	'name' => 'Ad',
+	'title' => 'Ad',
 	'description' => 'Təsvir',
 	'product' => 'Məhsul',
 	'tender' => 'Tender',
@@ -278,6 +279,5 @@ return [
 	'notes' => 'Qeydlər',
 	'password' => 'Şifrə',
 ];
-
 
 

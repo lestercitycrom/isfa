@@ -29,6 +29,13 @@
 				@endforeach
 			</x-admin.filter-select>
 		</div>
+		<div class="lg:col-span-2">
+			<x-admin.filter-input
+				label="ID"
+				placeholder="ID"
+				wire:model.live="subjectId"
+			/>
+		</div>
 	</x-admin.filters-bar>
 
 	<x-admin.card>
@@ -48,6 +55,12 @@
 					$subject = $activity->subject;
 					$subjectLabel = $subject?->name ?? $subject?->title ?? ('#' . $activity->subject_id);
 					$subjectTypeLabel = $subjectOptions[$activity->subject_type] ?? class_basename((string) $activity->subject_type);
+					$eventLabel = $eventOptions[$activity->event] ?? $activity->event ?? '—';
+					$changes = $activity->changes->get('attributes', []);
+					$changeLabels = array_map(
+						fn ($field) => \App\Support\ActivityLogFormatter::labelFor((string) $field),
+						array_keys($changes)
+					);
 					$subjectRoute = null;
 
 					if ($activity->subject_type === \App\Models\Tender::class) {
@@ -66,7 +79,7 @@
 						{{ $activity->created_at?->format('Y-m-d H:i') ?? '—' }}
 					</x-admin.td>
 					<x-admin.td>
-						<div class="text-sm font-semibold text-slate-900">{{ $activity->event ?? '—' }}</div>
+						<div class="text-sm font-semibold text-slate-900">{{ $eventLabel }}</div>
 						<div class="mt-1 text-xs text-slate-500">{{ $subjectTypeLabel }}</div>
 					</x-admin.td>
 					<x-admin.td>
@@ -83,7 +96,7 @@
 						<div class="text-sm text-slate-800">{{ $activity->description }}</div>
 						@if($activity->changes->isNotEmpty())
 							<div class="mt-1 text-xs text-slate-500">
-								{{ __('common.changes') }}: {{ implode(', ', array_keys($activity->changes->get('attributes', []))) }}
+								{{ __('common.changes') }}: {{ implode(', ', $changeLabels) }}
 							</div>
 						@endif
 					</x-admin.td>

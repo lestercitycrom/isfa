@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\CsvExportController;
 use App\Http\Controllers\Admin\CsvImportController;
 use App\Livewire\Admin\ActivityLogs\Index as ActivityLogsIndex;
 use App\Livewire\Admin\Categories\Index as CategoriesIndex;
+use App\Livewire\Admin\Categories\Edit as CategoriesEdit;
 use App\Livewire\Admin\Companies\Edit as CompaniesEdit;
 use App\Livewire\Admin\Companies\Index as CompaniesIndex;
 use App\Livewire\Admin\Companies\Show as CompaniesShow;
@@ -58,6 +59,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 	})->name('dashboard');
 
 	Route::get('/categories', CategoriesIndex::class)->name('categories.index');
+	Route::get('/categories/create', CategoriesEdit::class)->name('categories.create');
+	Route::get('/categories/{category}/edit', CategoriesEdit::class)->name('categories.edit');
 
 	Route::get('/products', ProductsIndex::class)->name('products.index');
 	Route::get('/products/create', ProductEdit::class)->name('products.create');

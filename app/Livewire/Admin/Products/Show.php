@@ -12,11 +12,14 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Collection;
 
 #[Layout('layouts.admin')]
 final class Show extends Component
 {
 	public Product $product;
+	public string $tab = 'details';
 
 	public int $attachSupplierId = 0;
 	public string $attachStatus = 'reserve';
@@ -123,6 +126,27 @@ final class Show extends Component
 				->when($this->product->company_id !== null, fn ($q) => $q->where('company_id', $this->product->company_id))
 				->orderBy('name')
 				->get(),
+			'activities' => $this->loadActivities(),
 		]);
+	}
+
+	public function setTab(string $tab): void
+	{
+		$allowed = ['details', 'history'];
+
+		$this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
+	}
+
+	/**
+	 * @return Collection<int, Activity>
+	 */
+	private function loadActivities(): Collection
+	{
+		return Activity::query()
+			->where('subject_type', $this->product->getMorphClass())
+			->where('subject_id', $this->product->getKey())
+			->latest()
+			->limit(50)
+			->get();
 	}
 }
