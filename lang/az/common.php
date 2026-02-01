@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
 	// Navigation
@@ -174,6 +174,7 @@ return [
 	'import_links_csv' => 'Əlaqələrin CSV importu',
 	'import' => 'İmport',
 	'products_imported' => 'Məhsullar import edildi.',
+	'products_import_result' => 'Əlavə edilən məhsul: :added. Təkrar buraxılan: :skipped.',
 	'suppliers_imported' => 'Təchizatçılar import edildi.',
 	'categories_imported' => 'Kateqoriyalar import edildi.',
 	'links_imported' => 'Əlaqələr import edildi.',

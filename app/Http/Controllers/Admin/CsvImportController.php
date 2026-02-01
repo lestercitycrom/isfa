@@ -36,8 +36,10 @@ final class CsvImportController extends Controller
 		$csv->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY);
 
 		$header = null;
+		$added = 0;
+		$skipped = 0;
 
-		DB::transaction(static function () use ($csv, &$header, $companyId): void {
+		DB::transaction(function () use ($csv, &$header, $companyId, &$added, &$skipped): void {
 			foreach ($csv as $row) {
 				if (!is_array($row) || count($row) === 1 && $row[0] === null) {
 					continue;
@@ -101,8 +103,9 @@ final class CsvImportController extends Controller
 						'name' => $name,
 						'description' => $data['description'] ?? null,
 					]);
+					$added++;
 				} else {
-					// Update existing product (merge category and description if provided)
+					// Update existing product (merge category and description if provided) — считаем как пропуск дубля
 					$updateData = [];
 					if ($categoryId !== null) {
 						$updateData['category_id'] = $categoryId;
@@ -116,6 +119,7 @@ final class CsvImportController extends Controller
 					if (!empty($updateData)) {
 						$product->update($updateData);
 					}
+					$skipped++;
 				}
 
 				// Import supplier links if provided in CSV
@@ -134,21 +138,38 @@ final class CsvImportController extends Controller
 
 					foreach ($supplierItems as $supplierItem) {
 						$supplier = null;
+						$supplierName = null;
 
-						// Try to find by ID if numeric
+						// Try to find by ID if numeric (в рамках текущего пользователя)
 						if (is_numeric($supplierItem)) {
 							$supplier = Supplier::query()
 								->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 								->whereKey((int) $supplierItem)
 								->first();
+							if ($supplier === null) {
+								// Поставщика с таким ID нет у пользователя — берём имя из глобальной записи и создаём своего
+								$existing = Supplier::query()->whereKey((int) $supplierItem)->first();
+								$supplierName = $existing?->name;
+							}
 						}
 
-						// If not found by ID, try to find by name
+						// If not found by ID, try to find by name (в рамках текущего пользователя)
 						if ($supplier === null) {
 							$supplier = Supplier::query()
 								->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 								->where('name', $supplierItem)
 								->first();
+							if ($supplier === null) {
+								$supplierName = $supplierName ?? $supplierItem;
+							}
+						}
+
+						// Если у пользователя такого поставщика нет — создаём ему поставщика с этим именем
+						if ($supplier === null && $supplierName !== null && $supplierName !== '') {
+							$supplier = Supplier::query()->firstOrCreate(
+								['name' => $supplierName, 'company_id' => $companyId],
+								['company_id' => $companyId]
+							);
 						}
 
 						if ($supplier !== null) {
@@ -182,7 +203,10 @@ final class CsvImportController extends Controller
 
 		return redirect()
 			->back()
-			->with('status', __('common.products_imported'));
+			->with('status', __('common.products_import_result', [
+				'added' => $added,
+				'skipped' => $skipped,
+			]));
 	}
 
 	public function importSuppliers(Request $request): RedirectResponse

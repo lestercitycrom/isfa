@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
 	// Navigation
@@ -174,6 +174,7 @@ return [
 	'import_links_csv' => 'Импорт связей CSV',
 	'import' => 'Импорт',
 	'products_imported' => 'Товары импортированы.',
+	'products_import_result' => 'Добавлено товаров: :added. Пропущено дублей: :skipped.',
 	'suppliers_imported' => 'Поставщики импортированы.',
 	'categories_imported' => 'Категории импортированы.',
 	'links_imported' => 'Связи импортированы.',
