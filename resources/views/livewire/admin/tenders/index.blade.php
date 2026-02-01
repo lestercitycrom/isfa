@@ -1,4 +1,4 @@
-﻿<div class="space-y-6">
+<div class="space-y-6">
 	<x-admin.page-header
 		:title="__('tenders.index.title')"
 		:subtitle="__('tenders.index.subtitle')"
@@ -11,18 +11,18 @@
 	@endif
 
 	<div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-		<form wire:submit.prevent="syncFromUrl" class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto] md:items-end">
-			<div>
-				<label class="block text-sm font-semibold text-slate-900">
-					{{ __('tenders.import.label') }}
-				</label>
+	<form wire:submit.prevent="syncFromUrl" class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto] md:items-end">
+		<div>
+			<label class="block text-sm font-semibold text-slate-900">
+				{{ __('tenders.import.label') }}
+			</label>
 
-				<input
-					type="text"
-					wire:model.defer="importUrl"
-					placeholder="{{ __('tenders.import.placeholder') }}"
-					class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
-				/>
+			<input
+				type="text"
+				wire:model.defer="importUrl"
+				placeholder="{{ __('tenders.import.placeholder') }}"
+				class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
+			/>
 
 				@error('importUrl')
 					<div class="mt-2 text-sm text-rose-600">{{ $message }}</div>
@@ -192,6 +192,4 @@
 		@endif
 	</div>
 </div>
-
-
 

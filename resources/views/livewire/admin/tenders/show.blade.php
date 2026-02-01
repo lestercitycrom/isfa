@@ -1,4 +1,4 @@
-﻿<div class="space-y-6">
+<div class="space-y-6">
 	<x-admin.page-header
 		:title="$tender->title"
 		:subtitle="$tender->organization_name ?: __('common.tender')"
