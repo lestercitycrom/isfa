@@ -14,6 +14,9 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_COMPANY = 'company';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,6 +26,17 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'company_name',
+        'legal_name',
+        'tax_id',
+        'registration_number',
+        'contact_name',
+        'phone',
+        'address',
+        'website',
+        'notes',
+        'password_plain',
     ];
 
     /**
@@ -32,6 +46,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'password_plain',
         'two_factor_secret',
         'two_factor_recovery_codes',
         'remember_token',
@@ -47,7 +62,35 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'password_plain' => 'encrypted',
         ];
+    }
+
+    /**
+     * Determine whether user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        if ($this->role === self::ROLE_ADMIN) {
+            return true;
+        }
+
+        if ($this->role === null) {
+            $adminEmail = (string) env('ADMIN_EMAIL', '');
+            if ($adminEmail !== '' && $this->email === $adminEmail) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Scope only company users.
+     */
+    public function scopeCompanies($query)
+    {
+        return $query->where('role', self::ROLE_COMPANY);
     }
 
     /**

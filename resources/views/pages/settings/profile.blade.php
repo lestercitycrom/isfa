@@ -98,4 +98,90 @@
 			</form>
 		</x-admin.card>
 	</div>
+
+	@if ($isCompany)
+		<x-admin.card :title="__('common.company_details')">
+			<form wire:submit="updateCompanyInformation" class="space-y-6">
+				<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+					<x-admin.input
+						:label="__('common.company_name')"
+						type="text"
+						wire:model="company_name"
+						required
+						:error="$errors->first('company_name')"
+					/>
+
+					<x-admin.input
+						:label="__('common.legal_name')"
+						type="text"
+						wire:model="legal_name"
+						:error="$errors->first('legal_name')"
+					/>
+				</div>
+
+				<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+					<x-admin.input
+						:label="__('common.tax_id')"
+						type="text"
+						wire:model="tax_id"
+						:error="$errors->first('tax_id')"
+					/>
+
+					<x-admin.input
+						:label="__('common.registration_number')"
+						type="text"
+						wire:model="registration_number"
+						:error="$errors->first('registration_number')"
+					/>
+
+					<x-admin.input
+						:label="__('common.website')"
+						type="text"
+						wire:model="website"
+						:error="$errors->first('website')"
+					/>
+				</div>
+
+				<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+					<x-admin.input
+						:label="__('common.contact_name')"
+						type="text"
+						wire:model="contact_name"
+						:error="$errors->first('contact_name')"
+					/>
+
+					<x-admin.input
+						:label="__('common.phone')"
+						type="text"
+						wire:model="phone"
+						:error="$errors->first('phone')"
+					/>
+				</div>
+
+				<x-admin.input
+					:label="__('common.address')"
+					type="text"
+					wire:model="address"
+					:error="$errors->first('address')"
+				/>
+
+				<x-admin.input
+					:label="__('common.notes')"
+					type="textarea"
+					wire:model="notes"
+					:error="$errors->first('notes')"
+				/>
+
+				<div class="flex items-center gap-4">
+					<x-admin.button variant="primary" type="submit">
+						{{ __('common.save') }}
+					</x-admin.button>
+
+					<x-action-message class="text-sm text-slate-600" on="company-updated">
+						{{ __('common.saved') }}
+					</x-action-message>
+				</div>
+			</form>
+		</x-admin.card>
+	@endif
 </div>

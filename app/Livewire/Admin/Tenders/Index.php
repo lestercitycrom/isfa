@@ -6,7 +6,9 @@ namespace App\Livewire\Admin\Tenders;
 
 use App\Models\DictionaryValue;
 use App\Models\Tender;
+use App\Models\User;
 use App\Services\Etender\EtenderEventSyncService;
+use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
@@ -22,6 +24,7 @@ final class Index extends Component
 	public string $search = '';
 	public ?string $eventTypeFilter = null;
 	public ?string $eventStatusFilter = null;
+	public ?int $companyFilter = null;
 
 	/**
 	 * URL or numeric eventId entered by admin.
@@ -39,6 +42,11 @@ final class Index extends Component
 	}
 
 	public function updatedEventStatusFilter(): void
+	{
+		$this->resetPage();
+	}
+
+	public function updatedCompanyFilter(): void
 	{
 		$this->resetPage();
 	}
@@ -64,7 +72,7 @@ final class Index extends Component
 		}
 
 		try {
-			$tender = $syncService->sync($eventId);
+			$tender = $syncService->sync($eventId, CompanyContext::companyId());
 
 			session()->flash('status', __('tenders.flash.synced', ['id' => $tender->event_id]));
 
@@ -116,7 +124,13 @@ final class Index extends Component
 
 	public function render(): View
 	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
 		$tenders = Tender::query()
+			->with('company')
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
 			->when($this->search !== '', function ($q): void {
 				$q->where(function ($q): void {
 					$q->where('title', 'like', '%' . $this->search . '%')
@@ -148,6 +162,8 @@ final class Index extends Component
 			'tenders' => $tenders,
 			'eventTypes' => $eventTypes,
 			'eventStatuses' => $eventStatuses,
+			'companies' => $isAdmin ? User::query()->companies()->orderBy('company_name')->get() : collect(),
+			'isAdmin' => $isAdmin,
 		]);
 	}
 }

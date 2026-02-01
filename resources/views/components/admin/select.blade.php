@@ -17,7 +17,12 @@
 
 <div class="space-y-1">
 	@if($label)
-		<label class="text-xs font-semibold text-slate-700">{{ $label }}</label>
+		<label class="text-xs font-semibold text-slate-700">
+			{{ $label }}
+			@if($attributes->has('required'))
+				<span class="ml-0.5 text-rose-500" aria-hidden="true">*</span>
+			@endif
+		</label>
 	@endif
 
 	<select {{ $attributes->merge(['class' => $base.' '.$pad.' '.$variantClass]) }}>

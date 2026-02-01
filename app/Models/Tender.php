@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tender extends Model
 {
 	protected $fillable = [
+		'company_id',
 		'event_id',
 		'rfx_id',
 		'inner_event_id',
@@ -42,6 +44,14 @@ class Tender extends Model
 	public function items(): HasMany
 	{
 		return $this->hasMany(TenderItem::class);
+	}
+
+	/**
+	 * @return BelongsTo<User, Tender>
+	 */
+	public function company(): BelongsTo
+	{
+		return $this->belongsTo(User::class, 'company_id');
 	}
 
 	public function contacts(): HasMany

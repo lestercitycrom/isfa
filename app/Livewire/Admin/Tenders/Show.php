@@ -6,6 +6,7 @@ namespace App\Livewire\Admin\Tenders;
 
 use App\Models\DictionaryValue;
 use App\Models\Tender;
+use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -22,6 +23,13 @@ final class Show extends Component
 
 	public function mount(Tender $tender): void
 	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
+		if (!$isAdmin && $companyId !== null && (int) $tender->company_id !== $companyId) {
+			abort(403);
+		}
+
 		$this->tender = $tender->load([
 			'items',
 			'contacts',

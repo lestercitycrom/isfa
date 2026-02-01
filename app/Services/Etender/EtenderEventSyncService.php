@@ -22,7 +22,7 @@ class EtenderEventSyncService
 	/**
 	 * @throws Throwable
 	 */
-	public function sync(int $eventId): Tender
+	public function sync(int $eventId, ?int $companyId = null): Tender
 	{
 		$base = $this->client->getBase($eventId);
 		$event = $this->client->getEvent($eventId);
@@ -56,6 +56,7 @@ class EtenderEventSyncService
 
 		return DB::transaction(function () use (
 			$eventId,
+			$companyId,
 			$base,
 			$event,
 			$info,
@@ -75,8 +76,12 @@ class EtenderEventSyncService
 			}
 
 			$tender = Tender::query()->updateOrCreate(
-				['event_id' => $eventId],
 				[
+					'event_id' => $eventId,
+					'company_id' => $companyId,
+				],
+				[
+					'company_id' => $companyId,
 					'rfx_id' => $event['rfxId'] ?? null,
 					'inner_event_id' => $event['eventId'] ?? null,
 

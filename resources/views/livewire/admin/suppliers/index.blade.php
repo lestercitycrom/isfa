@@ -36,6 +36,19 @@
 				icon="search"
 			/>
 		</div>
+		@if ($isAdmin)
+			<div class="lg:col-span-2">
+				<x-admin.filter-select
+					wire:model.live="companyFilter"
+					:placeholder="__('common.all_companies')"
+				>
+					<option value="">{{ __('common.all_companies') }}</option>
+					@foreach ($companies as $company)
+						<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
+					@endforeach
+				</x-admin.filter-select>
+			</div>
+		@endif
 	</x-admin.filters-bar>
 
 	<x-admin.card>
@@ -43,6 +56,9 @@
 			<x-slot name="head">
 				<tr>
 					<x-admin.th>{{ __('common.name') }}</x-admin.th>
+					@if ($isAdmin)
+						<x-admin.th>{{ __('common.company') }}</x-admin.th>
+					@endif
 					<x-admin.th>{{ __('common.contacts') }}</x-admin.th>
 					<x-admin.th align="right" nowrap>{{ __('common.actions') }}</x-admin.th>
 				</tr>
@@ -53,6 +69,11 @@
 					<x-admin.td>
 						<div class="font-medium text-slate-900">{{ $supplier->name }}</div>
 					</x-admin.td>
+					@if ($isAdmin)
+						<x-admin.td>
+							{{ $supplier->company?->company_name ?? $supplier->company?->name ?? '—' }}
+						</x-admin.td>
+					@endif
 					<x-admin.td>
 						@if($supplier->contact_name)
 							<div class="text-slate-900">{{ $supplier->contact_name }}</div>
@@ -82,7 +103,7 @@
 				</tr>
 			@empty
 				<tr>
-					<x-admin.td colspan="3" class="text-center py-8 text-slate-500">
+					<x-admin.td colspan="{{ $isAdmin ? 4 : 3 }}" class="text-center py-8 text-slate-500">
 						{{ __('common.no_suppliers') }}
 					</x-admin.td>
 				</tr>

@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
 	<x-admin.page-header
 		:title="__('tenders.index.title')"
 		:subtitle="__('tenders.index.subtitle')"
@@ -60,7 +60,7 @@
 
 	<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 		<div class="border-b border-slate-200 p-4">
-			<div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+			<div class="grid grid-cols-1 gap-3 md:grid-cols-4">
 				<div>
 					<label class="block text-xs font-semibold text-slate-600">{{ __('tenders.filters.search') }}</label>
 					<input
@@ -100,6 +100,20 @@
 						@endforeach
 					</select>
 				</div>
+				@if ($isAdmin)
+					<div>
+						<label class="block text-xs font-semibold text-slate-600">{{ __('common.company') }}</label>
+						<select
+							wire:model.live="companyFilter"
+							class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
+						>
+							<option value="">{{ __('common.all_companies') }}</option>
+							@foreach ($companies as $company)
+								<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
+							@endforeach
+						</select>
+					</div>
+				@endif
 			</div>
 		</div>
 
@@ -111,6 +125,9 @@
 						<th class="px-4 py-3">{{ __('tenders.table.title') }}</th>
 						<th class="px-4 py-3">{{ __('common.organization') }}</th>
 						<th class="px-4 py-3">{{ __('tenders.table.published') }}</th>
+						@if ($isAdmin)
+							<th class="px-4 py-3">{{ __('common.company') }}</th>
+						@endif
 						<th class="px-4 py-3 text-right">{{ __('tenders.table.actions') }}</th>
 					</tr>
 				</thead>
@@ -140,6 +157,12 @@
 								{{ $tender->published_at?->format('Y-m-d H:i') ?: '—' }}
 							</td>
 
+							@if ($isAdmin)
+								<td class="px-4 py-3 text-sm text-slate-700">
+									{{ $tender->company?->company_name ?? $tender->company?->name ?? '—' }}
+								</td>
+							@endif
+
 							<td class="px-4 py-3 text-right">
 								<a
 									class="inline-flex items-center justify-center rounded-xl h-9 w-9 transition focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 focus:ring-slate-300"
@@ -153,7 +176,7 @@
 						</tr>
 					@empty
 						<tr>
-							<td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">
+							<td colspan="{{ $isAdmin ? 6 : 5 }}" class="px-4 py-8 text-center text-sm text-slate-500">
 								{{ __('tenders.table.empty') }}
 							</td>
 						</tr>
@@ -169,3 +192,6 @@
 		@endif
 	</div>
 </div>
+
+
+

@@ -86,6 +86,18 @@
 			<path d="M10 11v6"/>
 			<path d="M14 11v6"/>
 		</svg>
+	@elseif($n === 'building')
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<path d="M3 21h18"/>
+			<path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/>
+			<path d="M9 7h.01"/>
+			<path d="M9 11h.01"/>
+			<path d="M9 15h.01"/>
+			<path d="M13 7h.01"/>
+			<path d="M13 11h.01"/>
+			<path d="M13 15h.01"/>
+			<path d="M17 21V9a2 2 0 0 1 2-2h1v14"/>
+		</svg>
 	@else
 		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 			<path d="M12 20h9"/>

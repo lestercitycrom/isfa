@@ -15,8 +15,9 @@ final class CsvExportController extends Controller
 	public function products(): StreamedResponse
 	{
 		$fileName = 'products.csv';
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
 
-		return response()->streamDownload(function (): void {
+		return response()->streamDownload(function () use ($companyId): void {
 			$handle = fopen('php://output', 'wb');
 
 			// Header
@@ -24,6 +25,7 @@ final class CsvExportController extends Controller
 
 			Product::query()
 				->with('category')
+				->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 				->orderBy('id')
 				->chunk(500, static function ($products) use ($handle): void {
 					foreach ($products as $product) {
@@ -43,14 +45,16 @@ final class CsvExportController extends Controller
 	public function suppliers(): StreamedResponse
 	{
 		$fileName = 'suppliers.csv';
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
 
-		return response()->streamDownload(function (): void {
+		return response()->streamDownload(function () use ($companyId): void {
 			$handle = fopen('php://output', 'wb');
 
 			// Header
 			fputcsv($handle, ['id', 'name', 'contact_name', 'phone', 'email', 'website', 'comment']);
 
 			Supplier::query()
+				->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 				->orderBy('id')
 				->chunk(500, static function ($suppliers) use ($handle): void {
 					foreach ($suppliers as $supplier) {
@@ -73,14 +77,16 @@ final class CsvExportController extends Controller
 	public function categories(): StreamedResponse
 	{
 		$fileName = 'categories.csv';
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
 
-		return response()->streamDownload(function (): void {
+		return response()->streamDownload(function () use ($companyId): void {
 			$handle = fopen('php://output', 'wb');
 
 			// Header
 			fputcsv($handle, ['id', 'name', 'description']);
 
 			ProductCategory::query()
+				->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 				->orderBy('id')
 				->chunk(500, static function ($categories) use ($handle): void {
 					foreach ($categories as $category) {
@@ -99,15 +105,21 @@ final class CsvExportController extends Controller
 	public function links(): StreamedResponse
 	{
 		$fileName = 'product_supplier.csv';
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
 
-		return response()->streamDownload(function (): void {
+		return response()->streamDownload(function () use ($companyId): void {
 			$handle = fopen('php://output', 'wb');
 
 			// Header
 			fputcsv($handle, ['product_id', 'supplier_id', 'status', 'terms']);
 
 			Product::query()
-				->with('suppliers')
+				->with(['suppliers' => function ($q) use ($companyId): void {
+					if ($companyId !== null) {
+						$q->where('suppliers.company_id', $companyId);
+					}
+				}])
+				->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 				->orderBy('id')
 				->chunk(200, static function ($products) use ($handle): void {
 					foreach ($products as $product) {

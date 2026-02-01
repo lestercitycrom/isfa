@@ -1,10 +1,11 @@
-<?php
+﻿<?php
 
 return [
 	// Navigation
 	'products' => 'Товары',
 	'suppliers' => 'Поставщики',
 	'categories' => 'Категории',
+	'tenders' => 'Тендеры',
 	'logout' => 'Выйти',
 
 	// Common actions
@@ -219,4 +220,30 @@ return [
 	'no_records' => 'Записей нет.',
 	'required' => 'Обязательное поле.',
 	
+	// Companies
+	'companies' => 'Компании',
+	'companies_subtitle' => 'Список всех компаний',
+	'add_company' => 'Добавить компанию',
+	'company' => 'Компания',
+	'company_name' => 'Название компании',
+	'legal_name' => 'Юридическое наименование',
+	'tax_id' => 'ИНН / Налоговый номер',
+	'registration_number' => 'Регистрационный номер',
+	'company_details' => 'Данные компании',
+	'company_not_set' => 'Не задано',
+	'search_company' => 'Поиск компании...',
+	'no_companies' => 'Компании не найдены',
+	'all_companies' => 'Все компании',
+	'editing_company' => 'Редактирование компании',
+	'creating_company' => 'Создание компании',
+	'editing_company_subtitle' => 'Обновление данных компании',
+	'creating_company_subtitle' => 'Добавление новой компании',
+	'company_deleted' => 'Компания удалена.',
+	'company_saved' => 'Компания сохранена.',
+	'confirm_delete_company' => 'Удалить компанию «:name»?',
+	'notes' => 'Заметки',
+	'password' => 'Пароль',
 ];
+
+
+

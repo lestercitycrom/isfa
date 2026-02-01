@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 final class Supplier extends Model
@@ -13,6 +14,7 @@ final class Supplier extends Model
 	use HasFactory;
 
 	protected $fillable = [
+		'company_id',
 		'name',
 		'contact_name',
 		'phone',
@@ -30,5 +32,13 @@ final class Supplier extends Model
 			->using(ProductSupplier::class)
 			->withPivot(['status', 'terms'])
 			->withTimestamps();
+	}
+
+	/**
+	 * @return BelongsTo<User, Supplier>
+	 */
+	public function company(): BelongsTo
+	{
+		return $this->belongsTo(User::class, 'company_id');
 	}
 }

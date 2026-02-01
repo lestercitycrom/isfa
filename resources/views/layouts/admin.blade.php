@@ -26,11 +26,17 @@
 				<nav class="hidden md:flex items-center gap-1">
 					@foreach((array) config('admin-kit.nav', []) as $item)
 						@php
+							$user = auth()->user();
 							$route = (string) ($item['route'] ?? '');
 							$labelKey = (string) ($item['label'] ?? '');
 							$label = str_starts_with($labelKey, 'common.') ? __($labelKey) : $labelKey;
 							$icon = (string) ($item['icon'] ?? '');
+							$adminOnly = (bool) ($item['admin_only'] ?? false);
 						@endphp
+
+						@if($adminOnly && (!$user || !$user->isAdmin()))
+							@continue
+						@endif
 
 						@if($route !== '' && $label !== '' && \Illuminate\Support\Facades\Route::has($route))
 							@php $isActive = request()->routeIs($route); @endphp
@@ -73,20 +79,26 @@
 			</div>
 
 			{{-- Mobile nav --}}
-			<div class="md:hidden pb-3">
-				<div class="flex flex-wrap gap-1">
-					@foreach((array) config('admin-kit.nav', []) as $item)
-						@php
-							$route = (string) ($item['route'] ?? '');
-							$labelKey = (string) ($item['label'] ?? '');
-							$label = str_starts_with($labelKey, 'common.') ? __($labelKey) : $labelKey;
-							$icon = (string) ($item['icon'] ?? '');
-						@endphp
+				<div class="md:hidden pb-3">
+					<div class="flex flex-wrap gap-1">
+						@foreach((array) config('admin-kit.nav', []) as $item)
+							@php
+								$user = auth()->user();
+								$route = (string) ($item['route'] ?? '');
+								$labelKey = (string) ($item['label'] ?? '');
+								$label = str_starts_with($labelKey, 'common.') ? __($labelKey) : $labelKey;
+								$icon = (string) ($item['icon'] ?? '');
+								$adminOnly = (bool) ($item['admin_only'] ?? false);
+							@endphp
 
-						@if($route !== '' && $label !== '' && \Illuminate\Support\Facades\Route::has($route))
-							@php $isActive = request()->routeIs($route); @endphp
-							<a
-								href="{{ route($route) }}"
+							@if($adminOnly && (!$user || !$user->isAdmin()))
+								@continue
+							@endif
+
+							@if($route !== '' && $label !== '' && \Illuminate\Support\Facades\Route::has($route))
+								@php $isActive = request()->routeIs($route); @endphp
+								<a
+									href="{{ route($route) }}"
 								class="rounded-xl px-3 py-2 text-sm font-semibold transition inline-flex items-center gap-2
 									{{ $isActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}"
 							>

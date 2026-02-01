@@ -5,6 +5,9 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\CsvExportController;
 use App\Http\Controllers\Admin\CsvImportController;
 use App\Livewire\Admin\Categories\Index as CategoriesIndex;
+use App\Livewire\Admin\Companies\Edit as CompaniesEdit;
+use App\Livewire\Admin\Companies\Index as CompaniesIndex;
+use App\Livewire\Admin\Companies\Show as CompaniesShow;
 use App\Livewire\Admin\ImportExport\Index as ImportExportIndex;
 use App\Livewire\Admin\Products\Edit as ProductEdit;
 use App\Livewire\Admin\Products\Index as ProductsIndex;
@@ -81,4 +84,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 	Route::post('/import/products', [CsvImportController::class, 'importProducts'])->name('import.products');
 	Route::post('/import/suppliers', [CsvImportController::class, 'importSuppliers'])->name('import.suppliers');
 	Route::post('/import/links', [CsvImportController::class, 'importLinks'])->name('import.links');
+
+	Route::middleware('admin')->group(function (): void {
+		Route::get('/companies', CompaniesIndex::class)->name('companies.index');
+		Route::get('/companies/create', CompaniesEdit::class)->name('companies.create');
+		Route::get('/companies/{company}/show', CompaniesShow::class)->name('companies.show');
+		Route::get('/companies/{company}/edit', CompaniesEdit::class)->name('companies.edit');
+	});
 });

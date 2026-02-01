@@ -12,6 +12,19 @@
 
 	<x-admin.card>
 		<form wire:submit="save" class="space-y-6">
+			@if ($isAdmin)
+				<x-admin.select
+					:label="__('common.company')"
+					wire:model="company_id"
+					:error="$errors->first('company_id')"
+				>
+					<option value="">{{ __('common.company_not_set') }}</option>
+					@foreach ($companies as $company)
+						<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
+					@endforeach
+				</x-admin.select>
+			@endif
+
 			<x-admin.input
 				:label="__('common.name')"
 				type="text"

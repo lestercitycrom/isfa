@@ -6,6 +6,8 @@ namespace App\Livewire\Admin\Products;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\User;
+use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -16,35 +18,69 @@ final class Edit extends Component
 {
 	public ?Product $product = null;
 
+	public ?int $company_id = null;
 	public ?int $category_id = null;
 	public string $name = '';
 	public ?string $description = null;
 
 	public function mount(?Product $product = null): void
 	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
 		$this->product = $product;
 
 		if ($product !== null) {
+			if (!$isAdmin && $companyId !== null && (int) $product->company_id !== $companyId) {
+				abort(403);
+			}
+
+			$this->company_id = $product->company_id;
 			$this->category_id = $product->category_id;
 			$this->name = $product->name;
 			$this->description = $product->description;
+		} elseif (!$isAdmin && $companyId !== null) {
+			$this->company_id = $companyId;
 		}
 	}
 
 	public function save(): void
 	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
+		if (!$isAdmin && $companyId !== null) {
+			$this->company_id = $companyId;
+		}
+
+		$categoryRule = Rule::exists('product_categories', 'id');
+		if ($this->company_id !== null) {
+			$categoryRule->where('company_id', $this->company_id);
+		}
+
+		$nameRule = Rule::unique('products', 'name')
+			->where(fn ($q) => $this->category_id
+				? $q->where('category_id', $this->category_id)
+				: $q->whereNull('category_id')
+			)
+			->ignore($this->product?->id);
+
+		if ($this->company_id !== null) {
+			$nameRule->where('company_id', $this->company_id);
+		}
+
 		$this->validate([
-			'category_id' => ['nullable', 'integer', 'exists:product_categories,id'],
+			'company_id' => ['nullable', 'integer', 'exists:users,id'],
+			'category_id' => [
+				'nullable',
+				'integer',
+				$categoryRule,
+			],
 			'name' => [
 				'required',
 				'string',
 				'max:255',
-				Rule::unique('products', 'name')
-					->where(fn ($q) => $this->category_id
-						? $q->where('category_id', $this->category_id)
-						: $q->whereNull('category_id')
-					)
-					->ignore($this->product?->id),
+				$nameRule,
 			],
 			'description' => ['nullable', 'string'],
 		]);
@@ -52,6 +88,7 @@ final class Edit extends Component
 		$product = Product::query()->updateOrCreate(
 			['id' => $this->product?->id],
 			[
+				'company_id' => $this->company_id,
 				'category_id' => $this->category_id,
 				'name' => $this->name,
 				'description' => $this->description,
@@ -66,7 +103,14 @@ final class Edit extends Component
 	public function render(): View
 	{
 		return view('livewire.admin.products.edit', [
-			'categories' => ProductCategory::query()->orderBy('name')->get(),
+			'categories' => ProductCategory::query()
+				->when($this->company_id !== null, fn ($q) => $q->where('company_id', $this->company_id))
+				->orderBy('name')
+				->get(),
+			'companies' => CompanyContext::isAdmin()
+				? User::query()->companies()->orderBy('company_name')->get()
+				: collect(),
+			'isAdmin' => CompanyContext::isAdmin(),
 		]);
 	}
 }

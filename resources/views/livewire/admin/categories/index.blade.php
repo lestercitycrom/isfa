@@ -36,6 +36,20 @@
 				icon="search"
 			/>
 		</div>
+		@if ($isAdmin)
+			<div class="lg:col-span-3">
+				<x-admin.filter-select
+					wire:model.live="companyFilter"
+					label="{{ __('common.company') }}"
+					icon="building"
+				>
+					<option value="">{{ __('common.all_companies') }}</option>
+					@foreach ($companies as $company)
+						<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
+					@endforeach
+				</x-admin.filter-select>
+			</div>
+		@endif
 	</x-admin.filters-bar>
 
 	<x-admin.card>
@@ -43,6 +57,9 @@
 			<x-slot name="head">
 				<tr>
 					<x-admin.th>{{ __('common.name') }}</x-admin.th>
+					@if ($isAdmin)
+						<x-admin.th>{{ __('common.company') }}</x-admin.th>
+					@endif
 					<x-admin.th align="right" nowrap>{{ __('common.actions') }}</x-admin.th>
 				</tr>
 			</x-slot>
@@ -55,6 +72,11 @@
 							<div class="mt-1 text-xs text-slate-500 line-clamp-1">{{ $cat->description }}</div>
 						@endif
 					</x-admin.td>
+					@if ($isAdmin)
+						<x-admin.td>
+							{{ $cat->company?->company_name ?? $cat->company?->name ?? '—' }}
+						</x-admin.td>
+					@endif
 					<x-admin.td align="right" nowrap>
 						<div class="inline-flex items-center gap-2">
 							<x-admin.icon-button wire:click="startEdit({{ $cat->id }})" icon="pencil" :title="__('common.edit')" variant="secondary" />
@@ -64,7 +86,7 @@
 				</tr>
 			@empty
 				<tr>
-					<x-admin.td colspan="2" class="text-center py-8 text-slate-500">
+					<x-admin.td colspan="{{ $isAdmin ? 3 : 2 }}" class="text-center py-8 text-slate-500">
 						{{ __('common.no_categories') }}
 					</x-admin.td>
 				</tr>
@@ -102,6 +124,19 @@
 			<div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl" wire:click.stop>
 				<x-admin.card :title="$editingId ? __('common.editing_category') : __('common.creating_category')">
 					<form wire:submit="save" class="space-y-4">
+						@if ($isAdmin)
+							<x-admin.select
+								:label="__('common.company')"
+								wire:model="company_id"
+								:error="$errors->first('company_id')"
+							>
+								<option value="">{{ __('common.company_not_set') }}</option>
+								@foreach ($companies as $company)
+									<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
+								@endforeach
+							</x-admin.select>
+						@endif
+
 						<x-admin.input
 							:label="__('common.name')"
 							type="text"

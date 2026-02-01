@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
 	<x-admin.page-header
 		:title="__('common.products')"
 		:subtitle="__('common.products_subtitle')"
@@ -60,8 +60,22 @@
 				@endforeach
 			</x-admin.filter-select>
 		</div>
+		@if ($isAdmin)
+			<div class="lg:col-span-3">
+				<x-admin.filter-select
+					wire:model.live="companyFilter"
+					label="{{ __('common.company') }}"
+					icon="building"
+				>
+					<option value="">{{ __('common.all_companies') }}</option>
+					@foreach ($companies as $company)
+						<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
+					@endforeach
+				</x-admin.filter-select>
+			</div>
+		@endif
 		<div class="lg:col-span-2">
-			<x-admin.button variant="secondary" wire:click="$set('categoryFilter', null); $set('supplierFilter', null); $set('search', '')">
+			<x-admin.button variant="secondary" wire:click="$set('categoryFilter', null); $set('supplierFilter', null); $set('companyFilter', null); $set('search', '')">
 				{{ __('common.reset') }}
 			</x-admin.button>
 		</div>
@@ -73,6 +87,9 @@
 				<tr>
 					<x-admin.th>{{ __('common.name') }}</x-admin.th>
 					<x-admin.th>{{ __('common.category') }}</x-admin.th>
+					@if ($isAdmin)
+						<x-admin.th>{{ __('common.company') }}</x-admin.th>
+					@endif
 					<x-admin.th align="right" nowrap>{{ __('common.actions') }}</x-admin.th>
 				</tr>
 			</x-slot>
@@ -92,6 +109,11 @@
 							<span class="text-slate-400">—</span>
 						@endif
 					</x-admin.td>
+					@if ($isAdmin)
+						<x-admin.td>
+							{{ $product->company?->company_name ?? $product->company?->name ?? '—' }}
+						</x-admin.td>
+					@endif
 					<x-admin.td align="right" nowrap>
 						<x-admin.table-actions
 							:viewHref="route('admin.products.show', $product)"
@@ -109,7 +131,7 @@
 				</tr>
 			@empty
 				<tr>
-					<x-admin.td colspan="3" class="text-center py-8 text-slate-500">
+					<x-admin.td colspan="{{ $isAdmin ? 4 : 3 }}" class="text-center py-8 text-slate-500">
 						{{ __('common.no_products') }}
 					</x-admin.td>
 				</tr>
@@ -141,3 +163,6 @@
 		</div>
 	</div>
 </div>
+
+
+

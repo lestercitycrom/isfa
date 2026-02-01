@@ -23,11 +23,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $companyName = fake()->company();
+
         return [
-            'name' => fake()->name(),
+            'name' => $companyName,
+            'company_name' => $companyName,
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'password_plain' => 'password',
+            'role' => \App\Models\User::ROLE_COMPANY,
             'remember_token' => Str::random(10),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,

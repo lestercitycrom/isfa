@@ -7,7 +7,9 @@ namespace App\Livewire\Admin\Products;
 use App\Enums\ProductSupplierStatus;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -32,6 +34,13 @@ final class Show extends Component
 
 	public function mount(Product $product): void
 	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
+		if (!$isAdmin && $companyId !== null && (int) $product->company_id !== $companyId) {
+			abort(403);
+		}
+
 		$this->product = $product->load(['category', 'suppliers']);
 
 		foreach ($this->product->suppliers as $supplier) {
@@ -44,8 +53,18 @@ final class Show extends Component
 
 	public function attach(): void
 	{
+		$companyId = $this->product->company_id;
+		$existsRule = Rule::exists('suppliers', 'id');
+		if ($companyId !== null) {
+			$existsRule->where('company_id', $companyId);
+		}
+
 		$this->validate([
-			'attachSupplierId' => ['required', 'integer', 'exists:suppliers,id'],
+			'attachSupplierId' => [
+				'required',
+				'integer',
+				$existsRule,
+			],
 			'attachStatus' => ['required', 'in:primary,reserve'],
 			'attachTerms' => ['nullable', 'string'],
 		]);
@@ -100,7 +119,10 @@ final class Show extends Component
 	public function render(): View
 	{
 		return view('livewire.admin.products.show', [
-			'suppliers' => Supplier::query()->orderBy('name')->get(),
+			'suppliers' => Supplier::query()
+				->when($this->product->company_id !== null, fn ($q) => $q->where('company_id', $this->product->company_id))
+				->orderBy('name')
+				->get(),
 		]);
 	}
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Tenders;
 
-use App\Models\Tender;
+use App\Services\Etender\EtenderEventSyncService;
+use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Artisan;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Throwable;
@@ -20,7 +20,7 @@ final class Create extends Component
 
 	public ?string $lastOutput = null;
 
-	public function sync(): void
+	public function sync(EtenderEventSyncService $syncService): void
 	{
 		$this->resetErrorBag();
 
@@ -34,32 +34,7 @@ final class Create extends Component
 		$this->lastOutput = null;
 
 		try {
-			// Run existing console sync to avoid duplicating parser logic
-			$exitCode = Artisan::call('etender:sync-event', [
-				'eventId' => $eventId,
-			]);
-
-			$this->lastOutput = trim((string) Artisan::output());
-
-			if ($exitCode !== 0) {
-				$this->addError('eventId', __('tenders.errors.sync_failed'));
-
-				return;
-			}
-
-			$tender = Tender::query()
-				->where('event_id', $eventId)
-				->first();
-
-			if ($tender === null) {
-				$tender = Tender::query()->whereKey($eventId)->first();
-			}
-
-			if ($tender === null) {
-				$this->addError('eventId', __('tenders.errors.tender_not_found'));
-
-				return;
-			}
+			$tender = $syncService->sync($eventId, CompanyContext::companyId());
 
 			session()->flash('status', __('tenders.flash.synced', ['id' => $tender->event_id]));
 

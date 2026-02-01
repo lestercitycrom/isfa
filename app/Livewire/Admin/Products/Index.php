@@ -7,6 +7,8 @@ namespace App\Livewire\Admin\Products;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
+use App\Models\User;
+use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -20,6 +22,7 @@ final class Index extends Component
 	public string $search = '';
 	public ?int $categoryFilter = null;
 	public ?int $supplierFilter = null;
+	public ?int $companyFilter = null;
 
 	public function updatedSearch(): void
 	{
@@ -36,24 +39,43 @@ final class Index extends Component
 		$this->resetPage();
 	}
 
+	public function updatedCompanyFilter(): void
+	{
+		$this->resetPage();
+	}
+
 	public function delete(int $id): void
 	{
-		Product::query()->whereKey($id)->delete();
+		$companyId = CompanyContext::companyId();
+
+		Product::query()
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->whereKey($id)
+			->delete();
 		session()->flash('status', __('common.product_deleted'));
 		$this->resetPage();
 	}
 
 	public function deleteAllProducts(): void
 	{
-		Product::query()->delete();
+		$companyId = CompanyContext::companyId();
+
+		Product::query()
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->delete();
 		session()->flash('status', __('common.all_products_deleted'));
 		$this->resetPage();
 	}
 
 	public function render(): View
 	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
 		$products = Product::query()
-			->with('category', 'suppliers')
+			->with('category', 'suppliers', 'company')
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
 			->when($this->search !== '', function ($q): void {
 				$q->where('name', 'like', '%' . $this->search . '%');
 			})
@@ -68,13 +90,23 @@ final class Index extends Component
 			->orderBy('name')
 			->paginate(15);
 
-		$categories = ProductCategory::query()->orderBy('name')->get();
-		$suppliers = Supplier::query()->orderBy('name')->get();
+		$categories = ProductCategory::query()
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
+			->orderBy('name')
+			->get();
+		$suppliers = Supplier::query()
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
+			->orderBy('name')
+			->get();
 
 		return view('livewire.admin.products.index', [
 			'products' => $products,
 			'categories' => $categories,
 			'suppliers' => $suppliers,
+			'companies' => $isAdmin ? User::query()->companies()->orderBy('company_name')->get() : collect(),
+			'isAdmin' => $isAdmin,
 		]);
 	}
 }

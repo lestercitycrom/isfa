@@ -1,10 +1,11 @@
-<?php
+﻿<?php
 
 return [
 	// Navigation
 	'products' => 'Məhsullar',
 	'suppliers' => 'Təchizatçılar',
 	'categories' => 'Kateqoriyalar',
+	'tenders' => 'Tenderlər',
 	'logout' => 'Çıxış',
 
 	// Common actions
@@ -219,4 +220,30 @@ return [
 	'no_records' => 'Qeyd yoxdur.',
 	'required' => 'Bu sahə mütləqdir.',
 	
+	// Companies
+	'companies' => 'Şirkətlər',
+	'companies_subtitle' => 'Bütün şirkətlərin siyahısı',
+	'add_company' => 'Şirkət əlavə et',
+	'company' => 'Şirkət',
+	'company_name' => 'Şirkətin adı',
+	'legal_name' => 'Hüquqi adı',
+	'tax_id' => 'VÖEN',
+	'registration_number' => 'Qeydiyyat nömrəsi',
+	'company_details' => 'Şirkət məlumatları',
+	'company_not_set' => 'Təyin edilməyib',
+	'search_company' => 'Şirkət axtar...',
+	'no_companies' => 'Şirkət tapılmadı',
+	'all_companies' => 'Bütün şirkətlər',
+	'editing_company' => 'Şirkətin redaktəsi',
+	'creating_company' => 'Şirkət yaradılması',
+	'editing_company_subtitle' => 'Şirkət məlumatlarının yenilənməsi',
+	'creating_company_subtitle' => 'Yeni şirkətin əlavə edilməsi',
+	'company_deleted' => 'Şirkət silindi.',
+	'company_saved' => 'Şirkət saxlanıldı.',
+	'confirm_delete_company' => '«:name» şirkəti silinsin?',
+	'notes' => 'Qeydlər',
+	'password' => 'Şifrə',
 ];
+
+
+

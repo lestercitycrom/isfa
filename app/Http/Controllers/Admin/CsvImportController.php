@@ -24,6 +24,8 @@ final class CsvImportController extends Controller
 			'file' => ['required', 'file', 'mimes:csv,txt'],
 		]);
 
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+
 		$filePath = $request->file('file')?->getRealPath();
 
 		if ($filePath === false || $filePath === null) {
@@ -35,7 +37,7 @@ final class CsvImportController extends Controller
 
 		$header = null;
 
-		DB::transaction(static function () use ($csv, &$header): void {
+		DB::transaction(static function () use ($csv, &$header, $companyId): void {
 			foreach ($csv as $row) {
 				if (!is_array($row) || count($row) === 1 && $row[0] === null) {
 					continue;
@@ -64,8 +66,8 @@ final class CsvImportController extends Controller
 
 				if ($categoryName !== '') {
 					$categoryId = ProductCategory::query()->firstOrCreate(
-						['name' => $categoryName],
-						['description' => null]
+						['name' => $categoryName, 'company_id' => $companyId],
+						['description' => null, 'company_id' => $companyId]
 					)->id;
 				}
 
@@ -75,12 +77,16 @@ final class CsvImportController extends Controller
 				// If ID is provided, use it; otherwise try to find by name to merge duplicates
 				$product = null;
 				if ($productId !== null && $productId > 0) {
-					$product = Product::query()->find($productId);
+					$product = Product::query()
+						->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+						->whereKey($productId)
+						->first();
 				}
 
 				// If not found by ID, try to find by name + category to merge duplicates
 				if ($product === null) {
 					$product = Product::query()
+						->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 						->where('name', $name)
 						->when($categoryId !== null, fn ($q) => $q->where('category_id', $categoryId))
 						->when($categoryId === null, fn ($q) => $q->whereNull('category_id'))
@@ -90,6 +96,7 @@ final class CsvImportController extends Controller
 				// If still not found, create new product
 				if ($product === null) {
 					$product = Product::query()->create([
+						'company_id' => $companyId,
 						'category_id' => $categoryId,
 						'name' => $name,
 						'description' => $data['description'] ?? null,
@@ -102,6 +109,9 @@ final class CsvImportController extends Controller
 					}
 					if (isset($data['description']) && $data['description'] !== null && $data['description'] !== '') {
 						$updateData['description'] = $data['description'];
+					}
+					if ($companyId !== null) {
+						$updateData['company_id'] = $companyId;
 					}
 					if (!empty($updateData)) {
 						$product->update($updateData);
@@ -127,12 +137,18 @@ final class CsvImportController extends Controller
 
 						// Try to find by ID if numeric
 						if (is_numeric($supplierItem)) {
-							$supplier = Supplier::query()->find((int) $supplierItem);
+							$supplier = Supplier::query()
+								->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+								->whereKey((int) $supplierItem)
+								->first();
 						}
 
 						// If not found by ID, try to find by name
 						if ($supplier === null) {
-							$supplier = Supplier::query()->where('name', $supplierItem)->first();
+							$supplier = Supplier::query()
+								->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+								->where('name', $supplierItem)
+								->first();
 						}
 
 						if ($supplier !== null) {
@@ -175,6 +191,8 @@ final class CsvImportController extends Controller
 			'file' => ['required', 'file', 'mimes:csv,txt'],
 		]);
 
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+
 		$filePath = $request->file('file')?->getRealPath();
 
 		if ($filePath === false || $filePath === null) {
@@ -186,7 +204,7 @@ final class CsvImportController extends Controller
 
 		$header = null;
 
-		DB::transaction(static function () use ($csv, &$header): void {
+		DB::transaction(static function () use ($csv, &$header, $companyId): void {
 			foreach ($csv as $row) {
 				if (!is_array($row) || count($row) === 1 && $row[0] === null) {
 					continue;
@@ -211,10 +229,22 @@ final class CsvImportController extends Controller
 
 				$supplierId = (int) ($data['id'] ?? 0) ?: null;
 
+				if ($supplierId !== null && $companyId !== null) {
+					$owned = Supplier::query()
+						->whereKey($supplierId)
+						->where('company_id', $companyId)
+						->exists();
+
+					if (!$owned) {
+						$supplierId = null;
+					}
+				}
+
 				// Check for duplicate name if creating new supplier (optional - no unique constraint in DB)
 				// But we'll skip if exact duplicate exists to avoid confusion
 				if ($supplierId === null) {
 					$existing = Supplier::query()
+						->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 						->where('name', $name)
 						->where('phone', $data['phone'] ?? null)
 						->where('email', $data['email'] ?? null)
@@ -227,6 +257,7 @@ final class CsvImportController extends Controller
 				Supplier::query()->updateOrCreate(
 					['id' => $supplierId],
 					[
+						'company_id' => $companyId,
 						'name' => $name,
 						'contact_name' => $data['contact_name'] ?? null,
 						'phone' => $data['phone'] ?? null,
@@ -249,6 +280,8 @@ final class CsvImportController extends Controller
 			'file' => ['required', 'file', 'mimes:csv,txt'],
 		]);
 
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+
 		$filePath = $request->file('file')?->getRealPath();
 
 		if ($filePath === false || $filePath === null) {
@@ -260,7 +293,7 @@ final class CsvImportController extends Controller
 
 		$header = null;
 
-		DB::transaction(static function () use ($csv, &$header): void {
+		DB::transaction(static function () use ($csv, &$header, $companyId): void {
 			foreach ($csv as $row) {
 				if (!is_array($row) || count($row) === 1 && $row[0] === null) {
 					continue;
@@ -285,9 +318,23 @@ final class CsvImportController extends Controller
 
 				$categoryId = (int) ($data['id'] ?? 0) ?: null;
 
+				if ($categoryId !== null && $companyId !== null) {
+					$owned = ProductCategory::query()
+						->whereKey($categoryId)
+						->where('company_id', $companyId)
+						->exists();
+
+					if (!$owned) {
+						$categoryId = null;
+					}
+				}
+
 				// Check for duplicate name if creating new category
 				if ($categoryId === null) {
-					$existing = ProductCategory::query()->where('name', $name)->first();
+					$existing = ProductCategory::query()
+						->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+						->where('name', $name)
+						->first();
 					if ($existing !== null) {
 						continue; // Skip duplicate
 					}
@@ -296,6 +343,7 @@ final class CsvImportController extends Controller
 				ProductCategory::query()->updateOrCreate(
 					['id' => $categoryId],
 					[
+						'company_id' => $companyId,
 						'name' => $name,
 						'description' => $data['description'] ?? null,
 					]
@@ -314,6 +362,8 @@ final class CsvImportController extends Controller
 			'file' => ['required', 'file', 'mimes:csv,txt'],
 		]);
 
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+
 		$filePath = $request->file('file')?->getRealPath();
 
 		if ($filePath === false || $filePath === null) {
@@ -325,7 +375,7 @@ final class CsvImportController extends Controller
 
 		$header = null;
 
-		DB::transaction(static function () use ($csv, &$header): void {
+		DB::transaction(static function () use ($csv, &$header, $companyId): void {
 			foreach ($csv as $row) {
 				if (!is_array($row) || count($row) === 1 && $row[0] === null) {
 					continue;
@@ -354,8 +404,14 @@ final class CsvImportController extends Controller
 
 				$terms = $data['terms'] ?? null;
 
-				$product = Product::query()->find($productId);
-				$supplier = Supplier::query()->find($supplierId);
+				$product = Product::query()
+					->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+					->whereKey($productId)
+					->first();
+				$supplier = Supplier::query()
+					->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+					->whereKey($supplierId)
+					->first();
 
 				if ($product === null || $supplier === null) {
 					continue;

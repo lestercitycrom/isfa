@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Suppliers;
 
 use App\Models\Supplier;
+use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -16,7 +17,22 @@ final class Show extends Component
 
 	public function mount(Supplier $supplier): void
 	{
-		$this->supplier = $supplier->load('products.category');
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
+		if (!$isAdmin && $companyId !== null && (int) $supplier->company_id !== $companyId) {
+			abort(403);
+		}
+
+		$this->supplier = $supplier->load([
+			'products' => function ($q) use ($companyId): void {
+				if ($companyId !== null) {
+					$q->where('products.company_id', $companyId);
+				}
+
+				$q->with('category');
+			},
+		]);
 	}
 
 	public function render(): View

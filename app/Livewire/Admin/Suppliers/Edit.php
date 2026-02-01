@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Suppliers;
 
 use App\Models\Supplier;
+use App\Models\User;
+use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -13,6 +15,7 @@ use Livewire\Component;
 final class Edit extends Component
 {
 	public ?Supplier $supplier = null;
+	public ?int $company_id = null;
 
 	public string $name = '';
 	public ?string $contact_name = null;
@@ -23,21 +26,39 @@ final class Edit extends Component
 
 	public function mount(?Supplier $supplier = null): void
 	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
 		$this->supplier = $supplier;
 
 		if ($supplier !== null) {
+			if (!$isAdmin && $companyId !== null && (int) $supplier->company_id !== $companyId) {
+				abort(403);
+			}
+
+			$this->company_id = $supplier->company_id;
 			$this->name = $supplier->name;
 			$this->contact_name = $supplier->contact_name;
 			$this->phone = $supplier->phone;
 			$this->email = $supplier->email;
 			$this->website = $supplier->website;
 			$this->comment = $supplier->comment;
+		} elseif (!$isAdmin && $companyId !== null) {
+			$this->company_id = $companyId;
 		}
 	}
 
 	public function save(): void
 	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
+		if (!$isAdmin && $companyId !== null) {
+			$this->company_id = $companyId;
+		}
+
 		$this->validate([
+			'company_id' => ['nullable', 'integer', 'exists:users,id'],
 			'name' => ['required', 'string', 'max:255'],
 			'contact_name' => ['nullable', 'string', 'max:255'],
 			'phone' => ['nullable', 'string', 'max:255'],
@@ -49,6 +70,7 @@ final class Edit extends Component
 		$supplier = Supplier::query()->updateOrCreate(
 			['id' => $this->supplier?->id],
 			[
+				'company_id' => $this->company_id,
 				'name' => $this->name,
 				'contact_name' => $this->contact_name,
 				'phone' => $this->phone,
@@ -65,6 +87,11 @@ final class Edit extends Component
 
 	public function render(): View
 	{
-		return view('livewire.admin.suppliers.edit');
+		$isAdmin = CompanyContext::isAdmin();
+
+		return view('livewire.admin.suppliers.edit', [
+			'companies' => $isAdmin ? User::query()->companies()->orderBy('company_name')->get() : collect(),
+			'isAdmin' => $isAdmin,
+		]);
 	}
 }
