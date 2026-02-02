@@ -40,7 +40,7 @@ final class Login extends Component
 
 		session()->regenerate();
 
-		$this->redirect(route('admin.products.index'), navigate: true);
+		$this->redirect(route('admin.dashboard'), navigate: true);
 	}
 
 	protected function ensureIsNotRateLimited(): void

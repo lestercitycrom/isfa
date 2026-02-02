@@ -22,6 +22,7 @@ final class ProductCategory extends Model
 		'company_id',
 		'name',
 		'description',
+		'comment',
 	];
 
 	/**

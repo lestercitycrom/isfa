@@ -264,17 +264,15 @@ final class CsvImportController extends Controller
 					}
 				}
 
-				// Check for duplicate name if creating new supplier (optional - no unique constraint in DB)
-				// But we'll skip if exact duplicate exists to avoid confusion
+				// If no valid ID provided, prefer existing supplier with same name inside the company.
 				if ($supplierId === null) {
 					$existing = Supplier::query()
 						->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+						->when($companyId === null, fn ($q) => $q->whereNull('company_id'))
 						->where('name', $name)
-						->where('phone', $data['phone'] ?? null)
-						->where('email', $data['email'] ?? null)
 						->first();
 					if ($existing !== null) {
-						continue; // Skip exact duplicate
+						$supplierId = $existing->id;
 					}
 				}
 

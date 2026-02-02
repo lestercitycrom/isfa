@@ -40,6 +40,7 @@ return [
 
 	'flash' => [
 		'synced' => 'Tender sinxronlaşdırıldı: #:id',
+		'deleted' => 'Tender silindi.',
 	],
 
 	'errors' => [

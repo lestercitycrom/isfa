@@ -10,6 +10,7 @@ use App\Models\Tender;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Spatie\Activitylog\Models\Activity;
@@ -23,6 +24,8 @@ final class Show extends Component
 
 	public string $productSearch = '';
 	public int $attachProductId = 0;
+	public bool $showProductDropdown = false;
+	public ?string $comment = null;
 
 	/**
 	 * @var array<string, array<string, string>>
@@ -46,6 +49,8 @@ final class Show extends Component
 			'products.category',
 		]);
 
+		$this->comment = $this->tender->comment;
+
 		$this->dictLabels = $this->buildDictionaryLabelMaps([
 			'event_type',
 			'event_status',
@@ -64,30 +69,31 @@ final class Show extends Component
 
 	public function setTab(string $tab): void
 	{
-		$allowed = ['details', 'products', 'history'];
+		$allowed = ['details', 'products', 'history', 'comments'];
 
 		$this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
 	}
 
 	public function attachProduct(int $productId): void
 	{
+		$isAdmin = CompanyContext::isAdmin();
 		$companyId = $this->tender->company_id !== null ? (int) $this->tender->company_id : null;
 
-		if ($companyId === null) {
+		$productQuery = Product::query()->whereKey($productId);
+		if ($companyId !== null) {
+			$productQuery->where('company_id', $companyId);
+		} elseif (!$isAdmin) {
 			return;
 		}
 
-		$product = Product::query()
-			->whereKey($productId)
-			->where('company_id', $companyId)
-			->firstOrFail();
+		$product = $productQuery->firstOrFail();
 
 		if ($this->tender->products()->whereKey($productId)->exists()) {
 			return;
 		}
 
 		$this->tender->products()->attach($productId, [
-			'company_id' => $companyId,
+			'company_id' => $companyId ?? $product->company_id,
 		]);
 
 		activity()
@@ -101,16 +107,49 @@ final class Show extends Component
 			->log('Product attached');
 
 		$this->productSearch = '';
+		$this->showProductDropdown = false;
 		$this->tender->load('products.category');
 		session()->flash('status', __('common.product_attached'));
 	}
 
 	public function attachSelectedProduct(): void
 	{
+		if ($this->attachProductId === 0) {
+			$first = $this->productOptions()->first();
+			if ($first !== null) {
+				$this->attachProductId = (int) $first->id;
+			}
+		}
+
 		if ($this->attachProductId > 0) {
 			$this->attachProduct($this->attachProductId);
 			$this->attachProductId = 0;
 		}
+	}
+
+	public function attachFromSearch(): void
+	{
+		$this->attachSelectedProduct();
+	}
+
+	public function updatedProductSearch(): void
+	{
+		$this->attachProductId = 0;
+		$this->showProductDropdown = true;
+	}
+
+	public function selectProduct(int $productId): void
+	{
+		$product = $this->productOptions()
+			->first(fn (Product $item) => (int) $item->id === $productId);
+
+		if ($product === null) {
+			return;
+		}
+
+		$this->attachProductId = $productId;
+		$this->productSearch = $product->name . ' (#' . $product->id . ')';
+		$this->showProductDropdown = false;
 	}
 
 	public function detachProduct(int $productId): void
@@ -143,6 +182,24 @@ final class Show extends Component
 		session()->flash('status', __('common.product_detached'));
 	}
 
+	public function saveComment(): void
+	{
+		if (!Schema::hasColumn($this->tender->getTable(), 'comment')) {
+			$raw = is_array($this->tender->raw) ? $this->tender->raw : [];
+			$raw['comment'] = $this->comment;
+			$this->tender->update(['raw' => $raw]);
+			session()->flash('status', __('common.saved'));
+
+			return;
+		}
+
+		$this->tender->update([
+			'comment' => $this->comment,
+		]);
+
+		session()->flash('status', __('common.saved'));
+	}
+
 	/**
 	 * @return Collection<int, Activity>
 	 */
@@ -163,12 +220,14 @@ final class Show extends Component
 	{
 		$search = trim($this->productSearch);
 
-		if ($this->tender->company_id === null) {
+		$companyId = $this->tender->company_id !== null ? (int) $this->tender->company_id : null;
+
+		if ($companyId === null && !CompanyContext::isAdmin()) {
 			return collect();
 		}
 
 		$query = Product::query()
-			->where('company_id', $this->tender->company_id)
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 			->whereDoesntHave('tenders', function ($query): void {
 				$query->whereKey($this->tender->getKey());
 			})
@@ -179,7 +238,7 @@ final class Show extends Component
 			$query->where('name', 'like', '%' . $search . '%');
 		}
 
-		return $query->limit(12)->get();
+		return $query->limit(20)->get();
 	}
 
 	/**

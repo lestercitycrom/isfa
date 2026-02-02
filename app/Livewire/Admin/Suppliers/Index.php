@@ -61,7 +61,15 @@ final class Index extends Component
 		$suppliers = Supplier::query()
 			->with('company')
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
-			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
+			->when($isAdmin && $this->companyFilter !== null, function ($q): void {
+				if ($this->companyFilter === 0) {
+					$q->whereNull('company_id');
+
+					return;
+				}
+
+				$q->where('company_id', $this->companyFilter);
+			})
 			->when($this->search !== '', fn ($q) => $q->where('name', 'like', '%' . $this->search . '%'))
 			->orderBy('name')
 			->paginate(15);

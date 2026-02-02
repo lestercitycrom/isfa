@@ -13,6 +13,8 @@ use Livewire\Component;
 final class Show extends Component
 {
 	public User $company;
+	public string $tab = 'details';
+	public ?string $comment = null;
 
 	public function mount(User $company): void
 	{
@@ -21,6 +23,23 @@ final class Show extends Component
 		}
 
 		$this->company = $company;
+		$this->comment = $company->notes;
+	}
+
+	public function setTab(string $tab): void
+	{
+		$allowed = ['details', 'comments'];
+
+		$this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
+	}
+
+	public function saveComment(): void
+	{
+		$this->company->update([
+			'notes' => $this->comment,
+		]);
+
+		session()->flash('status', __('common.saved'));
 	}
 
 	public function render(): View

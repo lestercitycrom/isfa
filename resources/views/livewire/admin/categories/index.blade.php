@@ -46,6 +46,7 @@
 					icon="building"
 				>
 					<option value="">{{ __('common.all_companies') }}</option>
+					<option value="0">{{ __('common.admin') }}</option>
 					@foreach ($companies as $company)
 						<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
 					@endforeach

@@ -20,8 +20,8 @@ final class Index extends Component
 	use WithPagination;
 
 	public string $search = '';
-	public ?int $categoryFilter = null;
-	public ?int $supplierFilter = null;
+	public string $categoryFilter = '';
+	public string $supplierFilter = '';
 	public ?int $companyFilter = null;
 
 	public function updatedSearch(): void
@@ -75,16 +75,26 @@ final class Index extends Component
 		$products = Product::query()
 			->with('category', 'suppliers', 'company')
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
-			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
+			->when($isAdmin && $this->companyFilter !== null, function ($q): void {
+				if ($this->companyFilter === 0) {
+					$q->whereNull('company_id');
+
+					return;
+				}
+
+				$q->where('company_id', $this->companyFilter);
+			})
 			->when($this->search !== '', function ($q): void {
 				$q->where('name', 'like', '%' . $this->search . '%');
 			})
-			->when($this->categoryFilter !== null, function ($q): void {
-				$q->where('category_id', $this->categoryFilter);
+			->when($this->categoryFilter !== '', function ($q): void {
+				$q->whereHas('category', function ($q): void {
+					$q->where('name', $this->categoryFilter);
+				});
 			})
-			->when($this->supplierFilter !== null, function ($q): void {
+			->when($this->supplierFilter !== '', function ($q): void {
 				$q->whereHas('suppliers', function ($q): void {
-					$q->where('suppliers.id', $this->supplierFilter);
+					$q->where('suppliers.name', $this->supplierFilter);
 				});
 			})
 			->orderBy('name')
@@ -92,14 +102,18 @@ final class Index extends Component
 
 		$categories = ProductCategory::query()
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
-			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
+			->select('name')
+			->whereNotNull('name')
+			->distinct()
 			->orderBy('name')
-			->get();
+			->pluck('name');
 		$suppliers = Supplier::query()
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
-			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
+			->select('name')
+			->whereNotNull('name')
+			->distinct()
 			->orderBy('name')
-			->get();
+			->pluck('name');
 
 		return view('livewire.admin.products.index', [
 			'products' => $products,

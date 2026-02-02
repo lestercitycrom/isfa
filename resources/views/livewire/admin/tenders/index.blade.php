@@ -108,6 +108,7 @@
 							class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
 						>
 							<option value="">{{ __('common.all_companies') }}</option>
+							<option value="0">{{ __('common.admin') }}</option>
 							@foreach ($companies as $company)
 								<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
 							@endforeach
@@ -164,14 +165,23 @@
 							@endif
 
 							<td class="px-4 py-3 text-right">
-								<a
-									class="inline-flex items-center justify-center rounded-xl h-9 w-9 transition focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 focus:ring-slate-300"
-									href="{{ route('admin.tenders.show', $tender) }}"
-									title="{{ __('tenders.actions.open') }}"
-									aria-label="{{ __('tenders.actions.open') }}"
-								>
-									<x-admin.icon name="eye" class="h-4 w-4" />
-								</a>
+								<div class="inline-flex items-center gap-2">
+									<a
+										class="inline-flex items-center justify-center rounded-xl h-9 w-9 transition focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 focus:ring-slate-300"
+										href="{{ route('admin.tenders.show', $tender) }}"
+										title="{{ __('tenders.actions.open') }}"
+										aria-label="{{ __('tenders.actions.open') }}"
+									>
+										<x-admin.icon name="eye" class="h-4 w-4" />
+									</a>
+									<x-admin.icon-button
+										wire:click="delete({{ $tender->id }})"
+										onclick="return confirm('{{ __('common.confirm_delete') }}')"
+										icon="trash"
+										:title="__('common.delete')"
+										variant="danger"
+									/>
+								</div>
 							</td>
 						</tr>
 					@empty
@@ -192,4 +202,3 @@
 		@endif
 	</div>
 </div>
-

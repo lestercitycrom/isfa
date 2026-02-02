@@ -140,7 +140,7 @@ final class ProfilePage extends Component
 		$user = Auth::user();
 
 		if ($user->hasVerifiedEmail()) {
-			$this->redirect(route('admin.products.index'));
+			$this->redirect(route('admin.dashboard'));
 
 			return;
 		}

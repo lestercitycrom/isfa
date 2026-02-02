@@ -38,6 +38,7 @@ class Tender extends Model
 		'view_fee',
 		'participation_fee',
 		'raw',
+		'comment',
 	];
 
 	protected $casts = [

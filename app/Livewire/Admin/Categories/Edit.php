@@ -8,6 +8,7 @@ use App\Models\ProductCategory;
 use App\Models\User;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -24,6 +25,7 @@ final class Edit extends Component
 	public ?int $company_id = null;
 	public string $name = '';
 	public ?string $description = null;
+	public ?string $comment = null;
 
 	public function mount(?ProductCategory $category = null): void
 	{
@@ -40,6 +42,7 @@ final class Edit extends Component
 			$this->company_id = $category->company_id;
 			$this->name = $category->name;
 			$this->description = $category->description;
+			$this->comment = $category->comment;
 		} elseif (!$isAdmin && $companyId !== null) {
 			$this->company_id = $companyId;
 		}
@@ -47,7 +50,7 @@ final class Edit extends Component
 
 	public function setTab(string $tab): void
 	{
-		$allowed = ['details', 'history'];
+		$allowed = ['details', 'history', 'comments'];
 
 		$this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
 	}
@@ -79,13 +82,19 @@ final class Edit extends Component
 			'name.unique' => __('common.category_name_already_exists'),
 		]);
 
+		$payload = [
+			'company_id' => $this->company_id,
+			'name' => $this->name,
+			'description' => $this->description,
+		];
+
+		if (Schema::hasColumn((new ProductCategory())->getTable(), 'comment')) {
+			$payload['comment'] = $this->comment;
+		}
+
 		$category = ProductCategory::query()->updateOrCreate(
 			['id' => $this->category?->id],
-			[
-				'company_id' => $this->company_id,
-				'name' => $this->name,
-				'description' => $this->description,
-			]
+			$payload
 		);
 
 		session()->flash('status', __('common.category_saved'));
@@ -102,6 +111,25 @@ final class Edit extends Component
 			'isAdmin' => CompanyContext::isAdmin(),
 			'activities' => $this->loadActivities(),
 		]);
+	}
+
+	public function saveComment(): void
+	{
+		if ($this->category === null) {
+			return;
+		}
+
+		if (!Schema::hasColumn($this->category->getTable(), 'comment')) {
+			session()->flash('status', __('common.comment_column_missing'));
+
+			return;
+		}
+
+		$this->category->update([
+			'comment' => $this->comment,
+		]);
+
+		session()->flash('status', __('common.saved'));
 	}
 
 	/**

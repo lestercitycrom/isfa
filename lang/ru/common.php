@@ -3,6 +3,7 @@
 return [
 	// Navigation
 	'products' => 'Товары',
+	'dashboard' => 'Дашборд',
 	'suppliers' => 'Поставщики',
 	'categories' => 'Категории',
 	'tenders' => 'Тендеры',
@@ -56,6 +57,7 @@ return [
 	'confirm_delete_all_products' => 'Вы уверены, что хотите удалить ВСЕ товары? Это действие необратимо!',
 	'confirm_delete_all_suppliers' => 'Вы уверены, что хотите удалить ВСЕХ поставщиков? Это действие необратимо!',
 	'confirm_delete_all_categories' => 'Вы уверены, что хотите удалить ВСЕ категории? Это действие необратимо!',
+	'confirm_delete' => 'Удалить запись?',
 	'confirm_delete_category' => 'Удалить категорию?',
 
 	// Status messages
@@ -95,7 +97,18 @@ return [
 	'user' => 'Пользователь',
 	'time' => 'Время',
 	'changes' => 'Изменения',
+	'details' => 'Подробнее',
+	'activity_summary' => ':event :subject «:title»',
+	'comment_column_missing' => 'Колонка для комментариев отсутствует в БД. Выполните миграции.',
 	'activity_log_subtitle' => 'История действий пользователей и изменения в сущностях.',
+	'dashboard_subtitle_admin' => 'Сводная аналитика по всем компаниям и данным администратора.',
+	'dashboard_subtitle_company' => 'Сводная аналитика по данным вашей компании.',
+	'tenders_last_30_days' => 'Тендеры за 30 дней',
+	'coverage' => 'Покрытие товаров тендерами',
+	'top_categories' => 'Топ категорий',
+	'top_suppliers' => 'Топ поставщиков',
+	'tender_status_breakdown' => 'Распределение по статусам тендеров',
+	'tender_status_breakdown_hint' => 'Показывает, сколько тендеров в каждом статусе и их долю в процентах.',
 
 	// Product/Supplier fields
 	'contact_name' => 'Контактное лицо',
@@ -103,6 +116,7 @@ return [
 	'email' => 'Email',
 	'website' => 'Сайт',
 	'comment' => 'Комментарий',
+	'comments' => 'Комментарии',
 
 	// Status
 	'status' => 'Статус',
@@ -261,6 +275,7 @@ return [
 	'companies_subtitle' => 'Список всех компаний',
 	'add_company' => 'Добавить компанию',
 	'company' => 'Компания',
+	'admin' => 'Админ',
 	'company_name' => 'Название компании',
 	'legal_name' => 'Юридическое наименование',
 	'tax_id' => 'ИНН / Налоговый номер',
@@ -280,5 +295,3 @@ return [
 	'notes' => 'Заметки',
 	'password' => 'Пароль',
 ];
-
-

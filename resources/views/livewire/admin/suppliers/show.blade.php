@@ -31,6 +31,14 @@
 		>
 			{{ __('common.tab_history') }}
 		</button>
+		<button
+			type="button"
+			wire:click="setTab('comments')"
+			class="px-4 py-2 text-sm font-semibold rounded-xl border transition
+				{{ $tab === 'comments' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' }}"
+		>
+			{{ __('common.comments') }}
+		</button>
 	</div>
 
 	@if($tab === 'details')
@@ -66,12 +74,6 @@
 						</div>
 					@endif
 				</div>
-			</x-admin.card>
-		@endif
-
-		@if ($supplier->comment)
-			<x-admin.card>
-				<div class="text-sm text-slate-700 whitespace-pre-line">{{ $supplier->comment }}</div>
 			</x-admin.card>
 		@endif
 
@@ -121,6 +123,21 @@
 	@if($tab === 'history')
 		<x-admin.card :title="__('common.activity_history')">
 			@include('partials.admin.activity-history', ['activities' => $activities])
+		</x-admin.card>
+	@endif
+
+	@if($tab === 'comments')
+		<x-admin.card :title="__('common.comments')">
+			<form wire:submit.prevent="saveComment" class="space-y-4">
+				<x-admin.input
+					:label="__('common.comment')"
+					type="textarea"
+					wire:model="comment"
+				/>
+				<x-admin.button variant="primary" type="submit">
+					{{ __('common.save') }}
+				</x-admin.button>
+			</form>
 		</x-admin.card>
 	@endif
 </div>

@@ -10,6 +10,7 @@ use App\Livewire\Admin\Categories\Edit as CategoriesEdit;
 use App\Livewire\Admin\Companies\Edit as CompaniesEdit;
 use App\Livewire\Admin\Companies\Index as CompaniesIndex;
 use App\Livewire\Admin\Companies\Show as CompaniesShow;
+use App\Livewire\Admin\Dashboard\Index as DashboardIndex;
 use App\Livewire\Admin\ImportExport\Index as ImportExportIndex;
 use App\Livewire\Admin\Products\Edit as ProductEdit;
 use App\Livewire\Admin\Products\Index as ProductsIndex;
@@ -29,7 +30,7 @@ use Illuminate\Support\Facades\Route;
  */
 Route::get('/', function () {
 	if (auth()->check()) {
-		return redirect()->route('admin.products.index');
+		return redirect()->route('admin.dashboard');
 	}
 
 	return redirect()->route('login');
@@ -52,11 +53,9 @@ Route::middleware('auth')->group(function () {
 require __DIR__ . '/settings.php';
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function (): void {
-	Route::get('/', static fn () => redirect()->route('admin.products.index'))->name('home');
+	Route::get('/', static fn () => redirect()->route('admin.dashboard'))->name('home');
 
-	Route::middleware('auth')->get('/dashboard', static function () {
-		return redirect()->route('admin.products.index');
-	})->name('dashboard');
+	Route::get('/dashboard', DashboardIndex::class)->name('dashboard');
 
 	Route::get('/categories', CategoriesIndex::class)->name('categories.index');
 	Route::get('/categories/create', CategoriesEdit::class)->name('categories.create');

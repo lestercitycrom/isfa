@@ -44,7 +44,7 @@
 			>
 				<option value="">{{ __('common.all_categories') }}</option>
 				@foreach ($categories as $cat)
-					<option value="{{ $cat->id }}">{{ $cat->name }}</option>
+					<option value="{{ $cat }}">{{ $cat }}</option>
 				@endforeach
 			</x-admin.filter-select>
 		</div>
@@ -56,7 +56,7 @@
 			>
 				<option value="">{{ __('common.all_suppliers') }}</option>
 				@foreach ($suppliers as $supplier)
-					<option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+					<option value="{{ $supplier }}">{{ $supplier }}</option>
 				@endforeach
 			</x-admin.filter-select>
 		</div>
@@ -68,6 +68,7 @@
 					icon="building"
 				>
 					<option value="">{{ __('common.all_companies') }}</option>
+					<option value="0">{{ __('common.admin') }}</option>
 					@foreach ($companies as $company)
 						<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
 					@endforeach
@@ -75,7 +76,7 @@
 			</div>
 		@endif
 		<div class="lg:col-span-2">
-			<x-admin.button variant="secondary" wire:click="$set('categoryFilter', null); $set('supplierFilter', null); $set('companyFilter', null); $set('search', '')">
+			<x-admin.button variant="secondary" wire:click="$set('categoryFilter', ''); $set('supplierFilter', ''); $set('companyFilter', null); $set('search', '')">
 				{{ __('common.reset') }}
 			</x-admin.button>
 		</div>
@@ -143,26 +144,25 @@
 		</div>
 	</x-admin.card>
 
-	<!-- Danger Zone -->
-	<div class="rounded-2xl border-2 border-red-200 bg-red-50 p-6">
-		<div class="flex items-start justify-between gap-4">
-			<div class="flex-1">
-				<h3 class="text-lg font-semibold text-red-900">{{ __('common.danger_zone') }}</h3>
-				<p class="mt-1 text-sm text-red-700">
-					{{ __('common.delete_all_products_warning') }}
-				</p>
+	@if(false)
+		<!-- Danger Zone -->
+		<div class="rounded-2xl border-2 border-red-200 bg-red-50 p-6">
+			<div class="flex items-start justify-between gap-4">
+				<div class="flex-1">
+					<h3 class="text-lg font-semibold text-red-900">{{ __('common.danger_zone') }}</h3>
+					<p class="mt-1 text-sm text-red-700">
+						{{ __('common.delete_all_products_warning') }}
+					</p>
+				</div>
+				<x-admin.button
+					variant="danger"
+					size="md"
+					wire:click="deleteAllProducts"
+					onclick="if(!confirm('{{ __('common.confirm_delete_all_products') }}')){event.preventDefault();event.stopImmediatePropagation();}"
+				>
+					{{ __('common.delete_all_products') }}
+				</x-admin.button>
 			</div>
-			<x-admin.button
-				variant="danger"
-				size="md"
-				wire:click="deleteAllProducts"
-				onclick="if(!confirm('{{ __('common.confirm_delete_all_products') }}')){event.preventDefault();event.stopImmediatePropagation();}"
-			>
-				{{ __('common.delete_all_products') }}
-			</x-admin.button>
 		</div>
-	</div>
+	@endif
 </div>
-
-
-

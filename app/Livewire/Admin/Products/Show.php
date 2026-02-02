@@ -6,9 +6,11 @@ namespace App\Livewire\Admin\Products;
 
 use App\Enums\ProductSupplierStatus;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Supplier;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -20,6 +22,7 @@ final class Show extends Component
 {
 	public Product $product;
 	public string $tab = 'details';
+	public ?string $comment = null;
 
 	public int $attachSupplierId = 0;
 	public string $attachStatus = 'reserve';
@@ -45,6 +48,7 @@ final class Show extends Component
 		}
 
 		$this->product = $product->load(['category', 'suppliers']);
+		$this->comment = $this->product->comment;
 
 		foreach ($this->product->suppliers as $supplier) {
 			$this->pivotStatus[(int) $supplier->id] = $supplier->pivot->status instanceof ProductSupplierStatus 
@@ -127,14 +131,33 @@ final class Show extends Component
 				->orderBy('name')
 				->get(),
 			'activities' => $this->loadActivities(),
+			'categoryMap' => ProductCategory::query()
+				->when($this->product->company_id !== null, fn ($q) => $q->where('company_id', $this->product->company_id))
+				->pluck('name', 'id')
+				->toArray(),
 		]);
 	}
 
 	public function setTab(string $tab): void
 	{
-		$allowed = ['details', 'history'];
+		$allowed = ['details', 'history', 'comments'];
 
 		$this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
+	}
+
+	public function saveComment(): void
+	{
+		if (!Schema::hasColumn($this->product->getTable(), 'comment')) {
+			session()->flash('status', __('common.comment_column_missing'));
+
+			return;
+		}
+
+		$this->product->update([
+			'comment' => $this->comment,
+		]);
+
+		session()->flash('status', __('common.saved'));
 	}
 
 	/**

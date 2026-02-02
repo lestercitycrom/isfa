@@ -3,6 +3,7 @@
 return [
 	// Navigation
 	'products' => 'Məhsullar',
+	'dashboard' => 'Panel',
 	'suppliers' => 'Təchizatçılar',
 	'categories' => 'Kateqoriyalar',
 	'tenders' => 'Tenderlər',
@@ -56,6 +57,7 @@ return [
 	'confirm_delete_all_products' => 'BÜTÜN məhsulları silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarılmaz!',
 	'confirm_delete_all_suppliers' => 'BÜTÜN təchizatçıları silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarılmaz!',
 	'confirm_delete_all_categories' => 'BÜTÜN kateqoriyaları silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarılmaz!',
+	'confirm_delete' => 'Qeyd silinsin?',
 	'confirm_delete_category' => 'Kateqoriyanı silmək istəyirsiniz?',
 
 	// Status messages
@@ -95,7 +97,18 @@ return [
 	'user' => 'İstifadəçi',
 	'time' => 'Vaxt',
 	'changes' => 'Dəyişikliklər',
+	'details' => 'Ətraflı',
+	'activity_summary' => ':event :subject ":title"',
+	'comment_column_missing' => 'Şərh sütunu bazada yoxdur. Miqrasiyaları işə salın.',
 	'activity_log_subtitle' => 'İstifadəçi əməliyyatları və dəyişikliklər tarixi.',
+	'dashboard_subtitle_admin' => 'Bütün şirkətlər və admin məlumatları üzrə ümumi analitika.',
+	'dashboard_subtitle_company' => 'Şirkətinizin məlumatları üzrə ümumi analitika.',
+	'tenders_last_30_days' => 'Son 30 gündə tenderlər',
+	'coverage' => 'Tenderlərlə məhsul əhatəsi',
+	'top_categories' => 'Top kateqoriyalar',
+	'top_suppliers' => 'Top təchizatçılar',
+	'tender_status_breakdown' => 'Tender statuslarına görə bölgü',
+	'tender_status_breakdown_hint' => 'Hər status üzrə tender sayı və ümumi payı göstərilir.',
 
 	// Product/Supplier fields
 	'contact_name' => 'Əlaqədar şəxs',
@@ -103,6 +116,7 @@ return [
 	'email' => 'Email',
 	'website' => 'Veb sayt',
 	'comment' => 'Şərh',
+	'comments' => 'Şərhlər',
 
 	// Status
 	'status' => 'Status',
@@ -261,6 +275,7 @@ return [
 	'companies_subtitle' => 'Bütün şirkətlərin siyahısı',
 	'add_company' => 'Şirkət əlavə et',
 	'company' => 'Şirkət',
+	'admin' => 'Admin',
 	'company_name' => 'Şirkətin adı',
 	'legal_name' => 'Hüquqi adı',
 	'tax_id' => 'VÖEN',
@@ -280,5 +295,3 @@ return [
 	'notes' => 'Qeydlər',
 	'password' => 'Şifrə',
 ];
-
-

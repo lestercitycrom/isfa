@@ -7,6 +7,7 @@ namespace App\Livewire\Admin\Suppliers;
 use App\Models\Supplier;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Spatie\Activitylog\Models\Activity;
@@ -17,6 +18,7 @@ final class Show extends Component
 {
 	public Supplier $supplier;
 	public string $tab = 'details';
+	public ?string $comment = null;
 
 	public function mount(Supplier $supplier): void
 	{
@@ -36,6 +38,8 @@ final class Show extends Component
 				$q->with('category');
 			},
 		]);
+
+		$this->comment = $this->supplier->comment;
 	}
 
 	public function render(): View
@@ -47,9 +51,24 @@ final class Show extends Component
 
 	public function setTab(string $tab): void
 	{
-		$allowed = ['details', 'history'];
+		$allowed = ['details', 'history', 'comments'];
 
 		$this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
+	}
+
+	public function saveComment(): void
+	{
+		if (!Schema::hasColumn($this->supplier->getTable(), 'comment')) {
+			session()->flash('status', __('common.comment_column_missing'));
+
+			return;
+		}
+
+		$this->supplier->update([
+			'comment' => $this->comment,
+		]);
+
+		session()->flash('status', __('common.saved'));
 	}
 
 	/**

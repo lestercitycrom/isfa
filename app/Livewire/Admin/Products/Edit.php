@@ -86,6 +86,8 @@ final class Edit extends Component
 				$nameRule,
 			],
 			'description' => ['nullable', 'string'],
+		], [
+			'name.unique' => __('common.product_name_already_exists'),
 		]);
 
 		$product = Product::query()->updateOrCreate(

@@ -18,7 +18,7 @@
 	<header class="sticky top-0 z-40 bg-gradient-to-r from-slate-900 to-slate-800 text-slate-100 border-b border-white/10">
 		<div class="mx-auto {{ config('admin-kit.layout.container', 'max-w-7xl') }} px-4">
 			<div class="h-16 flex items-center justify-between gap-4">
-				<a href="{{ route('admin.products.index') }}" class="flex items-center gap-2">
+				<a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
 					<img src="{{ asset('favicon.png') }}" alt="{{ config('app.name') }}" class="h-9 w-9 rounded-xl">
 					<span class="font-semibold tracking-wide">{{ config('app.name') }}</span>
 				</a>

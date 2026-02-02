@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace App\Support;
 
+use App\Models\Product;
+use App\Models\ProductCategory;
+use App\Models\Supplier;
+use App\Models\Tender;
+use App\Models\User;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Models\Activity;
 
 final class ActivityLogFormatter
 {
@@ -111,5 +117,48 @@ final class ActivityLogFormatter
 		}
 
 		return (string) $value;
+	}
+
+	public static function subjectTypeLabel(?string $subjectType): string
+	{
+		return match ((string) $subjectType) {
+			Tender::class => __('common.tender'),
+			Product::class => __('common.product'),
+			ProductCategory::class => __('common.category'),
+			Supplier::class => __('common.supplier'),
+			User::class => __('common.company'),
+			default => __('common.subject'),
+		};
+	}
+
+	public static function subjectTitle(Activity $activity): string
+	{
+		$subject = $activity->subject;
+
+		if ($subject === null) {
+			return '#' . ((string) $activity->subject_id);
+		}
+
+		foreach (['name', 'title', 'company_name', 'event_id'] as $field) {
+			$value = $subject->{$field} ?? null;
+			if ($value !== null && trim((string) $value) !== '') {
+				return (string) $value;
+			}
+		}
+
+		return '#' . ((string) $activity->subject_id);
+	}
+
+	public static function summary(Activity $activity): string
+	{
+		$event = mb_strtolower(self::eventLabel($activity->event));
+		$subject = mb_strtolower(self::subjectTypeLabel($activity->subject_type));
+		$title = self::subjectTitle($activity);
+
+		return __('common.activity_summary', [
+			'event' => $event,
+			'subject' => $subject,
+			'title' => $title,
+		]);
 	}
 }

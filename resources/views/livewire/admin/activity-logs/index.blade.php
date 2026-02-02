@@ -51,17 +51,19 @@
 			</x-slot>
 
 			@forelse($activities as $activity)
-				@php
-					$subject = $activity->subject;
-					$subjectLabel = $subject?->name ?? $subject?->title ?? ('#' . $activity->subject_id);
-					$subjectTypeLabel = $subjectOptions[$activity->subject_type] ?? class_basename((string) $activity->subject_type);
-					$eventLabel = $eventOptions[$activity->event] ?? $activity->event ?? '—';
-					$changes = $activity->changes->get('attributes', []);
-					$changeLabels = array_map(
-						fn ($field) => \App\Support\ActivityLogFormatter::labelFor((string) $field),
-						array_keys($changes)
-					);
-					$subjectRoute = null;
+					@php
+						$subject = $activity->subject;
+						$subjectLabel = \App\Support\ActivityLogFormatter::subjectTitle($activity);
+						$subjectTypeLabel = \App\Support\ActivityLogFormatter::subjectTypeLabel($activity->subject_type);
+						$eventLabel = \App\Support\ActivityLogFormatter::eventLabel($activity->event);
+						$summary = \App\Support\ActivityLogFormatter::summary($activity);
+						$rawDescription = (string) $activity->description;
+						$rawEvent = (string) $activity->event;
+						$hideDescription = $rawDescription === '' || $rawDescription === $rawEvent || in_array($rawDescription, ['created', 'updated', 'deleted', 'attached', 'detached'], true);
+						$changes = $activity->changes->get('attributes', []);
+						$oldValues = $activity->changes->get('old', []);
+						$hasDetails = !$hideDescription || (is_array($changes) && count($changes) > 0);
+						$subjectRoute = null;
 
 					if ($activity->subject_type === \App\Models\Tender::class) {
 						$subjectRoute = route('admin.tenders.show', $activity->subject_id);
@@ -93,11 +95,35 @@
 						<div class="mt-1 text-xs text-slate-500">ID: {{ $activity->subject_id ?? '—' }}</div>
 					</x-admin.td>
 					<x-admin.td>
-						<div class="text-sm text-slate-800">{{ $activity->description }}</div>
-						@if($activity->changes->isNotEmpty())
-							<div class="mt-1 text-xs text-slate-500">
-								{{ __('common.changes') }}: {{ implode(', ', $changeLabels) }}
-							</div>
+						<div class="text-sm font-semibold text-slate-900">{{ $summary }}</div>
+						@if($hasDetails)
+							<details class="mt-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+								<summary class="cursor-pointer text-xs font-semibold text-slate-600">
+									{{ __('common.details') }}
+								</summary>
+								<div class="mt-2 space-y-2 text-xs text-slate-600">
+									@if(!$hideDescription)
+										<div>{{ $rawDescription }}</div>
+									@endif
+									@if(is_array($changes) && count($changes) > 0)
+										@foreach($changes as $field => $newValue)
+											@php
+												$label = \App\Support\ActivityLogFormatter::labelFor((string) $field);
+												$oldValue = \App\Support\ActivityLogFormatter::formatValue($oldValues[$field] ?? null);
+												$newValueFormatted = \App\Support\ActivityLogFormatter::formatValue($newValue);
+											@endphp
+											<div class="flex flex-wrap items-center gap-2">
+												<span class="rounded bg-white px-2 py-0.5 font-semibold text-slate-700">{{ $label }}</span>
+												@if($oldValue !== '-')
+													<span>{{ $oldValue }}</span>
+												@endif
+												<span class="text-slate-400">-></span>
+												<span class="font-medium text-slate-800">{{ $newValueFormatted }}</span>
+											</div>
+										@endforeach
+									@endif
+								</div>
+							</details>
 						@endif
 					</x-admin.td>
 					<x-admin.td>

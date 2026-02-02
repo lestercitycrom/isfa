@@ -8,6 +8,7 @@ use App\Models\Supplier;
 use App\Models\User;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -57,14 +58,22 @@ final class Edit extends Component
 			$this->company_id = $companyId;
 		}
 
+		$uniqueNameRule = Rule::unique('suppliers', 'name')
+			->ignore($this->supplier?->id)
+			->where(static function ($query): void {
+				$query->where('company_id', $this->company_id);
+			});
+
 		$this->validate([
 			'company_id' => ['nullable', 'integer', 'exists:users,id'],
-			'name' => ['required', 'string', 'max:255'],
+			'name' => ['required', 'string', 'max:255', $uniqueNameRule],
 			'contact_name' => ['nullable', 'string', 'max:255'],
 			'phone' => ['nullable', 'string', 'max:255'],
 			'email' => ['nullable', 'string', 'max:255'],
 			'website' => ['nullable', 'string', 'max:255'],
 			'comment' => ['nullable', 'string'],
+		], [
+			'name.unique' => __('common.supplier_name_already_exists'),
 		]);
 
 		$supplier = Supplier::query()->updateOrCreate(

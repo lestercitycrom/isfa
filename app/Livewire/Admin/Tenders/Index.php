@@ -51,6 +51,18 @@ final class Index extends Component
 		$this->resetPage();
 	}
 
+	public function delete(int $id): void
+	{
+		$companyId = CompanyContext::companyId();
+
+		Tender::query()
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->whereKey($id)
+			->delete();
+
+		session()->flash('status', __('tenders.flash.deleted'));
+	}
+
 	public function syncFromUrl(EtenderEventSyncService $syncService): void
 	{
 		$this->resetErrorBag();
@@ -130,7 +142,15 @@ final class Index extends Component
 		$tenders = Tender::query()
 			->with('company')
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
-			->when($isAdmin && $this->companyFilter !== null, fn ($q) => $q->where('company_id', $this->companyFilter))
+			->when($isAdmin && $this->companyFilter !== null, function ($q): void {
+				if ($this->companyFilter === 0) {
+					$q->whereNull('company_id');
+
+					return;
+				}
+
+				$q->where('company_id', $this->companyFilter);
+			})
 			->when($this->search !== '', function ($q): void {
 				$q->where(function ($q): void {
 					$q->where('title', 'like', '%' . $this->search . '%')
