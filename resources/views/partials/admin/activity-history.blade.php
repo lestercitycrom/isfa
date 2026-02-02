@@ -2,6 +2,8 @@
 	$formatValue = fn ($value) => \App\Support\ActivityLogFormatter::formatValue($value);
 	$labelFor = fn (string $field) => \App\Support\ActivityLogFormatter::labelFor($field);
 	$valueMaps = $valueMaps ?? [];
+	$showCompany = $showCompany ?? false;
+	$companyNames = $companyNames ?? [];
 @endphp
 
 <div class="space-y-3">
@@ -15,11 +17,21 @@
 			$rawEvent = (string) $activity->event;
 			$hideDescription = $rawDescription === '' || $rawDescription === $rawEvent || in_array($rawDescription, ['created', 'updated', 'deleted', 'attached', 'detached'], true);
 			$hasDetails = !$hideDescription || (is_array($newValues) && count($newValues) > 0);
+			$companyLabel = null;
+			if ($showCompany && \App\Support\CompanyContext::isAdmin()) {
+				$companyId = $activity->company_id;
+				$companyLabel = $companyId !== null
+					? ($companyNames[(int) $companyId] ?? ('#' . $companyId))
+					: __('common.admin');
+			}
 		@endphp
 		<div class="rounded-2xl border border-slate-200 bg-white p-4">
 			<div class="flex flex-wrap items-center justify-between gap-3">
 				<div class="space-y-1">
 					<div class="text-sm font-semibold text-slate-900">{{ $summary }}</div>
+					@if($companyLabel !== null)
+						<div class="text-xs text-slate-500">{{ __('common.company') }}: {{ $companyLabel }}</div>
+					@endif
 					@if($activity->causer)
 						<div class="text-xs text-slate-500">{{ __('common.user') }}: {{ $activity->causer?->name }}</div>
 					@endif

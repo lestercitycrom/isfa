@@ -95,9 +95,14 @@
 					type="textarea"
 					wire:model="comment"
 				/>
-				<x-admin.button variant="primary" type="submit">
-					{{ __('common.save') }}
-				</x-admin.button>
+				<div class="flex items-center gap-4">
+					<x-admin.button variant="primary" type="submit">
+						{{ __('common.save') }}
+					</x-admin.button>
+					<x-action-message class="text-sm text-slate-600" on="comment-saved">
+						{{ __('common.saved') }}
+					</x-action-message>
+				</div>
 			</form>
 		</x-admin.card>
 	@endif

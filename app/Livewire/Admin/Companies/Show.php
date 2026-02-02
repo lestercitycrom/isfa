@@ -39,7 +39,7 @@ final class Show extends Component
 			'notes' => $this->comment,
 		]);
 
-		session()->flash('status', __('common.saved'));
+		$this->dispatch('comment-saved');
 	}
 
 	public function render(): View

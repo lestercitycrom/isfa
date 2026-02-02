@@ -9,6 +9,7 @@ use App\Models\ProductCategory;
 use App\Models\Supplier;
 use App\Models\Tender;
 use App\Models\DictionaryValue;
+use App\Models\User;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
@@ -89,9 +90,16 @@ final class Index extends Component
 
 		$latestActivities = Activity::query()
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->with(['causer', 'subject'])
 			->latest()
 			->limit(10)
 			->get();
+
+		$companyNames = User::query()
+			->companies()
+			->get(['id', 'company_name', 'name'])
+			->mapWithKeys(fn (User $company) => [(int) $company->id => ($company->company_name ?: $company->name ?: '-')])
+			->all();
 
 		return view('livewire.admin.dashboard.index', [
 			'isAdmin' => CompanyContext::isAdmin(),
@@ -108,6 +116,7 @@ final class Index extends Component
 			'statusLabels' => $statusLabels,
 			'statusTotal' => $statusTotal,
 			'latestActivities' => $latestActivities,
+			'companyNames' => $companyNames,
 		]);
 	}
 }

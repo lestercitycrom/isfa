@@ -82,7 +82,9 @@ final class Show extends Component
 		$productQuery = Product::query()->whereKey($productId);
 		if ($companyId !== null) {
 			$productQuery->where('company_id', $companyId);
-		} elseif (!$isAdmin) {
+		} elseif ($isAdmin) {
+			$productQuery->whereNull('company_id');
+		} else {
 			return;
 		}
 
@@ -188,7 +190,7 @@ final class Show extends Component
 			$raw = is_array($this->tender->raw) ? $this->tender->raw : [];
 			$raw['comment'] = $this->comment;
 			$this->tender->update(['raw' => $raw]);
-			session()->flash('status', __('common.saved'));
+			$this->dispatch('comment-saved');
 
 			return;
 		}
@@ -197,7 +199,7 @@ final class Show extends Component
 			'comment' => $this->comment,
 		]);
 
-		session()->flash('status', __('common.saved'));
+		$this->dispatch('comment-saved');
 	}
 
 	/**
@@ -228,6 +230,7 @@ final class Show extends Component
 
 		$query = Product::query()
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+			->when($companyId === null && CompanyContext::isAdmin(), fn ($q) => $q->whereNull('company_id'))
 			->whereDoesntHave('tenders', function ($query): void {
 				$query->whereKey($this->tender->getKey());
 			})

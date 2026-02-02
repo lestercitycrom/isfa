@@ -100,19 +100,11 @@
 		</x-admin.card>
 
 		<x-admin.card :title="__('common.activity_log')">
-			<div class="space-y-3">
-				@forelse ($latestActivities as $activity)
-					<div class="rounded-xl border border-slate-200 px-3 py-2">
-						<div class="flex items-center justify-between gap-3">
-							<div class="text-sm font-semibold text-slate-900">{{ $activity->event ?: '-' }}</div>
-							<div class="text-xs text-slate-500">{{ $activity->created_at?->format('Y-m-d H:i') }}</div>
-						</div>
-						<div class="mt-1 text-sm text-slate-600 line-clamp-2">{{ $activity->description ?: '-' }}</div>
-					</div>
-				@empty
-					<div class="text-sm text-slate-500">{{ __('common.no_records') }}</div>
-				@endforelse
-			</div>
+			@include('partials.admin.activity-history', [
+				'activities' => $latestActivities,
+				'showCompany' => true,
+				'companyNames' => $companyNames,
+			])
 		</x-admin.card>
 	</div>
 </div>

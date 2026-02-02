@@ -129,7 +129,7 @@ final class Edit extends Component
 			'comment' => $this->comment,
 		]);
 
-		session()->flash('status', __('common.saved'));
+		$this->dispatch('comment-saved');
 	}
 
 	/**
