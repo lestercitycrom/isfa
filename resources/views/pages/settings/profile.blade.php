@@ -165,13 +165,6 @@
 					:error="$errors->first('address')"
 				/>
 
-				<x-admin.input
-					:label="__('common.notes')"
-					type="textarea"
-					wire:model="notes"
-					:error="$errors->first('notes')"
-				/>
-
 				<div class="flex items-center gap-4">
 					<x-admin.button variant="primary" type="submit">
 						{{ __('common.save') }}

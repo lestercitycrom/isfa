@@ -36,7 +36,6 @@ final class ProfilePage extends Component
 	public ?string $phone = null;
 	public ?string $address = null;
 	public ?string $website = null;
-	public ?string $notes = null;
 
 	/**
 	 * Mount the component.
@@ -56,7 +55,6 @@ final class ProfilePage extends Component
 		$this->phone = $user->phone;
 		$this->address = $user->address;
 		$this->website = $user->website;
-		$this->notes = $user->notes;
 	}
 
 	/**
@@ -121,7 +119,6 @@ final class ProfilePage extends Component
 			'phone' => ['nullable', 'string', 'max:255'],
 			'address' => ['nullable', 'string', 'max:255'],
 			'website' => ['nullable', 'string', 'max:255'],
-			'notes' => ['nullable', 'string'],
 		]);
 
 		$user->fill($validated);

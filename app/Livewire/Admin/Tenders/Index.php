@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Tenders;
 
-use App\Models\DictionaryValue;
 use App\Models\Tender;
 use App\Models\User;
 use App\Services\Etender\EtenderEventSyncService;
@@ -22,8 +21,6 @@ final class Index extends Component
 	use WithPagination;
 
 	public string $search = '';
-	public ?string $eventTypeFilter = null;
-	public ?string $eventStatusFilter = null;
 	public ?int $companyFilter = null;
 
 	/**
@@ -32,16 +29,6 @@ final class Index extends Component
 	public string $importUrl = '';
 
 	public function updatedSearch(): void
-	{
-		$this->resetPage();
-	}
-
-	public function updatedEventTypeFilter(): void
-	{
-		$this->resetPage();
-	}
-
-	public function updatedEventStatusFilter(): void
 	{
 		$this->resetPage();
 	}
@@ -159,29 +146,11 @@ final class Index extends Component
 						->orWhere('document_number', 'like', '%' . $this->search . '%');
 				});
 			})
-			->when($this->eventTypeFilter !== null && $this->eventTypeFilter !== '', function ($q): void {
-				$q->where('event_type_code', $this->eventTypeFilter);
-			})
-			->when($this->eventStatusFilter !== null && $this->eventStatusFilter !== '', function ($q): void {
-				$q->where('event_status_code', $this->eventStatusFilter);
-			})
 			->orderByDesc('published_at')
 			->paginate(20);
 
-		$eventTypes = DictionaryValue::query()
-			->where('dictionary', 'event_type')
-			->orderBy('code')
-			->get();
-
-		$eventStatuses = DictionaryValue::query()
-			->where('dictionary', 'event_status')
-			->orderBy('code')
-			->get();
-
 		return view('livewire.admin.tenders.index', [
 			'tenders' => $tenders,
-			'eventTypes' => $eventTypes,
-			'eventStatuses' => $eventStatuses,
 			'companies' => $isAdmin ? User::query()->companies()->orderBy('company_name')->get() : collect(),
 			'isAdmin' => $isAdmin,
 		]);

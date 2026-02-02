@@ -60,8 +60,12 @@ final class Edit extends Component
 
 		$uniqueNameRule = Rule::unique('suppliers', 'name')
 			->ignore($this->supplier?->id)
-			->where(static function ($query): void {
-				$query->where('company_id', $this->company_id);
+			->where(function ($query): void {
+				if ($this->company_id !== null) {
+					$query->where('company_id', $this->company_id);
+				} else {
+					$query->whereNull('company_id');
+				}
 			});
 
 		$this->validate([

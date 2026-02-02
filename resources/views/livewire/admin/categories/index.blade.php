@@ -101,23 +101,25 @@
 		</div>
 	</x-admin.card>
 
-	<!-- Danger Zone -->
-	<div class="rounded-2xl border-2 border-red-200 bg-red-50 p-6">
-		<div class="flex items-start justify-between gap-4">
-			<div class="flex-1">
-				<h3 class="text-lg font-semibold text-red-900">{{ __('common.danger_zone') }}</h3>
-				<p class="mt-1 text-sm text-red-700">
-					{{ __('common.delete_all_categories_warning') }}
-				</p>
+	@if(false)
+		<!-- Danger Zone -->
+		<div class="rounded-2xl border-2 border-red-200 bg-red-50 p-6">
+			<div class="flex items-start justify-between gap-4">
+				<div class="flex-1">
+					<h3 class="text-lg font-semibold text-red-900">{{ __('common.danger_zone') }}</h3>
+					<p class="mt-1 text-sm text-red-700">
+						{{ __('common.delete_all_categories_warning') }}
+					</p>
+				</div>
+				<x-admin.button
+					variant="danger"
+					size="md"
+					wire:click="deleteAllCategories"
+					onclick="if(!confirm('{{ __('common.confirm_delete_all_categories') }}')){event.preventDefault();event.stopImmediatePropagation();}"
+				>
+					{{ __('common.delete_all_categories') }}
+				</x-admin.button>
 			</div>
-			<x-admin.button
-				variant="danger"
-				size="md"
-				wire:click="deleteAllCategories"
-				onclick="if(!confirm('{{ __('common.confirm_delete_all_categories') }}')){event.preventDefault();event.stopImmediatePropagation();}"
-			>
-				{{ __('common.delete_all_categories') }}
-			</x-admin.button>
 		</div>
-	</div>
+	@endif
 </div>

@@ -91,20 +91,6 @@
 					</div>
 
 					<div class="mt-3 flex flex-wrap gap-2">
-						@if($tender->event_type_code)
-							@php
-								$typeLabel = $dictLabels['event_type'][$tender->event_type_code] ?? $tender->event_type_code;
-							@endphp
-							<x-admin.badge variant="blue">{{ __('common.event_type') }}: {{ $typeLabel }}</x-admin.badge>
-						@endif
-
-						@if($tender->event_status_code)
-							@php
-								$statusLabel = $dictLabels['event_status'][$tender->event_status_code] ?? $tender->event_status_code;
-							@endphp
-							<x-admin.badge variant="gray">{{ __('common.status') }}: {{ $statusLabel }}</x-admin.badge>
-						@endif
-
 						@if($tender->document_view_type_code)
 							@php
 								$viewLabel = $dictLabels['document_view_type'][$tender->document_view_type_code] ?? $tender->document_view_type_code;

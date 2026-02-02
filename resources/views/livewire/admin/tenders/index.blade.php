@@ -60,7 +60,7 @@
 
 	<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 		<div class="border-b border-slate-200 p-4">
-			<div class="grid grid-cols-1 gap-3 md:grid-cols-4">
+			<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
 				<div>
 					<label class="block text-xs font-semibold text-slate-600">{{ __('tenders.filters.search') }}</label>
 					<input
@@ -71,35 +71,6 @@
 					/>
 				</div>
 
-				<div>
-					<label class="block text-xs font-semibold text-slate-600">{{ __('tenders.filters.type') }}</label>
-					<select
-						wire:model.live="eventTypeFilter"
-						class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
-					>
-						<option value="">{{ __('tenders.filters.all') }}</option>
-						@foreach ($eventTypes as $type)
-							<option value="{{ $type->code }}">
-								{{ $type->label ?: $type->code }}
-							</option>
-						@endforeach
-					</select>
-				</div>
-
-				<div>
-					<label class="block text-xs font-semibold text-slate-600">{{ __('tenders.filters.status') }}</label>
-					<select
-						wire:model.live="eventStatusFilter"
-						class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
-					>
-						<option value="">{{ __('tenders.filters.all') }}</option>
-						@foreach ($eventStatuses as $status)
-							<option value="{{ $status->code }}">
-								{{ $status->label ?: $status->code }}
-							</option>
-						@endforeach
-					</select>
-				</div>
 				@if ($isAdmin)
 					<div>
 						<label class="block text-xs font-semibold text-slate-600">{{ __('common.company') }}</label>
