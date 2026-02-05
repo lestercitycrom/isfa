@@ -42,6 +42,22 @@
 	</div>
 
 	@if($tab === 'details')
+		@if($product->photo_path)
+			<x-admin.card>
+				<div class="flex items-center gap-4">
+					<img
+						src="{{ asset('storage/' . $product->photo_path) }}"
+						alt="Photo"
+						class="h-24 w-24 rounded-lg object-cover border border-slate-200"
+					/>
+					<div>
+						<div class="text-xs font-semibold text-slate-600">{{ __('common.photo') }}</div>
+						<div class="text-sm text-slate-900">{{ $product->name }}</div>
+					</div>
+				</div>
+			</x-admin.card>
+		@endif
+
 		@if ($product->description)
 			<x-admin.card>
 				<div class="text-sm text-slate-700 whitespace-pre-line">{{ $product->description }}</div>

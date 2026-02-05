@@ -21,6 +21,22 @@
 				</a>
 			</div>
 
+			<div class="mt-6 text-sm font-semibold text-slate-900">{{ __('common.export_excel') }}</div>
+			<div class="mt-3 space-y-3">
+				<a class="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition" href="{{ route('admin.export.products.excel') }}">
+					<x-admin.icon name="file-text" class="h-4 w-4 inline mr-2" />
+					{{ __('common.download_products') }} (products.xlsx)
+				</a>
+				<a class="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition" href="{{ route('admin.export.suppliers.excel') }}">
+					<x-admin.icon name="file-text" class="h-4 w-4 inline mr-2" />
+					{{ __('common.download_suppliers') }} (suppliers.xlsx)
+				</a>
+				<a class="block rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition" href="{{ route('admin.export.links.excel') }}">
+					<x-admin.icon name="file-text" class="h-4 w-4 inline mr-2" />
+					{{ __('common.download_links') }} (product_supplier.xlsx)
+				</a>
+			</div>
+
 			<div class="mt-4 text-xs text-slate-500">
 				{{ __('common.import_accepts_same_columns') }}
 			</div>

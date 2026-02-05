@@ -9,6 +9,11 @@
 				<x-admin.icon name="upload" class="h-4 w-4" />
 				{{ __('common.export_csv') }}
 			</a>
+			<a class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 transition"
+				href="{{ route('admin.export.suppliers.excel') }}">
+				<x-admin.icon name="file-text" class="h-4 w-4" />
+				{{ __('common.export_excel') }}
+			</a>
 
 			<form method="POST" action="{{ route('admin.import.suppliers') }}" enctype="multipart/form-data" class="inline-flex">
 				@csrf

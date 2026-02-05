@@ -302,4 +302,6 @@ return [
 	'account_details_hint' => 'This account will have access to the company data.',
 	'account_saved' => 'Account saved.',
 	'account_deleted' => 'Account deleted.',
+	'photo' => 'Photo',
+	'export_excel' => 'Export Excel',
 ];

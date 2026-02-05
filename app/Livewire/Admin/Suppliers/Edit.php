@@ -8,13 +8,17 @@ use App\Models\Supplier;
 use App\Models\Company;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.admin')]
 final class Edit extends Component
 {
+	use WithFileUploads;
+
 	public ?Supplier $supplier = null;
 	public ?int $company_id = null;
 
@@ -23,6 +27,7 @@ final class Edit extends Component
 	public ?string $phone = null;
 	public ?string $email = null;
 	public ?string $website = null;
+	public mixed $photo = null;
 	public ?string $comment = null;
 
 	public function mount(?Supplier $supplier = null): void
@@ -75,10 +80,19 @@ final class Edit extends Component
 			'phone' => ['nullable', 'string', 'max:255'],
 			'email' => ['nullable', 'string', 'max:255'],
 			'website' => ['nullable', 'string', 'max:255'],
+			'photo' => ['nullable', 'image', 'max:4096'],
 			'comment' => ['nullable', 'string'],
 		], [
 			'name.unique' => __('common.supplier_name_already_exists'),
 		]);
+
+		$photoPath = $this->supplier?->photo_path;
+		if ($this->photo) {
+			if ($photoPath) {
+				Storage::disk('public')->delete($photoPath);
+			}
+			$photoPath = $this->photo->store('suppliers', 'public');
+		}
 
 		$supplier = Supplier::query()->updateOrCreate(
 			['id' => $this->supplier?->id],
@@ -89,6 +103,7 @@ final class Edit extends Component
 				'phone' => $this->phone,
 				'email' => $this->email,
 				'website' => $this->website,
+				'photo_path' => $photoPath,
 				'comment' => $this->comment,
 			]
 		);

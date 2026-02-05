@@ -11,19 +11,24 @@ use App\Models\Company;
 use App\Models\Supplier;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Layout('layouts.admin')]
 final class Edit extends Component
 {
+	use WithFileUploads;
+
 	public ?Product $product = null;
 
 	public ?int $company_id = null;
 	public ?int $category_id = null;
 	public string $name = '';
 	public ?string $description = null;
+	public mixed $photo = null;
 
 	public int $attachSupplierId = 0;
 	public string $attachStatus = 'primary';
@@ -110,9 +115,18 @@ final class Edit extends Component
 				$nameRule,
 			],
 			'description' => ['nullable', 'string'],
+			'photo' => ['nullable', 'image', 'max:4096'],
 		], [
 			'name.unique' => __('common.product_name_already_exists'),
 		]);
+
+		$photoPath = $this->product?->photo_path;
+		if ($this->photo) {
+			if ($photoPath) {
+				Storage::disk('public')->delete($photoPath);
+			}
+			$photoPath = $this->photo->store('products', 'public');
+		}
 
 		$product = Product::query()->updateOrCreate(
 			['id' => $this->product?->id],
@@ -121,6 +135,7 @@ final class Edit extends Component
 				'category_id' => $this->category_id,
 				'name' => $this->name,
 				'description' => $this->description,
+				'photo_path' => $photoPath,
 			]
 		);
 

@@ -52,6 +52,25 @@
 				:error="$errors->first('description')"
 			/>
 
+			<div class="space-y-2">
+				<div class="text-sm font-semibold text-slate-700">{{ __('common.photo') }}</div>
+				<input
+					type="file"
+					wire:model="photo"
+					accept="image/*"
+					class="block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+				/>
+				@if ($errors->has('photo'))
+					<div class="text-xs text-red-600">{{ $errors->first('photo') }}</div>
+				@endif
+
+				@if ($photo)
+					<img src="{{ $photo->temporaryUrl() }}" alt="Photo preview" class="h-24 w-24 rounded-lg object-cover border border-slate-200" />
+				@elseif ($product && $product->photo_path)
+					<img src="{{ asset('storage/' . $product->photo_path) }}" alt="Photo" class="h-24 w-24 rounded-lg object-cover border border-slate-200" />
+				@endif
+			</div>
+
 			<div class="flex items-center gap-4">
 				<x-admin.button variant="primary" type="submit">
 					{{ __('common.save') }}

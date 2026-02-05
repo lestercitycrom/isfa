@@ -25,6 +25,7 @@ final class Supplier extends Model
 		'phone',
 		'email',
 		'website',
+		'photo_path',
 		'comment',
 	];
 

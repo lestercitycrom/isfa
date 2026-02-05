@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\CategoriesExport;
+use App\Exports\ProductSupplierLinksExport;
+use App\Exports\ProductsExport;
+use App\Exports\SuppliersExport;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class CsvExportController extends Controller
@@ -21,19 +27,20 @@ final class CsvExportController extends Controller
 			$handle = fopen('php://output', 'wb');
 
 			// Header
-			fputcsv($handle, ['id', 'category_name', 'name', 'description']);
+			fputcsv($handle, ['id', 'category_name', 'name', 'description', 'photo_url']);
 
 			Product::query()
 				->with('category')
 				->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 				->orderBy('id')
-				->chunk(500, static function ($products) use ($handle): void {
+				->chunk(500, function ($products) use ($handle): void {
 					foreach ($products as $product) {
 						fputcsv($handle, [
 							$product->id,
 							$product->category?->name,
 							$product->name,
 							$product->description,
+							$this->photoUrl($product->photo_path),
 						]);
 					}
 				});
@@ -51,12 +58,12 @@ final class CsvExportController extends Controller
 			$handle = fopen('php://output', 'wb');
 
 			// Header
-			fputcsv($handle, ['id', 'name', 'contact_name', 'phone', 'email', 'website', 'comment']);
+			fputcsv($handle, ['id', 'name', 'contact_name', 'phone', 'email', 'website', 'comment', 'photo_url']);
 
 			Supplier::query()
 				->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 				->orderBy('id')
-				->chunk(500, static function ($suppliers) use ($handle): void {
+				->chunk(500, function ($suppliers) use ($handle): void {
 					foreach ($suppliers as $supplier) {
 						fputcsv($handle, [
 							$supplier->id,
@@ -66,6 +73,7 @@ final class CsvExportController extends Controller
 							$supplier->email,
 							$supplier->website,
 							$supplier->comment,
+							$this->photoUrl($supplier->photo_path),
 						]);
 					}
 				});
@@ -142,6 +150,34 @@ final class CsvExportController extends Controller
 		}, $fileName, $this->csvHeaders());
 	}
 
+	public function productsExcel(): BinaryFileResponse
+	{
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
+
+		return Excel::download(new ProductsExport($companyId), 'products.xlsx');
+	}
+
+	public function suppliersExcel(): BinaryFileResponse
+	{
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
+
+		return Excel::download(new SuppliersExport($companyId), 'suppliers.xlsx');
+	}
+
+	public function categoriesExcel(): BinaryFileResponse
+	{
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
+
+		return Excel::download(new CategoriesExport($companyId), 'categories.xlsx');
+	}
+
+	public function linksExcel(): BinaryFileResponse
+	{
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
+
+		return Excel::download(new ProductSupplierLinksExport($companyId), 'product_supplier.xlsx');
+	}
+
 	/**
 	 * @return array<string, string>
 	 */
@@ -150,5 +186,16 @@ final class CsvExportController extends Controller
 		return [
 			'Content-Type' => 'text/csv; charset=UTF-8',
 		];
+	}
+
+	private function photoUrl(?string $path): ?string
+	{
+		if ($path === null || $path === '') {
+			return null;
+		}
+
+		$base = rtrim((string) config('app.url'), '/');
+
+		return $base . '/storage/' . ltrim($path, '/');
 	}
 }
