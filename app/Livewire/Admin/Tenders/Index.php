@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Tenders;
 
 use App\Models\Tender;
-use App\Models\User;
+use App\Models\Company;
 use App\Services\Etender\EtenderEventSyncService;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
@@ -151,7 +151,7 @@ final class Index extends Component
 
 		return view('livewire.admin.tenders.index', [
 			'tenders' => $tenders,
-			'companies' => $isAdmin ? User::query()->companies()->orderBy('company_name')->get() : collect(),
+			'companies' => $isAdmin ? Company::query()->orderBy('name')->get() : collect(),
 			'isAdmin' => $isAdmin,
 		]);
 	}

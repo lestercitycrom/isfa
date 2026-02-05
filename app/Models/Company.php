@@ -7,44 +7,45 @@ namespace App\Models;
 use App\Concerns\LogsCompanyActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-final class ProductCategory extends Model
+final class Company extends Model
 {
 	use HasFactory;
 	use LogsActivity;
 	use LogsCompanyActivity;
 
 	protected $fillable = [
-		'company_id',
 		'name',
-		'description',
-		'comment',
+		'legal_name',
+		'tax_id',
+		'registration_number',
+		'contact_name',
+		'phone',
+		'address',
+		'website',
+		'notes',
 	];
 
 	/**
-	 * @return HasMany<Product>
+	 * @return HasMany<User>
 	 */
-	public function products(): HasMany
+	public function users(): HasMany
 	{
-		return $this->hasMany(Product::class, 'category_id');
+		return $this->hasMany(User::class);
 	}
 
-	/**
-	 * @return BelongsTo<Company, ProductCategory>
-	 */
-	public function company(): BelongsTo
+	protected function resolveActivityCompanyId(): ?int
 	{
-		return $this->belongsTo(Company::class, 'company_id');
+		return $this->id !== null ? (int) $this->id : null;
 	}
 
 	public function getActivitylogOptions(): LogOptions
 	{
 		return LogOptions::defaults()
-			->useLogName('category')
+			->useLogName('company')
 			->logFillable()
 			->logOnlyDirty()
 			->dontLogIfAttributesChangedOnly(['updated_at'])

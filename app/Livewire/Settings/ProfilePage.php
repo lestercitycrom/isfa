@@ -6,6 +6,7 @@ namespace App\Livewire\Settings;
 
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
@@ -43,18 +44,19 @@ final class ProfilePage extends Component
 	public function mount(): void
 	{
 		$user = Auth::user();
+		$company = $user?->company;
 
 		$this->name = $user->name;
 		$this->email = $user->email;
 
-		$this->company_name = $user->company_name;
-		$this->legal_name = $user->legal_name;
-		$this->tax_id = $user->tax_id;
-		$this->registration_number = $user->registration_number;
-		$this->contact_name = $user->contact_name;
-		$this->phone = $user->phone;
-		$this->address = $user->address;
-		$this->website = $user->website;
+		$this->company_name = $company?->name;
+		$this->legal_name = $company?->legal_name;
+		$this->tax_id = $company?->tax_id;
+		$this->registration_number = $company?->registration_number;
+		$this->contact_name = $company?->contact_name;
+		$this->phone = $company?->phone;
+		$this->address = $company?->address;
+		$this->website = $company?->website;
 	}
 
 	/**
@@ -121,10 +123,26 @@ final class ProfilePage extends Component
 			'website' => ['nullable', 'string', 'max:255'],
 		]);
 
-		$user->fill($validated);
-		$user->name = $validated['company_name'];
-		$user->company_name = $validated['company_name'];
-		$user->save();
+		$company = $user->company;
+
+		$payload = [
+			'name' => $validated['company_name'],
+			'legal_name' => $validated['legal_name'],
+			'tax_id' => $validated['tax_id'],
+			'registration_number' => $validated['registration_number'],
+			'contact_name' => $validated['contact_name'],
+			'phone' => $validated['phone'],
+			'address' => $validated['address'],
+			'website' => $validated['website'],
+		];
+
+		if ($company instanceof Company) {
+			$company->update($payload);
+		} else {
+			$company = Company::query()->create($payload);
+			$user->company()->associate($company);
+			$user->save();
+		}
 
 		$this->dispatch('company-updated');
 	}

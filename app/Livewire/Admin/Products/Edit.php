@@ -6,7 +6,7 @@ namespace App\Livewire\Admin\Products;
 
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\User;
+use App\Models\Company;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
@@ -73,7 +73,7 @@ final class Edit extends Component
 			->ignore($this->product?->id);
 
 		$this->validate([
-			'company_id' => ['nullable', 'integer', 'exists:users,id'],
+			'company_id' => ['nullable', 'integer', 'exists:companies,id'],
 			'category_id' => [
 				'nullable',
 				'integer',
@@ -113,7 +113,7 @@ final class Edit extends Component
 				->orderBy('name')
 				->get(),
 			'companies' => CompanyContext::isAdmin()
-				? User::query()->companies()->orderBy('company_name')->get()
+				? Company::query()->orderBy('name')->get()
 				: collect(),
 			'isAdmin' => CompanyContext::isAdmin(),
 		]);

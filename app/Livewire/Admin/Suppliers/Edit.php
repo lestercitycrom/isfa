@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Suppliers;
 
 use App\Models\Supplier;
-use App\Models\User;
+use App\Models\Company;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
@@ -69,7 +69,7 @@ final class Edit extends Component
 			});
 
 		$this->validate([
-			'company_id' => ['nullable', 'integer', 'exists:users,id'],
+			'company_id' => ['nullable', 'integer', 'exists:companies,id'],
 			'name' => ['required', 'string', 'max:255', $uniqueNameRule],
 			'contact_name' => ['nullable', 'string', 'max:255'],
 			'phone' => ['nullable', 'string', 'max:255'],
@@ -103,7 +103,7 @@ final class Edit extends Component
 		$isAdmin = CompanyContext::isAdmin();
 
 		return view('livewire.admin.suppliers.edit', [
-			'companies' => $isAdmin ? User::query()->companies()->orderBy('company_name')->get() : collect(),
+			'companies' => $isAdmin ? Company::query()->orderBy('name')->get() : collect(),
 			'isAdmin' => $isAdmin,
 		]);
 	}

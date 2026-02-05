@@ -8,7 +8,7 @@ use Throwable;
 
 class EtenderSyncEventCommand extends Command
 {
-	protected $signature = 'etender:sync-event {eventId : etender.gov.az event id} {--company= : Company user id}';
+	protected $signature = 'etender:sync-event {eventId : etender.gov.az event id} {--company= : Company id}';
 	protected $description = 'Sync a single eTender event into local database';
 
 	public function handle(EtenderEventSyncService $service): int

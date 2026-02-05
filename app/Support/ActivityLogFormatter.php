@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
 use App\Models\Tender;
+use App\Models\Company;
 use App\Models\User;
 use Carbon\Carbon;
 use DateTimeInterface;
@@ -126,7 +127,8 @@ final class ActivityLogFormatter
 			Product::class => __('common.product'),
 			ProductCategory::class => __('common.category'),
 			Supplier::class => __('common.supplier'),
-			User::class => __('common.company'),
+			Company::class => __('common.company'),
+			User::class => __('common.user'),
 			default => __('common.subject'),
 		};
 	}

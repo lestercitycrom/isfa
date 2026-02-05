@@ -83,24 +83,37 @@
 				:error="$errors->first('notes')"
 			/>
 
-			<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-				<x-admin.input
-					:label="__('common.email')"
-					type="email"
-					wire:model="email"
-					required
-					:error="$errors->first('email')"
-				/>
+			@if ($company === null)
+				<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+					<div class="text-sm font-semibold text-slate-700">{{ __('common.account_details') }}</div>
+					<div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+						<x-admin.input
+							:label="__('common.account_name')"
+							type="text"
+							wire:model="account_name"
+							required
+							:error="$errors->first('account_name')"
+						/>
 
-				<x-admin.input
-					:label="__('common.password')"
-					type="text"
-					wire:model="password"
-					:placeholder="$company ? '' : __('common.password')"
-					:required="$company === null"
-					:error="$errors->first('password')"
-				/>
-			</div>
+						<x-admin.input
+							:label="__('common.email')"
+							type="email"
+							wire:model="email"
+							required
+							:error="$errors->first('email')"
+						/>
+
+						<x-admin.input
+							:label="__('common.password')"
+							type="text"
+							wire:model="password"
+							required
+							:error="$errors->first('password')"
+						/>
+					</div>
+					<p class="mt-2 text-xs text-slate-500">{{ __('common.account_details_hint') }}</p>
+				</div>
+			@endif
 
 			<div class="flex items-center gap-4">
 				<x-admin.button variant="primary" type="submit">

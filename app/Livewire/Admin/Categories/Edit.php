@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Categories;
 
 use App\Models\ProductCategory;
-use App\Models\User;
+use App\Models\Company;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Schema;
@@ -77,7 +77,7 @@ final class Edit extends Component
 					->ignore($this->category?->id),
 			],
 			'description' => ['nullable', 'string'],
-			'company_id' => ['nullable', 'integer', 'exists:users,id'],
+			'company_id' => ['nullable', 'integer', 'exists:companies,id'],
 		], [
 			'name.unique' => __('common.category_name_already_exists'),
 		]);
@@ -106,7 +106,7 @@ final class Edit extends Component
 	{
 		return view('livewire.admin.categories.edit', [
 			'companies' => CompanyContext::isAdmin()
-				? User::query()->companies()->orderBy('company_name')->get()
+				? Company::query()->orderBy('name')->get()
 				: collect(),
 			'isAdmin' => CompanyContext::isAdmin(),
 			'activities' => $this->loadActivities(),

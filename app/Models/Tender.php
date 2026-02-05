@@ -55,11 +55,11 @@ class Tender extends Model
 	}
 
 	/**
-	 * @return BelongsTo<User, Tender>
+	 * @return BelongsTo<Company, Tender>
 	 */
 	public function company(): BelongsTo
 	{
-		return $this->belongsTo(User::class, 'company_id');
+		return $this->belongsTo(Company::class, 'company_id');
 	}
 
 	public function contacts(): HasMany

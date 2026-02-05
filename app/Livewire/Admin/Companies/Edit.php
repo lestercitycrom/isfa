@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Companies;
 
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -14,7 +15,7 @@ use Livewire\Component;
 #[Layout('layouts.admin')]
 final class Edit extends Component
 {
-	public ?User $company = null;
+	public ?Company $company = null;
 
 	public string $company_name = '';
 	public ?string $legal_name = null;
@@ -26,19 +27,16 @@ final class Edit extends Component
 	public ?string $website = null;
 	public ?string $notes = null;
 
+	public string $account_name = '';
 	public string $email = '';
 	public string $password = '';
 
-	public function mount(?User $company = null): void
+	public function mount(?Company $company = null): void
 	{
-		if ($company !== null && $company->role !== User::ROLE_COMPANY) {
-			abort(404);
-		}
-
 		$this->company = $company;
 
 		if ($company !== null) {
-			$this->company_name = $company->company_name ?? $company->name ?? '';
+			$this->company_name = $company->name ?? '';
 			$this->legal_name = $company->legal_name;
 			$this->tax_id = $company->tax_id;
 			$this->registration_number = $company->registration_number;
@@ -47,14 +45,12 @@ final class Edit extends Component
 			$this->address = $company->address;
 			$this->website = $company->website;
 			$this->notes = $company->notes;
-			$this->email = $company->email ?? '';
-			$this->password = (string) ($company->password_plain ?? '');
 		}
 	}
 
 	public function save(): void
 	{
-		$this->validate([
+		$rules = [
 			'company_name' => ['required', 'string', 'max:255'],
 			'legal_name' => ['nullable', 'string', 'max:255'],
 			'tax_id' => ['nullable', 'string', 'max:255'],
@@ -64,24 +60,23 @@ final class Edit extends Component
 			'address' => ['nullable', 'string', 'max:255'],
 			'website' => ['nullable', 'string', 'max:255'],
 			'notes' => ['nullable', 'string'],
-			'email' => [
+		];
+
+		if (!$this->company?->exists) {
+			$rules['account_name'] = ['required', 'string', 'max:255'];
+			$rules['email'] = [
 				'required',
 				'email',
 				'max:255',
-				Rule::unique('users', 'email')->ignore($this->company?->id),
-			],
-			'password' => [
-				$this->company ? 'nullable' : 'required',
-				'string',
-				'min:6',
-				'max:255',
-			],
-		]);
+				Rule::unique('users', 'email'),
+			];
+			$rules['password'] = ['required', 'string', 'min:6', 'max:255'];
+		}
+
+		$this->validate($rules);
 
 		$payload = [
-			'role' => User::ROLE_COMPANY,
 			'name' => $this->company_name,
-			'company_name' => $this->company_name,
 			'legal_name' => $this->legal_name,
 			'tax_id' => $this->tax_id,
 			'registration_number' => $this->registration_number,
@@ -90,18 +85,22 @@ final class Edit extends Component
 			'address' => $this->address,
 			'website' => $this->website,
 			'notes' => $this->notes,
-			'email' => $this->email,
 		];
 
-		if ($this->password !== '') {
-			$payload['password'] = Hash::make($this->password);
-			$payload['password_plain'] = $this->password;
+		if ($this->company?->exists) {
+			$this->company->update($payload);
+		} else {
+			DB::transaction(function () use ($payload): void {
+				$company = Company::query()->create($payload);
+				$company->users()->create([
+					'name' => $this->account_name,
+					'email' => $this->email,
+					'password' => $this->password,
+					'password_plain' => $this->password,
+					'role' => User::ROLE_COMPANY,
+				]);
+			});
 		}
-
-		User::query()->updateOrCreate(
-			['id' => $this->company?->id],
-			$payload
-		);
 
 		session()->flash('status', __('common.company_saved'));
 

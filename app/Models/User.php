@@ -28,6 +28,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'name',
         'email',
         'password',
@@ -98,6 +99,14 @@ class User extends Authenticatable
         return $query->where('role', self::ROLE_COMPANY);
     }
 
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Company, User>
+	 */
+	public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+	{
+		return $this->belongsTo(Company::class, 'company_id');
+	}
+
     /**
      * Get the user's initials
      */
@@ -116,7 +125,11 @@ class User extends Authenticatable
 			return null;
 		}
 
-		return (int) $this->id;
+		if ($this->company_id === null) {
+			return null;
+		}
+
+		return (int) $this->company_id;
 	}
 
 	public function getActivitylogOptions(): LogOptions

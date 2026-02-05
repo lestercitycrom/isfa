@@ -35,11 +35,11 @@ final class Product extends Model
 	}
 
 	/**
-	 * @return BelongsTo<User, Product>
+	 * @return BelongsTo<Company, Product>
 	 */
 	public function company(): BelongsTo
 	{
-		return $this->belongsTo(User::class, 'company_id');
+		return $this->belongsTo(Company::class, 'company_id');
 	}
 
 	/**

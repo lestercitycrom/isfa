@@ -24,7 +24,7 @@ final class CsvImportController extends Controller
 			'file' => ['required', 'file', 'mimes:csv,txt'],
 		]);
 
-		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		$filePath = $request->file('file')?->getRealPath();
 
@@ -215,7 +215,7 @@ final class CsvImportController extends Controller
 			'file' => ['required', 'file', 'mimes:csv,txt'],
 		]);
 
-		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		$filePath = $request->file('file')?->getRealPath();
 
@@ -302,7 +302,7 @@ final class CsvImportController extends Controller
 			'file' => ['required', 'file', 'mimes:csv,txt'],
 		]);
 
-		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		$filePath = $request->file('file')?->getRealPath();
 
@@ -384,7 +384,7 @@ final class CsvImportController extends Controller
 			'file' => ['required', 'file', 'mimes:csv,txt'],
 		]);
 
-		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		$filePath = $request->file('file')?->getRealPath();
 

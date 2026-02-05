@@ -294,4 +294,12 @@ return [
 	'confirm_delete_company' => '«:name» şirkəti silinsin?',
 	'notes' => 'Qeydlər',
 	'password' => 'Şifrə',
+	'accounts' => 'Accounts',
+	'account_name' => 'Account name',
+	'add_account' => 'Add account',
+	'no_accounts' => 'No accounts yet.',
+	'account_details' => 'Account details',
+	'account_details_hint' => 'This account will have access to the company data.',
+	'account_saved' => 'Account saved.',
+	'account_deleted' => 'Account deleted.',
 ];

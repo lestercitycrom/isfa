@@ -31,6 +31,10 @@ final class CompanyContext
 			return null;
 		}
 
-		return (int) $user->id;
+		if ($user->company_id === null) {
+			return null;
+		}
+
+		return (int) $user->company_id;
 	}
 }

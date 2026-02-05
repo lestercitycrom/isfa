@@ -9,7 +9,7 @@ use App\Models\ProductCategory;
 use App\Models\Supplier;
 use App\Models\Tender;
 use App\Models\DictionaryValue;
-use App\Models\User;
+use App\Models\Company;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
@@ -95,10 +95,10 @@ final class Index extends Component
 			->limit(10)
 			->get();
 
-		$companyNames = User::query()
-			->companies()
-			->get(['id', 'company_name', 'name'])
-			->mapWithKeys(fn (User $company) => [(int) $company->id => ($company->company_name ?: $company->name ?: '-')])
+		$companyNames = Company::query()
+			->orderBy('name')
+			->get(['id', 'name'])
+			->mapWithKeys(fn (Company $company) => [(int) $company->id => ($company->name ?: '-')])
 			->all();
 
 		return view('livewire.admin.dashboard.index', [

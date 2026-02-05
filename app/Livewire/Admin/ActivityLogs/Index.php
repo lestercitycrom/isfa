@@ -12,6 +12,7 @@ use App\Models\TenderAnnouncement;
 use App\Models\TenderContact;
 use App\Models\TenderItem;
 use App\Models\TenderPublishHistory;
+use App\Models\Company;
 use App\Models\User;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
@@ -100,7 +101,7 @@ final class Index extends Component
 			Product::class => __('common.product'),
 			ProductCategory::class => __('common.category'),
 			Supplier::class => __('common.supplier'),
-			User::class => __('common.company'),
+			Company::class => __('common.company'),
 		];
 	}
 

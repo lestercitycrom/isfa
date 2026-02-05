@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Categories;
 
 use App\Models\ProductCategory;
-use App\Models\User;
+use App\Models\Company;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -76,7 +76,7 @@ final class Index extends Component
 
 		return view('livewire.admin.categories.index', [
 			'categories' => $categories,
-			'companies' => $isAdmin ? User::query()->companies()->orderBy('company_name')->get() : collect(),
+			'companies' => $isAdmin ? Company::query()->orderBy('name')->get() : collect(),
 			'isAdmin' => $isAdmin,
 		]);
 	}

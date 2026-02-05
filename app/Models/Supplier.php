@@ -40,11 +40,11 @@ final class Supplier extends Model
 	}
 
 	/**
-	 * @return BelongsTo<User, Supplier>
+	 * @return BelongsTo<Company, Supplier>
 	 */
 	public function company(): BelongsTo
 	{
-		return $this->belongsTo(User::class, 'company_id');
+		return $this->belongsTo(Company::class, 'company_id');
 	}
 
 	public function getActivitylogOptions(): LogOptions

@@ -15,7 +15,7 @@ final class CsvExportController extends Controller
 	public function products(): StreamedResponse
 	{
 		$fileName = 'products.csv';
-		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		return response()->streamDownload(function () use ($companyId): void {
 			$handle = fopen('php://output', 'wb');
@@ -45,7 +45,7 @@ final class CsvExportController extends Controller
 	public function suppliers(): StreamedResponse
 	{
 		$fileName = 'suppliers.csv';
-		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		return response()->streamDownload(function () use ($companyId): void {
 			$handle = fopen('php://output', 'wb');
@@ -77,7 +77,7 @@ final class CsvExportController extends Controller
 	public function categories(): StreamedResponse
 	{
 		$fileName = 'categories.csv';
-		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		return response()->streamDownload(function () use ($companyId): void {
 			$handle = fopen('php://output', 'wb');
@@ -105,7 +105,7 @@ final class CsvExportController extends Controller
 	public function links(): StreamedResponse
 	{
 		$fileName = 'product_supplier.csv';
-		$companyId = auth()->user()?->isAdmin() ? null : auth()->id();
+		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		return response()->streamDownload(function () use ($companyId): void {
 			$handle = fopen('php://output', 'wb');

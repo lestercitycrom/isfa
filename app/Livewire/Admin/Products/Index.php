@@ -7,7 +7,7 @@ namespace App\Livewire\Admin\Products;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
-use App\Models\User;
+use App\Models\Company;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -119,7 +119,7 @@ final class Index extends Component
 			'products' => $products,
 			'categories' => $categories,
 			'suppliers' => $suppliers,
-			'companies' => $isAdmin ? User::query()->companies()->orderBy('company_name')->get() : collect(),
+			'companies' => $isAdmin ? Company::query()->orderBy('name')->get() : collect(),
 			'isAdmin' => $isAdmin,
 		]);
 	}

@@ -27,15 +27,17 @@
 				<tr>
 					<x-admin.th>{{ __('common.company') }}</x-admin.th>
 					<x-admin.th>{{ __('common.contacts') }}</x-admin.th>
+					<x-admin.th>{{ __('common.accounts') }}</x-admin.th>
 					<x-admin.th>{{ __('common.tax_id') }}</x-admin.th>
 					<x-admin.th align="right" nowrap>{{ __('common.actions') }}</x-admin.th>
 				</tr>
 			</x-slot>
 
 			@forelse ($companies as $company)
+				@php($primaryUser = $company->users->first())
 				<tr class="hover:bg-slate-50/70">
 					<x-admin.td>
-						<div class="font-medium text-slate-900">{{ $company->company_name ?? $company->name }}</div>
+						<div class="font-medium text-slate-900">{{ $company->name }}</div>
 						@if($company->legal_name)
 							<div class="text-xs text-slate-500">{{ $company->legal_name }}</div>
 						@endif
@@ -45,10 +47,13 @@
 							<div class="text-slate-900">{{ $company->contact_name }}</div>
 						@endif
 						<div class="mt-1 text-xs text-slate-500">
-							@if($company->email){{ $company->email }}@endif
-							@if($company->email && $company->phone) • @endif
+							@if($primaryUser?->email){{ $primaryUser->email }}@endif
+							@if($primaryUser?->email && $company->phone) • @endif
 							@if($company->phone){{ $company->phone }}@endif
 						</div>
+					</x-admin.td>
+					<x-admin.td>
+						{{ $company->users_count }}
 					</x-admin.td>
 					<x-admin.td>
 						{{ $company->tax_id ?: '—' }}
@@ -63,14 +68,14 @@
 								:title="__('common.delete')"
 								variant="danger"
 								wire:click="delete({{ $company->id }})"
-								onclick="if(!confirm('{{ __('common.confirm_delete_company', ['name' => $company->company_name ?? $company->name]) }}')){event.preventDefault();event.stopImmediatePropagation();}"
+								onclick="if(!confirm('{{ __('common.confirm_delete_company', ['name' => $company->name]) }}')){event.preventDefault();event.stopImmediatePropagation();}"
 							/>
 						</x-admin.table-actions>
 					</x-admin.td>
 				</tr>
 			@empty
 				<tr>
-					<x-admin.td colspan="4" class="text-center py-8 text-slate-500">
+					<x-admin.td colspan="5" class="text-center py-8 text-slate-500">
 						{{ __('common.no_companies') }}
 					</x-admin.td>
 				</tr>
