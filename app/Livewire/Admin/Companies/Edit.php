@@ -31,6 +31,9 @@ final class Edit extends Component
 	public string $email = '';
 	public string $password = '';
 
+	public string $account_email = '';
+	public string $account_password = '';
+
 	public function mount(?Company $company = null): void
 	{
 		$this->company = $company;
@@ -105,6 +108,53 @@ final class Edit extends Component
 		session()->flash('status', __('common.company_saved'));
 
 		$this->redirectRoute('admin.companies.index');
+	}
+
+	public function addAccount(): void
+	{
+		if (!$this->company?->exists) {
+			return;
+		}
+
+		$this->validate([
+			'account_name' => ['required', 'string', 'max:255'],
+			'account_email' => [
+				'required',
+				'email',
+				'max:255',
+				Rule::unique('users', 'email'),
+			],
+			'account_password' => ['required', 'string', 'min:6', 'max:255'],
+		]);
+
+		$this->company->users()->create([
+			'name' => $this->account_name,
+			'email' => $this->account_email,
+			'password' => $this->account_password,
+			'password_plain' => $this->account_password,
+			'role' => User::ROLE_COMPANY,
+		]);
+
+		$this->company->refresh()->load('users');
+		$this->reset('account_name', 'account_email', 'account_password');
+
+		session()->flash('status', __('common.account_saved'));
+	}
+
+	public function deleteAccount(int $id): void
+	{
+		if (!$this->company?->exists) {
+			return;
+		}
+
+		$user = $this->company->users()->whereKey($id)->first();
+		if (!$user) {
+			return;
+		}
+
+		$user->delete();
+		$this->company->refresh()->load('users');
+		session()->flash('status', __('common.account_deleted'));
 	}
 
 	public function render(): View

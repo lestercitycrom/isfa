@@ -78,58 +78,17 @@
 		</x-admin.card>
 
 		<x-admin.card :title="__('common.accounts')">
-			<div class="space-y-4">
-				<div class="grid grid-cols-1 gap-3">
-					@forelse ($accounts as $account)
-						<div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3">
-							<div>
-								<div class="text-sm font-semibold text-slate-900">{{ $account->name }}</div>
-								<div class="text-xs text-slate-500">{{ $account->email }}</div>
-							</div>
-							<x-admin.icon-button
-								icon="trash"
-								:title="__('common.delete')"
-								variant="danger"
-								wire:click="deleteAccount({{ $account->id }})"
-								onclick="if(!confirm('{{ __('common.confirm_delete') }}')){event.preventDefault();event.stopImmediatePropagation();}"
-							/>
+			<div class="grid grid-cols-1 gap-3">
+				@forelse ($accounts as $account)
+					<div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3">
+						<div>
+							<div class="text-sm font-semibold text-slate-900">{{ $account->name }}</div>
+							<div class="text-xs text-slate-500">{{ $account->email }}</div>
 						</div>
-					@empty
-						<div class="text-sm text-slate-500">{{ __('common.no_accounts') }}</div>
-					@endforelse
-				</div>
-
-				<form wire:submit.prevent="addAccount" class="space-y-3">
-					<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-						<x-admin.input
-							:label="__('common.account_name')"
-							type="text"
-							wire:model="account_name"
-							:error="$errors->first('account_name')"
-							required
-						/>
-						<x-admin.input
-							:label="__('common.email')"
-							type="email"
-							wire:model="account_email"
-							:error="$errors->first('account_email')"
-							required
-						/>
-						<x-admin.input
-							:label="__('common.password')"
-							type="text"
-							wire:model="account_password"
-							:error="$errors->first('account_password')"
-							required
-						/>
 					</div>
-
-					<div class="flex items-center gap-4">
-						<x-admin.button variant="primary" type="submit">
-							{{ __('common.add_account') }}
-						</x-admin.button>
-					</div>
-				</form>
+				@empty
+					<div class="text-sm text-slate-500">{{ __('common.no_accounts') }}</div>
+				@endforelse
 			</div>
 		</x-admin.card>
 	@endif

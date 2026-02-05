@@ -50,54 +50,12 @@
 
 		<x-admin.card :title="__('common.suppliers_for_product')">
 			<div class="space-y-4">
-				<div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-					<div class="lg:col-span-2">
-						<x-admin.select
-							:label="__('common.supplier')"
-							wire:model="attachSupplierId"
-							:error="$errors->first('attachSupplierId')"
-						>
-							<option value="0">—</option>
-							@foreach ($suppliers as $s)
-								<option value="{{ $s->id }}">{{ $s->name }}</option>
-							@endforeach
-						</x-admin.select>
-					</div>
-
-					<div>
-						<x-admin.select
-							:label="__('common.status')"
-							wire:model="attachStatus"
-							:error="$errors->first('attachStatus')"
-						>
-							<option value="primary">{{ __('common.status_primary') }}</option>
-							<option value="reserve">{{ __('common.status_reserve') }}</option>
-						</x-admin.select>
-					</div>
-
-					<div class="flex items-end">
-						<x-admin.button variant="primary" wire:click="attach" class="w-full">
-							{{ __('common.link') }}
-						</x-admin.button>
-					</div>
-
-					<div class="lg:col-span-4">
-						<x-admin.input
-							:label="__('common.price_terms')"
-							type="textarea"
-							wire:model="attachTerms"
-							:error="$errors->first('attachTerms')"
-						/>
-					</div>
-				</div>
-
 				<x-admin.table :zebra="true">
 					<x-slot name="head">
 						<tr>
 							<x-admin.th>{{ __('common.supplier') }}</x-admin.th>
 							<x-admin.th>{{ __('common.status') }}</x-admin.th>
 							<x-admin.th>{{ __('common.price_terms') }}</x-admin.th>
-							<x-admin.th align="right" nowrap>{{ __('common.actions') }}</x-admin.th>
 						</tr>
 					</x-slot>
 
@@ -110,38 +68,20 @@
 							</x-admin.td>
 
 							<x-admin.td>
-								<x-admin.select wire:model="pivotStatus.{{ $s->id }}" size="sm">
-									<option value="primary">{{ __('common.status_primary') }}</option>
-									<option value="reserve">{{ __('common.status_reserve') }}</option>
-								</x-admin.select>
+								@if(($s->pivot->status ?? null) === 'reserve')
+									{{ __('common.status_reserve') }}
+								@else
+									{{ __('common.status_primary') }}
+								@endif
 							</x-admin.td>
 
 							<x-admin.td>
-								<x-admin.input
-									type="textarea"
-									wire:model="pivotTerms.{{ $s->id }}"
-									size="sm"
-								/>
-							</x-admin.td>
-
-							<x-admin.td align="right" nowrap>
-								<div class="inline-flex items-center gap-2">
-									<x-admin.button variant="secondary" size="sm" wire:click="savePivot({{ $s->id }})">
-										{{ __('common.save') }}
-									</x-admin.button>
-									<x-admin.icon-button
-										icon="trash"
-										:title="__('common.detach')"
-										variant="danger"
-										wire:click="detach({{ $s->id }})"
-										onclick="if(!confirm('{{ __('common.confirm_detach') }}')){event.preventDefault();event.stopImmediatePropagation();}"
-									/>
-								</div>
+								{{ $s->pivot->terms ?: '—' }}
 							</x-admin.td>
 						</tr>
 					@empty
 						<tr>
-							<x-admin.td colspan="4" class="text-center py-8 text-slate-500">
+							<x-admin.td colspan="3" class="text-center py-8 text-slate-500">
 								{{ __('common.no_linked_suppliers') }}
 							</x-admin.td>
 						</tr>
