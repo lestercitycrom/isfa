@@ -73,7 +73,16 @@
 			@forelse ($suppliers as $supplier)
 				<tr class="hover:bg-slate-50/70">
 					<x-admin.td>
-						<div class="font-medium text-slate-900">{{ $supplier->name }}</div>
+						<div class="flex items-center gap-3">
+							<div class="h-10 w-10 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center">
+								@if ($supplier->photo_path)
+									<img src="{{ asset('storage/' . $supplier->photo_path) }}" alt="{{ __('common.photo') }}" class="h-full w-full object-cover" />
+								@else
+									<x-admin.icon name="image" class="h-4 w-4 text-slate-400" />
+								@endif
+							</div>
+							<div class="font-medium text-slate-900">{{ $supplier->name }}</div>
+						</div>
 					</x-admin.td>
 					@if ($isAdmin)
 						<x-admin.td>

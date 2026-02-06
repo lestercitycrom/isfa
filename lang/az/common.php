@@ -303,5 +303,11 @@ return [
 	'account_saved' => 'Account saved.',
 	'account_deleted' => 'Account deleted.',
 	'photo' => 'Photo',
+	'photo_not_set' => 'Şəkil təyin edilməyib',
+	'photo_upload_action' => 'Şəkil yüklə',
+	'photo_upload_hint' => 'PNG / JPG, maksimum 4 MB',
+	'photo_uploading' => 'Yüklənir...',
+	'photo_remove' => 'Şəkli sil',
+	'photo_removed' => 'Şəkil silindi.',
 	'export_excel' => 'Export Excel',
 ];

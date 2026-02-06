@@ -103,10 +103,21 @@
 			@forelse ($products as $product)
 				<tr class="hover:bg-slate-50/70">
 					<x-admin.td>
-						<div class="font-medium text-slate-900">{{ $product->name }}</div>
-						@if($product->description)
-							<div class="mt-1 text-xs text-slate-500 line-clamp-1">{{ $product->description }}</div>
-						@endif
+						<div class="flex items-center gap-3">
+							<div class="h-10 w-10 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center">
+								@if ($product->photo_path)
+									<img src="{{ asset('storage/' . $product->photo_path) }}" alt="{{ __('common.photo') }}" class="h-full w-full object-cover" />
+								@else
+									<x-admin.icon name="image" class="h-4 w-4 text-slate-400" />
+								@endif
+							</div>
+							<div>
+								<div class="font-medium text-slate-900">{{ $product->name }}</div>
+								@if($product->description)
+									<div class="mt-1 text-xs text-slate-500 line-clamp-1">{{ $product->description }}</div>
+								@endif
+							</div>
+						</div>
 					</x-admin.td>
 					<x-admin.td>
 						@if($product->category)

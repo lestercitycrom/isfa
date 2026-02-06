@@ -94,6 +94,12 @@
 		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 			<path d="M3 12h4l2-5 4 10 2-5h6"/>
 		</svg>
+	@elseif($n === 'image')
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<rect x="3" y="3" width="18" height="18" rx="2"/>
+			<circle cx="8.5" cy="8.5" r="1.5"/>
+			<path d="M21 15l-5-5L5 21"/>
+		</svg>
 	@elseif($n === 'chevron-down')
 		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 			<path d="M6 9l6 6 6-6"/>

@@ -121,6 +121,24 @@ final class Edit extends Component
 		]);
 	}
 
+	public function removePhoto(): void
+	{
+		if ($this->photo instanceof TemporaryUploadedFile) {
+			$this->photo = null;
+			return;
+		}
+
+		if (!$this->supplier?->exists || !$this->supplier->photo_path) {
+			return;
+		}
+
+		Storage::disk('public')->delete($this->supplier->photo_path);
+		$this->supplier->update(['photo_path' => null]);
+		$this->supplier->refresh();
+
+		session()->flash('status', __('common.photo_removed'));
+	}
+
 	public function render(): View
 	{
 		$isAdmin = CompanyContext::isAdmin();

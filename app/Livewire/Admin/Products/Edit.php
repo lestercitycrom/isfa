@@ -152,6 +152,24 @@ final class Edit extends Component
 		]);
 	}
 
+	public function removePhoto(): void
+	{
+		if ($this->photo instanceof TemporaryUploadedFile) {
+			$this->photo = null;
+			return;
+		}
+
+		if (!$this->product?->exists || !$this->product->photo_path) {
+			return;
+		}
+
+		Storage::disk('public')->delete($this->product->photo_path);
+		$this->product->update(['photo_path' => null]);
+		$this->product->refresh();
+
+		session()->flash('status', __('common.photo_removed'));
+	}
+
 	public function attach(): void
 	{
 		if (!$this->product?->exists) {

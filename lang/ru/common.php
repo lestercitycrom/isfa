@@ -303,5 +303,11 @@ return [
 	'account_saved' => 'Account saved.',
 	'account_deleted' => 'Account deleted.',
 	'photo' => 'Photo',
+	'photo_not_set' => 'Фото не задано',
+	'photo_upload_action' => 'Загрузить фото',
+	'photo_upload_hint' => 'PNG / JPG, макс. 4 МБ',
+	'photo_uploading' => 'Загрузка...',
+	'photo_remove' => 'Удалить фото',
+	'photo_removed' => 'Фото удалено.',
 	'export_excel' => 'Export Excel',
 ];
