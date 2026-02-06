@@ -11,64 +11,82 @@
 	</x-admin.page-header>
 
 	<x-admin.card>
-		<form wire:submit="save" class="space-y-6">
-			@if ($isAdmin)
-				<x-admin.select
-					:label="__('common.company')"
-					wire:model="company_id"
-					:error="$errors->first('company_id')"
-				>
-					<option value="">{{ __('common.company_not_set') }}</option>
-					@foreach ($companies as $company)
-						<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
-					@endforeach
-				</x-admin.select>
-			@endif
+		<form wire:submit="save" class="space-y-8">
+			<div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+				<div class="xl:col-span-1">
+					<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+						<div class="mb-3 text-sm font-semibold text-slate-900">{{ __('common.photo') }}</div>
+						<div class="space-y-3">
+							<div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+								@if ($photo)
+									<img src="{{ $photo->temporaryUrl() }}" alt="Photo preview" class="h-64 w-full object-cover" />
+								@elseif ($product && $product->photo_path)
+									<img src="{{ asset('storage/' . $product->photo_path) }}" alt="Photo" class="h-64 w-full object-cover" />
+								@else
+									<div class="flex h-64 items-center justify-center bg-slate-100 text-sm font-medium text-slate-500">
+										{{ __('common.photo') }}: —
+									</div>
+								@endif
+							</div>
 
-			<x-admin.select
-				:label="__('common.category')"
-				wire:model="category_id"
-				:error="$errors->first('category_id')"
-			>
-				<option value="">{{ __('common.category_not_set') }}</option>
-				@foreach ($categories as $cat)
-					<option value="{{ $cat->id }}">{{ $cat->name }}</option>
-				@endforeach
-			</x-admin.select>
+							<label for="product-photo" class="block cursor-pointer rounded-xl border border-dashed border-slate-300 bg-white px-4 py-4 text-center text-sm text-slate-600 transition hover:border-slate-400 hover:bg-slate-50">
+								<span class="font-semibold text-slate-800">{{ __('common.photo') }}</span>
+								<span class="block mt-1">PNG / JPG, max 4MB</span>
+							</label>
+							<input id="product-photo" type="file" wire:model.live="photo" accept="image/*" class="sr-only" />
 
-			<x-admin.input
-				:label="__('common.name')"
-				type="text"
-				wire:model="name"
-				required
-				autofocus
-				:error="$errors->first('name')"
-			/>
+							<div wire:loading wire:target="photo" class="text-xs font-medium text-slate-500">
+								Загрузка...
+							</div>
 
-			<x-admin.input
-				:label="__('common.description')"
-				type="textarea"
-				wire:model="description"
-				:error="$errors->first('description')"
-			/>
+							@if ($errors->has('photo'))
+								<div class="text-xs text-red-600">{{ $errors->first('photo') }}</div>
+							@endif
+						</div>
+					</div>
+				</div>
 
-			<div class="space-y-2">
-				<div class="text-sm font-semibold text-slate-700">{{ __('common.photo') }}</div>
-				<input
-					type="file"
-					wire:model="photo"
-					accept="image/*"
-					class="block w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-				/>
-				@if ($errors->has('photo'))
-					<div class="text-xs text-red-600">{{ $errors->first('photo') }}</div>
-				@endif
+				<div class="xl:col-span-2 space-y-6">
+					@if ($isAdmin)
+						<x-admin.select
+							:label="__('common.company')"
+							wire:model="company_id"
+							:error="$errors->first('company_id')"
+						>
+							<option value="">{{ __('common.company_not_set') }}</option>
+							@foreach ($companies as $company)
+								<option value="{{ $company->id }}">{{ $company->company_name ?? $company->name }}</option>
+							@endforeach
+						</x-admin.select>
+					@endif
 
-				@if ($photo)
-					<img src="{{ $photo->temporaryUrl() }}" alt="Photo preview" class="h-24 w-24 rounded-lg object-cover border border-slate-200" />
-				@elseif ($product && $product->photo_path)
-					<img src="{{ asset('storage/' . $product->photo_path) }}" alt="Photo" class="h-24 w-24 rounded-lg object-cover border border-slate-200" />
-				@endif
+					<x-admin.select
+						:label="__('common.category')"
+						wire:model="category_id"
+						:error="$errors->first('category_id')"
+					>
+						<option value="">{{ __('common.category_not_set') }}</option>
+						@foreach ($categories as $cat)
+							<option value="{{ $cat->id }}">{{ $cat->name }}</option>
+						@endforeach
+					</x-admin.select>
+
+					<x-admin.input
+						:label="__('common.name')"
+						type="text"
+						wire:model="name"
+						required
+						autofocus
+						:error="$errors->first('name')"
+					/>
+
+					<x-admin.input
+						:label="__('common.description')"
+						type="textarea"
+						wire:model="description"
+						:error="$errors->first('description')"
+					/>
+				</div>
 			</div>
 
 			<div class="flex items-center gap-4">

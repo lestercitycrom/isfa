@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
 #[Layout('layouts.admin')]
@@ -87,7 +88,7 @@ final class Edit extends Component
 		]);
 
 		$photoPath = $this->supplier?->photo_path;
-		if ($this->photo) {
+		if ($this->photo instanceof TemporaryUploadedFile) {
 			if ($photoPath) {
 				Storage::disk('public')->delete($photoPath);
 			}
@@ -111,6 +112,13 @@ final class Edit extends Component
 		session()->flash('status', __('common.supplier_saved'));
 
 		$this->redirectRoute('admin.suppliers.index');
+	}
+
+	public function updatedPhoto(): void
+	{
+		$this->validateOnly('photo', [
+			'photo' => ['nullable', 'image', 'max:4096'],
+		]);
 	}
 
 	public function render(): View
