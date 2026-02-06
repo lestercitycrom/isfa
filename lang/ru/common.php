@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return [
 	// Navigation
@@ -309,5 +309,15 @@ return [
 	'photo_uploading' => 'Загрузка...',
 	'photo_remove' => 'Удалить фото',
 	'photo_removed' => 'Фото удалено.',
+	'payment_details' => 'Реквизиты оплаты',
+	'payment_method' => 'Метод оплаты',
+	'payment_method_cash' => 'Наличные',
+	'payment_method_card' => 'С карты на карту',
+	'payment_method_kocurme' => 'Перечисление',
+	'card_number' => 'Номер карты',
+	'routing_number' => 'Routing number',
 	'export_excel' => 'Export Excel',
 ];
+
+
+

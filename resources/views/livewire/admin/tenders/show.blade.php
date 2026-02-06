@@ -326,33 +326,84 @@
 		</x-admin.card>
 
 		<x-admin.card :title="__('common.linked_products')">
-			<x-admin.table :zebra="true">
+			<x-admin.table :zebra="true" :sticky="true">
 				<x-slot name="head">
 					<tr>
 						<x-admin.th>{{ __('common.name') }}</x-admin.th>
 						<x-admin.th>{{ __('common.category') }}</x-admin.th>
+						<x-admin.th>{{ __('common.suppliers') }}</x-admin.th>
+						@if ($isAdmin)
+							<x-admin.th>{{ __('common.company') }}</x-admin.th>
+						@endif
 						<x-admin.th nowrap>{{ __('common.actions') }}</x-admin.th>
 					</tr>
 				</x-slot>
 
 				@forelse($tender->products as $product)
 					<tr class="hover:bg-slate-50/70">
-						<x-admin.td class="font-medium text-slate-900">{{ $product->name }}</x-admin.td>
-                        <x-admin.td class="text-slate-700">{{ $product->category?->name ?: '-' }}</x-admin.td>
 						<x-admin.td>
-							<button
-								type="button"
-								wire:click="detachProduct({{ $product->id }})"
-								class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+							<div class="flex items-center gap-3">
+								<div class="h-10 w-10 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center">
+									@if ($product->photo_path)
+										<img src="{{ asset('storage/' . $product->photo_path) }}" alt="{{ __('common.photo') }}" class="h-full w-full object-cover" />
+									@else
+										<x-admin.icon name="image" class="h-4 w-4 text-slate-400" />
+									@endif
+								</div>
+								<div>
+									<div class="font-medium text-slate-900">{{ $product->name }}</div>
+									@if($product->description)
+										<div class="mt-1 text-xs text-slate-500 line-clamp-1">{{ $product->description }}</div>
+									@endif
+								</div>
+							</div>
+						</x-admin.td>
+						<x-admin.td>
+							@if($product->category)
+								<x-admin.badge variant="blue">{{ $product->category->name }}</x-admin.badge>
+							@else
+								<span class="text-slate-400">вЂ”</span>
+							@endif
+						</x-admin.td>
+						<x-admin.td>
+							@if ($product->suppliers->isNotEmpty())
+								<div class="flex flex-wrap gap-1">
+									@foreach ($product->suppliers->take(3) as $supplier)
+										<a href="{{ route('admin.suppliers.show', $supplier) }}" class="inline-flex">
+											<x-admin.badge variant="slate">{{ $supplier->name }}</x-admin.badge>
+										</a>
+									@endforeach
+									@if ($product->suppliers->count() > 3)
+										<x-admin.badge variant="slate">+{{ $product->suppliers->count() - 3 }}</x-admin.badge>
+									@endif
+								</div>
+							@else
+								<span class="text-slate-400">вЂ—</span>
+							@endif
+						</x-admin.td>
+						@if ($isAdmin)
+							<x-admin.td>
+								{{ $product->company?->company_name ?? $product->company?->name ?? 'вЂ”' }}
+							</x-admin.td>
+						@endif
+						<x-admin.td align="right" nowrap>
+							<x-admin.table-actions
+								:viewHref="route('admin.products.show', $product)"
+								:editHref="route('admin.products.edit', $product)"
 							>
-								<x-admin.icon name="trash" class="h-3.5 w-3.5" />
-								{{ __('common.detach') }}
-							</button>
+								<x-admin.icon-button
+									icon="trash"
+									:title="__('common.detach')"
+									variant="danger"
+									wire:click="detachProduct({{ $product->id }})"
+									onclick="if(!confirm('{{ __('common.confirm_detach') }}')){event.preventDefault();event.stopImmediatePropagation();}"
+								/>
+							</x-admin.table-actions>
 						</x-admin.td>
 					</tr>
 				@empty
 					<tr>
-						<x-admin.td colspan="3" class="text-center py-8 text-slate-500">
+						<x-admin.td colspan="{{ $isAdmin ? 5 : 4 }}" class="text-center py-8 text-slate-500">
 							{{ __('common.no_linked_products') }}
 						</x-admin.td>
 					</tr>

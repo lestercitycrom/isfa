@@ -93,6 +93,7 @@
 				<tr>
 					<x-admin.th>{{ __('common.name') }}</x-admin.th>
 					<x-admin.th>{{ __('common.category') }}</x-admin.th>
+					<x-admin.th>{{ __('common.suppliers') }}</x-admin.th>
 					@if ($isAdmin)
 						<x-admin.th>{{ __('common.company') }}</x-admin.th>
 					@endif
@@ -126,6 +127,22 @@
 							<span class="text-slate-400">—</span>
 						@endif
 					</x-admin.td>
+					<x-admin.td>
+						@if ($product->suppliers->isNotEmpty())
+							<div class="flex flex-wrap gap-1">
+								@foreach ($product->suppliers->take(3) as $supplier)
+									<a href="{{ route('admin.suppliers.show', $supplier) }}" class="inline-flex">
+										<x-admin.badge variant="slate">{{ $supplier->name }}</x-admin.badge>
+									</a>
+								@endforeach
+								@if ($product->suppliers->count() > 3)
+									<x-admin.badge variant="slate">+{{ $product->suppliers->count() - 3 }}</x-admin.badge>
+								@endif
+							</div>
+						@else
+							<span class="text-slate-400">‗</span>
+						@endif
+					</x-admin.td>
 					@if ($isAdmin)
 						<x-admin.td>
 							{{ $product->company?->company_name ?? $product->company?->name ?? '—' }}
@@ -148,7 +165,7 @@
 				</tr>
 			@empty
 				<tr>
-					<x-admin.td colspan="{{ $isAdmin ? 4 : 3 }}" class="text-center py-8 text-slate-500">
+					<x-admin.td colspan="{{ $isAdmin ? 5 : 4 }}" class="text-center py-8 text-slate-500">
 						{{ __('common.no_products') }}
 					</x-admin.td>
 				</tr>
@@ -182,3 +199,4 @@
 		</div>
 	@endif
 </div>
+

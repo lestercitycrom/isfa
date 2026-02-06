@@ -47,6 +47,8 @@ final class Show extends Component
 			'announcements',
 			'publishHistories',
 			'products.category',
+			'products.suppliers',
+			'products.company',
 		]);
 
 		$this->comment = $this->tender->comment;
@@ -64,6 +66,7 @@ final class Show extends Component
 			'originalUrl' => 'https://etender.gov.az/main/competition/detail/' . $this->tender->event_id,
 			'activities' => $this->loadActivities(),
 			'productOptions' => $this->productOptions(),
+			'isAdmin' => CompanyContext::isAdmin(),
 		]);
 	}
 
@@ -111,6 +114,7 @@ final class Show extends Component
 		$this->productSearch = '';
 		$this->showProductDropdown = false;
 		$this->tender->load('products.category');
+		$this->tender->load('products.suppliers', 'products.company');
 		session()->flash('status', __('common.product_attached'));
 	}
 
@@ -181,6 +185,7 @@ final class Show extends Component
 			->log('Product detached');
 
 		$this->tender->load('products.category');
+		$this->tender->load('products.suppliers', 'products.company');
 		session()->flash('status', __('common.product_detached'));
 	}
 

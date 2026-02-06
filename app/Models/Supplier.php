@@ -21,10 +21,14 @@ final class Supplier extends Model
 	protected $fillable = [
 		'company_id',
 		'name',
+		'voen',
 		'contact_name',
 		'phone',
 		'email',
 		'website',
+		'payment_method',
+		'payment_card_number',
+		'payment_routing_number',
 		'photo_path',
 		'comment',
 	];

@@ -85,6 +85,13 @@
 
 					<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 						<x-admin.input
+							:label="__('common.voen')"
+							type="text"
+							wire:model="voen"
+							:error="$errors->first('voen')"
+						/>
+
+						<x-admin.input
 							:label="__('common.contact_name')"
 							type="text"
 							wire:model="contact_name"
@@ -111,6 +118,37 @@
 							wire:model="website"
 							:error="$errors->first('website')"
 						/>
+					</div>
+
+					<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+						<div class="text-sm font-semibold text-slate-900">{{ __('common.payment_details') }}</div>
+						<div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+							<x-admin.select
+								:label="__('common.payment_method')"
+								wire:model="payment_method"
+								:error="$errors->first('payment_method')"
+							>
+								<option value="cash">{{ __('common.payment_method_cash') }}</option>
+								<option value="card">{{ __('common.payment_method_card') }}</option>
+								<option value="kocurme">{{ __('common.payment_method_kocurme') }}</option>
+							</x-admin.select>
+
+							@if ($payment_method === 'card')
+								<x-admin.input
+									:label="__('common.card_number')"
+									type="text"
+									wire:model="payment_card_number"
+									:error="$errors->first('payment_card_number')"
+								/>
+							@elseif ($payment_method === 'kocurme')
+								<x-admin.input
+									:label="__('common.routing_number')"
+									type="text"
+									wire:model="payment_routing_number"
+									:error="$errors->first('payment_routing_number')"
+								/>
+							@endif
+						</div>
 					</div>
 
 					<x-admin.input

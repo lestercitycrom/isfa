@@ -73,7 +73,11 @@ final class Index extends Component
 		$isAdmin = CompanyContext::isAdmin();
 
 		$products = Product::query()
-			->with('category', 'suppliers', 'company')
+			->with([
+				'category',
+				'company',
+				'suppliers' => fn ($q) => $q->orderByDesc('product_supplier.created_at'),
+			])
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 			->when($isAdmin && $this->companyFilter !== null, function ($q): void {
 				if ($this->companyFilter === 0) {

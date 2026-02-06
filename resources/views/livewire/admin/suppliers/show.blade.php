@@ -58,9 +58,15 @@
 			</x-admin.card>
 		@endif
 
-		@if ($supplier->contact_name || $supplier->phone || $supplier->email || $supplier->website)
+		@if ($supplier->contact_name || $supplier->phone || $supplier->email || $supplier->website || $supplier->voen || $supplier->payment_method)
 			<x-admin.card>
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+					@if($supplier->voen)
+						<div>
+							<div class="text-xs font-semibold text-slate-600">{{ __('common.voen') }}</div>
+							<div class="mt-1 text-sm text-slate-900">{{ $supplier->voen }}</div>
+						</div>
+					@endif
 					@if($supplier->contact_name)
 						<div>
 							<div class="text-xs font-semibold text-slate-600">{{ __('common.contact_name') }}</div>
@@ -87,6 +93,40 @@
 									{{ $supplier->website }}
 								</a>
 							</div>
+						</div>
+					@endif
+				</div>
+			</x-admin.card>
+		@endif
+
+		@if ($supplier->payment_method)
+			<x-admin.card>
+				<div class="text-sm font-semibold text-slate-900">{{ __('common.payment_details') }}</div>
+				<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+					<div>
+						<div class="text-xs font-semibold text-slate-600">{{ __('common.payment_method') }}</div>
+						<div class="mt-1 text-sm text-slate-900">
+							@if ($supplier->payment_method === 'cash')
+								{{ __('common.payment_method_cash') }}
+							@elseif ($supplier->payment_method === 'card')
+								{{ __('common.payment_method_card') }}
+							@elseif ($supplier->payment_method === 'kocurme')
+								{{ __('common.payment_method_kocurme') }}
+							@else
+								{{ $supplier->payment_method }}
+							@endif
+						</div>
+					</div>
+					@if ($supplier->payment_method === 'card' && $supplier->payment_card_number)
+						<div>
+							<div class="text-xs font-semibold text-slate-600">{{ __('common.card_number') }}</div>
+							<div class="mt-1 text-sm text-slate-900">{{ $supplier->payment_card_number }}</div>
+						</div>
+					@endif
+					@if ($supplier->payment_method === 'kocurme' && $supplier->payment_routing_number)
+						<div>
+							<div class="text-xs font-semibold text-slate-600">{{ __('common.routing_number') }}</div>
+							<div class="mt-1 text-sm text-slate-900">{{ $supplier->payment_routing_number }}</div>
 						</div>
 					@endif
 				</div>
