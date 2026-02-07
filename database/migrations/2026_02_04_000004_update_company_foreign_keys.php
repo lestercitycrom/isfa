@@ -39,6 +39,16 @@ return new class extends Migration
 
 	private function replaceForeignKeyTarget(string $table, string $column, string $targetTable): void
 	{
+		$defaultConstraintName = "{$table}_{$column}_foreign";
+
+		// On some MySQL hosts information_schema may lag during migration steps.
+		// Force-drop the conventional FK name first to avoid duplicate name errors.
+		try {
+			DB::statement("alter table `{$table}` drop foreign key `{$defaultConstraintName}`");
+		} catch (\Throwable) {
+			// Ignore when it does not exist.
+		}
+
 		$rows = DB::select(
 			"select constraint_name, referenced_table_name from information_schema.key_column_usage where table_schema = database() and table_name = ? and column_name = ? and referenced_table_name is not null",
 			[$table, $column]
@@ -60,6 +70,15 @@ return new class extends Migration
 			} catch (\Throwable) {
 				// Ignore race/partial-state issues and continue with a clean add below.
 			}
+		}
+
+		$stillExists = DB::selectOne(
+			"select constraint_name from information_schema.table_constraints where constraint_schema = database() and constraint_name = ? and constraint_type = 'FOREIGN KEY' limit 1",
+			[$defaultConstraintName]
+		);
+
+		if ($stillExists) {
+			return;
 		}
 
 		Schema::table($table, function (Blueprint $table) use ($column, $targetTable): void {
