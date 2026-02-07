@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Products;
 
 use App\Enums\ProductSupplierStatus;
-use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\Company;
+use App\Models\Product;
+use App\Models\ProductAttributeDefinition;
+use App\Models\ProductCategory;
 use App\Models\Supplier;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -24,6 +27,7 @@ final class Edit extends Component
 	use WithFileUploads;
 
 	public ?Product $product = null;
+	public string $tab = 'details';
 
 	public ?int $company_id = null;
 	public ?int $category_id = null;
@@ -47,6 +51,15 @@ final class Edit extends Component
 	 * @var array<int, string|null>
 	 */
 	public array $pivotTerms = [];
+
+	public string $newAttributeLabel = '';
+	public string $newAttributeCode = '';
+	public string $newAttributeType = 'text';
+
+	/**
+	 * @var array<int, string>
+	 */
+	public array $attributeValues = [];
 
 	public function mount(?Product $product = null): void
 	{
@@ -75,9 +88,17 @@ final class Edit extends Component
 					: (string) $supplier->pivot->status;
 				$this->pivotTerms[(int) $supplier->id] = $supplier->pivot->terms;
 			}
+
+			$this->loadAttributeValues();
 		} elseif (!$isAdmin && $companyId !== null) {
 			$this->company_id = $companyId;
 		}
+	}
+
+	public function setTab(string $tab): void
+	{
+		$allowed = ['details', 'attributes', 'suppliers'];
+		$this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
 	}
 
 	public function save(): void
@@ -94,7 +115,6 @@ final class Edit extends Component
 			$categoryRule->where('company_id', $this->company_id);
 		}
 
-		// Уникальность: компания + название + категория (в рамках компании — только свои товары)
 		$nameRule = Rule::unique('products', 'name')
 			->where(function ($q): void {
 				if ($this->company_id !== null) {
@@ -152,6 +172,9 @@ final class Edit extends Component
 			]
 		);
 
+		$this->product = $product;
+		$this->syncAttributeValues();
+
 		session()->flash('status', __('common.product_saved'));
 
 		$this->redirectRoute('admin.products.index');
@@ -180,6 +203,80 @@ final class Edit extends Component
 		$this->product->refresh();
 
 		session()->flash('status', __('common.photo_removed'));
+	}
+
+	public function createAttributeDefinition(): void
+	{
+		$this->validate([
+			'newAttributeLabel' => ['required', 'string', 'max:120'],
+			'newAttributeCode' => ['nullable', 'string', 'max:64', 'regex:/^[a-zA-Z0-9_\\-]+$/'],
+			'newAttributeType' => ['required', 'in:text'],
+		], [
+			'newAttributeCode.regex' => 'Code: only letters, digits, "_" and "-".',
+		]);
+
+		$companyId = $this->resolveAttributeCompanyId();
+
+		$baseCode = trim($this->newAttributeCode);
+		if ($baseCode === '') {
+			$baseCode = Str::slug($this->newAttributeLabel, '_');
+		}
+		if ($baseCode === '') {
+			$baseCode = 'attr';
+		}
+
+		$code = $baseCode;
+		$i = 2;
+		while ($this->attributeCodeExists($companyId, $code)) {
+			$code = $baseCode.'_'.$i;
+			$i++;
+		}
+
+		ProductAttributeDefinition::query()->create([
+			'company_id' => $companyId,
+			'code' => Str::lower($code),
+			'label' => trim($this->newAttributeLabel),
+			'field_type' => $this->newAttributeType,
+			'options_json' => null,
+			'is_active' => true,
+		]);
+
+		$this->newAttributeLabel = '';
+		$this->newAttributeCode = '';
+		$this->newAttributeType = 'text';
+
+		$this->dispatch('attributes-saved');
+	}
+
+	public function deleteAttributeDefinition(int $definitionId): void
+	{
+		$definition = $this->attributeDefinitions()
+			->firstWhere('id', $definitionId);
+
+		if ($definition === null) {
+			return;
+		}
+
+		$definition->delete();
+		unset($this->attributeValues[$definitionId]);
+
+		$this->dispatch('attributes-saved');
+	}
+
+	public function saveAttributes(): void
+	{
+		$this->validate([
+			'attributeValues.*' => ['nullable', 'string'],
+		]);
+
+		if (!$this->product?->exists) {
+			session()->flash('status', __('common.product_saved'));
+			return;
+		}
+
+		$this->syncAttributeValues();
+
+		$this->dispatch('attributes-saved');
 	}
 
 	public function attach(): void
@@ -272,6 +369,87 @@ final class Edit extends Component
 				? Company::query()->orderBy('name')->get()
 				: collect(),
 			'isAdmin' => CompanyContext::isAdmin(),
+			'attributeDefinitions' => $this->attributeDefinitions(),
 		]);
 	}
+
+	private function resolveAttributeCompanyId(): ?int
+	{
+		if ($this->product?->exists) {
+			return $this->product->company_id;
+		}
+
+		if (CompanyContext::isAdmin()) {
+			return $this->company_id;
+		}
+
+		return CompanyContext::companyId();
+	}
+
+	private function attributeCodeExists(?int $companyId, string $code): bool
+	{
+		return ProductAttributeDefinition::query()
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId), fn ($q) => $q->whereNull('company_id'))
+			->where('code', Str::lower($code))
+			->exists();
+	}
+
+	/**
+	 * @return Collection<int, ProductAttributeDefinition>
+	 */
+	private function attributeDefinitions(): Collection
+	{
+		$companyId = $this->resolveAttributeCompanyId();
+
+		return ProductAttributeDefinition::query()
+			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId), fn ($q) => $q->whereNull('company_id'))
+			->orderBy('sort_order')
+			->orderBy('label')
+			->get();
+	}
+
+	private function loadAttributeValues(): void
+	{
+		if (!$this->product?->exists) {
+			$this->attributeValues = [];
+			return;
+		}
+
+		$this->attributeValues = $this->product->attributeValues()
+			->pluck('value_text', 'product_attribute_definition_id')
+			->map(fn ($value): string => (string) $value)
+			->toArray();
+	}
+
+	private function syncAttributeValues(): void
+	{
+		if (!$this->product?->exists) {
+			return;
+		}
+
+		$definitions = $this->attributeDefinitions();
+		$definitionIds = $definitions->pluck('id');
+
+		foreach ($definitions as $definition) {
+			$value = trim((string) ($this->attributeValues[$definition->id] ?? ''));
+
+			if ($value === '') {
+				$this->product->attributeValues()
+					->where('product_attribute_definition_id', $definition->id)
+					->delete();
+				continue;
+			}
+
+			$this->product->attributeValues()->updateOrCreate(
+				['product_attribute_definition_id' => $definition->id],
+				['value_text' => $value, 'value_json' => null]
+			);
+		}
+
+		$this->product->attributeValues()
+			->when($definitionIds->isNotEmpty(), fn ($q) => $q->whereNotIn('product_attribute_definition_id', $definitionIds))
+			->delete();
+	}
 }
+
+
