@@ -11,3 +11,7 @@ Artisan::command('inspire', function () {
 Schedule::command('tender:send-reminders')
 	->everyThirtyMinutes()
 	->withoutOverlapping();
+
+Schedule::command('tender:send-keyword-alerts')
+	->everySixHours()
+	->withoutOverlapping();
