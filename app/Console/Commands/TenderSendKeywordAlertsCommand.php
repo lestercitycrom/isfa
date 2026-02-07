@@ -38,13 +38,10 @@ final class TenderSendKeywordAlertsCommand extends Command
                 continue;
             }
 
-            foreach ($candidates as $item) {
-                if (! is_array($item)) {
-                    continue;
-                }
+            $matches = $searchService->findMatches($keyword, $candidates);
 
-                $searchText = $searchService->extractSearchableText($item);
-                if (! $searchService->matchesQuery($keyword, $searchText)) {
+            foreach ($matches as $item) {
+                if (! is_array($item)) {
                     continue;
                 }
 

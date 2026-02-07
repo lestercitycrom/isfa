@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Http;
 final class EtenderSearchService
 {
     /**
+     * @var array<string, array<string, mixed>>
+     */
+    private array $detailCache = [];
+
+    /**
      * @return array<int, array<string, mixed>>
      */
     public function fetchCandidates(): array
@@ -77,6 +82,88 @@ final class EtenderSearchService
         return true;
     }
 
+    public function queryNeedsDetail(string $query): bool
+    {
+        $tokens = array_values(array_filter(explode(' ', $this->normalizeQuery($query)), static fn (string $t): bool => $t !== ''));
+
+        foreach ($tokens as $token) {
+            if (preg_match('/\d/', $token) === 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $candidates
+     * @return array<int, array<string, mixed>>
+     */
+    public function findMatches(string $query, array $candidates): array
+    {
+        $query = $this->normalizeQuery($query);
+        if ($query === '') {
+            return [];
+        }
+
+        $matches = [];
+        $seen = [];
+
+        // Fast pass: list fields only.
+        foreach ($candidates as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $text = $this->extractSearchableText($item, false);
+            if (! $this->matchesQuery($query, $text)) {
+                continue;
+            }
+
+            $eventId = $this->extractEventId($item);
+            if ($eventId === null || isset($seen[$eventId])) {
+                continue;
+            }
+
+            $seen[$eventId] = true;
+            $matches[] = $item;
+        }
+
+        if ($matches !== [] || ! $this->queryNeedsDetail($query)) {
+            return $matches;
+        }
+
+        // Slow pass: include detail fields for digit-heavy queries.
+        $maxDetailChecks = max(1, (int) config('etender.search_max_detail_check', 250));
+        $checked = 0;
+
+        foreach ($candidates as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            if ($checked >= $maxDetailChecks) {
+                break;
+            }
+            $checked++;
+
+            $text = $this->extractSearchableText($item, true);
+            if (! $this->matchesQuery($query, $text)) {
+                continue;
+            }
+
+            $eventId = $this->extractEventId($item);
+            if ($eventId === null || isset($seen[$eventId])) {
+                continue;
+            }
+
+            $seen[$eventId] = true;
+            $matches[] = $item;
+        }
+
+        return $matches;
+    }
+
     /**
      * @param  array<string, mixed>  $item
      */
@@ -116,9 +203,40 @@ final class EtenderSearchService
     /**
      * @param  array<string, mixed>  $item
      */
-    public function extractSearchableText(array $item): string
+    public function extractSearchableText(array $item, bool $withDetail = false): string
     {
-        return $this->extractDisplayTitle($item);
+        $parts = [];
+
+        $listText = $this->extractDisplayTitle($item);
+        if ($listText !== '') {
+            $parts[] = $listText;
+        }
+
+        if (! $withDetail) {
+            return trim(implode(' ', $parts));
+        }
+
+        $detail = $this->fetchEventDetail($this->extractEventId($item));
+        if ($detail !== null) {
+            foreach (['tenderName', 'eventName', 'organizationName', 'buyerOrganizationName'] as $key) {
+                $value = $detail[$key] ?? null;
+                if (is_string($value) && trim($value) !== '') {
+                    $parts[] = trim($value);
+                }
+            }
+
+            $categoryCodes = $detail['categoryCodes'] ?? null;
+            if (is_array($categoryCodes)) {
+                foreach ($categoryCodes as $code) {
+                    $codeValue = trim((string) $code);
+                    if ($codeValue !== '') {
+                        $parts[] = $codeValue;
+                    }
+                }
+            }
+        }
+
+        return trim(implode(' ', $parts));
     }
 
     public function buildDetailUrl(string $eventId): string
@@ -241,6 +359,35 @@ final class EtenderSearchService
             ->timeout($timeoutSeconds)
             ->withHeaders([
                 'User-Agent' => 'LaravelEtenderKeywordSearch/1.0',
+                'Accept-Language' => 'az,en;q=0.8,ru;q=0.7',
             ]);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function fetchEventDetail(?string $eventId): ?array
+    {
+        if ($eventId === null || $eventId === '') {
+            return null;
+        }
+
+        if (isset($this->detailCache[$eventId])) {
+            return $this->detailCache[$eventId];
+        }
+
+        $response = $this->request()->get('/api/events/'.$eventId);
+        if (! $response->ok()) {
+            return null;
+        }
+
+        $data = $response->json();
+        if (! is_array($data)) {
+            return null;
+        }
+
+        $this->detailCache[$eventId] = $data;
+
+        return $data;
     }
 }
