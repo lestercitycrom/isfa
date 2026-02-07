@@ -8,10 +8,13 @@ use App\Exports\CategoriesExport;
 use App\Exports\ProductSupplierLinksExport;
 use App\Exports\ProductsExport;
 use App\Exports\SuppliersExport;
+use App\Exports\TenderItemsExport;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
+use App\Models\Tender;
+use App\Support\CompanyContext;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -196,6 +199,20 @@ final class CsvExportController extends Controller
 		$companyId = auth()->user()?->isAdmin() ? null : auth()->user()?->company_id;
 
 		return Excel::download(new ProductSupplierLinksExport($companyId), 'product_supplier.xlsx');
+	}
+
+	public function tenderItemsExcel(Tender $tender): BinaryFileResponse
+	{
+		$companyId = CompanyContext::companyId();
+		$isAdmin = CompanyContext::isAdmin();
+
+		if (! $isAdmin && $companyId !== null && (int) $tender->company_id !== $companyId) {
+			abort(403);
+		}
+
+		$eventId = $tender->event_id ?: $tender->id;
+
+		return Excel::download(new TenderItemsExport((int) $tender->id), 'tender_items_' . $eventId . '.xlsx');
 	}
 
 	/**

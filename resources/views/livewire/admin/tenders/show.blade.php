@@ -7,6 +7,13 @@
 			<x-admin.button variant="secondary" :href="route('admin.tenders.index')">
 				{{ __('common.back') }}
 			</x-admin.button>
+			<a
+				class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 transition"
+				href="{{ route('admin.export.tenders.items.excel', $tender) }}"
+			>
+				<x-admin.icon name="download" class="h-4 w-4" />
+				{{ __('common.export_excel') }}
+			</a>
 
 			<a
 				class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 transition"

@@ -90,6 +90,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 	Route::get('/export/products.xlsx', [CsvExportController::class, 'productsExcel'])->name('export.products.excel');
 	Route::get('/export/suppliers.xlsx', [CsvExportController::class, 'suppliersExcel'])->name('export.suppliers.excel');
 	Route::get('/export/links.xlsx', [CsvExportController::class, 'linksExcel'])->name('export.links.excel');
+	Route::get('/export/tenders/{tender}/items.xlsx', [CsvExportController::class, 'tenderItemsExcel'])->name('export.tenders.items.excel');
 
 	Route::post('/import/categories', [CsvImportController::class, 'importCategories'])->name('import.categories');
 	Route::post('/import/products', [CsvImportController::class, 'importProducts'])->name('import.products');
