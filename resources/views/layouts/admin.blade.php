@@ -55,18 +55,34 @@
 								$parentActive = ($route !== '' && request()->routeIs($route)) || $childActive;
 							@endphp
 
-							<details class="relative group" @if($parentActive) open @endif>
-								<summary class="list-none cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold transition inline-flex items-center gap-2
-									{{ $parentActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+							<div
+								class="relative group"
+								x-data="{ open: false }"
+								x-on:click.outside="open = false"
+								x-on:keydown.escape.window="open = false"
+							>
+								<button
+									type="button"
+									x-on:click="open = !open"
+									class="list-none cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold transition inline-flex items-center gap-2
+										{{ $parentActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}"
+									aria-haspopup="menu"
+									x-bind:aria-expanded="open ? 'true' : 'false'"
+								>
 									@if($icon !== '')
 										<x-admin.icon :name="$icon" class="h-4 w-4" />
 									@endif
 									<span>{{ $label }}</span>
 									<x-admin.icon name="chevron-down" class="h-4 w-4" />
-								</summary>
-								<div class="absolute left-0 mt-2 min-w-52 rounded-xl border border-slate-200 bg-white p-1 shadow-lg z-50">
+								</button>
+								<div
+									x-show="open"
+									x-transition.origin.top.left
+									class="absolute left-0 mt-2 min-w-52 rounded-xl border border-slate-200 bg-white p-1 shadow-lg z-50"
+									role="menu"
+								>
 									@if($route !== '' && \Illuminate\Support\Facades\Route::has($route))
-										<a href="{{ route($route) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+										<a href="{{ route($route) }}" x-on:click="open = false" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
 											<x-admin.icon name="box" class="h-4 w-4 text-slate-500" />
 											<span>{{ __('common.all_products') }}</span>
 										</a>
@@ -79,7 +95,7 @@
 											$childIcon = (string) ($child['icon'] ?? '');
 											$childIsActive = request()->routeIs($childRoute);
 										@endphp
-										<a href="{{ route($childRoute) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ $childIsActive ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50' }}">
+										<a href="{{ route($childRoute) }}" x-on:click="open = false" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ $childIsActive ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50' }}">
 											@if($childIcon !== '')
 												<x-admin.icon :name="$childIcon" class="h-4 w-4 text-slate-500" />
 											@endif
@@ -87,7 +103,7 @@
 										</a>
 									@endforeach
 								</div>
-							</details>
+							</div>
 						@elseif($route !== '' && $label !== '' && \Illuminate\Support\Facades\Route::has($route))
 							@php $isActive = request()->routeIs($route); @endphp
 							<a

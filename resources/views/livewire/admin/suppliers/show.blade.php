@@ -41,6 +41,14 @@
 		</button>
 	</div>
 
+	<x-admin.card :title="__('common.tags')">
+		<x-admin.tag-manager
+			:selected-tags="$supplier->tags"
+			:tag-suggestions="$tagSuggestions"
+			:show-tag-dropdown="$showTagDropdown"
+		/>
+	</x-admin.card>
+
 	@if($tab === 'details')
 		@if($supplier->photo_path)
 			<x-admin.card>

@@ -83,6 +83,15 @@
 						:error="$errors->first('name')"
 					/>
 
+					<div class="space-y-2">
+						<label class="text-xs font-semibold text-slate-700">{{ __('common.tags') }}</label>
+						<x-admin.tag-manager
+							:selected-tags="$selectedTags"
+							:tag-suggestions="$tagSuggestions"
+							:show-tag-dropdown="$showTagDropdown"
+						/>
+					</div>
+
 					<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
 						<x-admin.input
 							:label="__('common.voen')"

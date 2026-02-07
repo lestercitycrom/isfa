@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Tenders;
 
-use App\Models\Tender;
 use App\Models\Company;
+use App\Models\Tag;
+use App\Models\Tender;
 use App\Services\Etender\EtenderEventSyncService;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
@@ -18,144 +19,184 @@ use Throwable;
 #[Layout('layouts.admin')]
 final class Index extends Component
 {
-	use WithPagination;
+    use WithPagination;
 
-	public string $search = '';
-	public ?int $companyFilter = null;
+    public string $search = '';
 
-	/**
-	 * URL or numeric eventId entered by admin.
-	 */
-	public string $importUrl = '';
+    public ?int $companyFilter = null;
 
-	public function updatedSearch(): void
-	{
-		$this->resetPage();
-	}
+    public ?int $tagFilter = null;
 
-	public function updatedCompanyFilter(): void
-	{
-		$this->resetPage();
-	}
+    /**
+     * URL or numeric eventId entered by admin.
+     */
+    public string $importUrl = '';
 
-	public function delete(int $id): void
-	{
-		$companyId = CompanyContext::companyId();
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
 
-		Tender::query()
-			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
-			->whereKey($id)
-			->delete();
+    public function updatedCompanyFilter(): void
+    {
+        $this->tagFilter = null;
+        $this->resetPage();
+    }
 
-		session()->flash('status', __('tenders.flash.deleted'));
-	}
+    public function updatedTagFilter(): void
+    {
+        $this->resetPage();
+    }
 
-	public function syncFromUrl(EtenderEventSyncService $syncService): void
-	{
-		$this->resetErrorBag();
+    public function delete(int $id): void
+    {
+        $companyId = CompanyContext::companyId();
 
-		$import = trim($this->importUrl);
+        Tender::query()
+            ->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+            ->whereKey($id)
+            ->delete();
 
-		if ($import === '') {
-			$this->addError('importUrl', __('common.required'));
+        session()->flash('status', __('tenders.flash.deleted'));
+    }
 
-			return;
-		}
+    public function syncFromUrl(EtenderEventSyncService $syncService): void
+    {
+        $this->resetErrorBag();
 
-		$eventId = $this->extractEventId($import);
+        $import = trim($this->importUrl);
 
-		if ($eventId === null) {
-			$this->addError('importUrl', __('tenders.errors.cant_extract_event_id'));
+        if ($import === '') {
+            $this->addError('importUrl', __('common.required'));
 
-			return;
-		}
+            return;
+        }
 
-		try {
-			$tender = $syncService->sync($eventId, CompanyContext::companyId());
+        $eventId = $this->extractEventId($import);
 
-			session()->flash('status', __('tenders.flash.synced', ['id' => $tender->event_id]));
+        if ($eventId === null) {
+            $this->addError('importUrl', __('tenders.errors.cant_extract_event_id'));
 
-			$this->redirectRoute('admin.tenders.show', ['tender' => $tender->getKey()]);
-		} catch (Throwable $e) {
-			report($e);
+            return;
+        }
 
-			$this->addError('importUrl', __('tenders.errors.sync_error', ['message' => $e->getMessage()]));
-		}
-	}
+        try {
+            $tender = $syncService->sync($eventId, CompanyContext::companyId());
 
-	private function extractEventId(string $value): ?int
-	{
-		$value = trim($value);
+            session()->flash('status', __('tenders.flash.synced', ['id' => $tender->event_id]));
 
-		// 1) If admin pasted numeric eventId only.
-		if (ctype_digit($value)) {
-			$asInt = (int) $value;
+            $this->redirectRoute('admin.tenders.show', ['tender' => $tender->getKey()]);
+        } catch (Throwable $e) {
+            report($e);
 
-			return $asInt > 0 ? $asInt : null;
-		}
+            $this->addError('importUrl', __('tenders.errors.sync_error', ['message' => $e->getMessage()]));
+        }
+    }
 
-		// 2) If admin pasted full URL.
-		if (!filter_var($value, FILTER_VALIDATE_URL)) {
-			return null;
-		}
+    private function extractEventId(string $value): ?int
+    {
+        $value = trim($value);
 
-		// Typical: https://etender.gov.az/main/competition/detail/346012
-		if (preg_match('~/(?:detail|competition/detail)/(?P<id>\d+)~i', $value, $m) === 1) {
-			$asInt = (int) ($m['id'] ?? 0);
+        // 1) If admin pasted numeric eventId only.
+        if (ctype_digit($value)) {
+            $asInt = (int) $value;
 
-			return $asInt > 0 ? $asInt : null;
-		}
+            return $asInt > 0 ? $asInt : null;
+        }
 
-		// Fallback: last numeric segment.
-		$last = (string) Str::of(parse_url($value, PHP_URL_PATH) ?: '')
-			->trim('/')
-			->explode('/')
-			->last();
+        // 2) If admin pasted full URL.
+        if (! filter_var($value, FILTER_VALIDATE_URL)) {
+            return null;
+        }
 
-		if ($last !== '' && ctype_digit($last)) {
-			$asInt = (int) $last;
+        // Typical: https://etender.gov.az/main/competition/detail/346012
+        if (preg_match('~/(?:detail|competition/detail)/(?P<id>\d+)~i', $value, $m) === 1) {
+            $asInt = (int) ($m['id'] ?? 0);
 
-			return $asInt > 0 ? $asInt : null;
-		}
+            return $asInt > 0 ? $asInt : null;
+        }
 
-		return null;
-	}
+        // Fallback: last numeric segment.
+        $last = (string) Str::of(parse_url($value, PHP_URL_PATH) ?: '')
+            ->trim('/')
+            ->explode('/')
+            ->last();
 
-	public function render(): View
-	{
-		$companyId = CompanyContext::companyId();
-		$isAdmin = CompanyContext::isAdmin();
+        if ($last !== '' && ctype_digit($last)) {
+            $asInt = (int) $last;
 
-		$tenders = Tender::query()
-			->with('company')
-			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
-			->when($isAdmin && $this->companyFilter !== null, function ($q): void {
-				if ($this->companyFilter === 0) {
-					$q->whereNull('company_id');
+            return $asInt > 0 ? $asInt : null;
+        }
 
-					return;
-				}
+        return null;
+    }
 
-				$q->where('company_id', $this->companyFilter);
-			})
-			->when($this->search !== '', function ($q): void {
-				$q->where(function ($q): void {
-					$q->where('title', 'like', '%' . $this->search . '%')
-						->orWhere('organization_name', 'like', '%' . $this->search . '%')
-						->orWhere('event_id', 'like', '%' . $this->search . '%')
-						->orWhere('document_number', 'like', '%' . $this->search . '%')
-						->orWhereHas('items', function ($itemsQuery): void {
-							$itemsQuery->where('name', 'like', '%' . $this->search . '%');
-						});
-				});
-			})
-			->orderByDesc('published_at')
-			->paginate(20);
+    public function render(): View
+    {
+        $companyId = CompanyContext::companyId();
+        $isAdmin = CompanyContext::isAdmin();
 
-		return view('livewire.admin.tenders.index', [
-			'tenders' => $tenders,
-			'companies' => $isAdmin ? Company::query()->orderBy('name')->get() : collect(),
-			'isAdmin' => $isAdmin,
-		]);
-	}
+        $tenders = Tender::query()
+            ->with(['company', 'tags'])
+            ->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
+            ->when($isAdmin && $this->companyFilter !== null, function ($q): void {
+                if ($this->companyFilter === 0) {
+                    $q->whereNull('company_id');
+
+                    return;
+                }
+
+                $q->where('company_id', $this->companyFilter);
+            })
+            ->when($this->tagFilter !== null && $this->tagFilter > 0, function ($q): void {
+                $q->whereHas('tags', fn ($tagsQ) => $tagsQ->whereKey($this->tagFilter));
+            })
+            ->when($this->search !== '', function ($q): void {
+                $q->where(function ($q): void {
+                    $q->where('title', 'like', '%'.$this->search.'%')
+                        ->orWhere('organization_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('event_id', 'like', '%'.$this->search.'%')
+                        ->orWhere('document_number', 'like', '%'.$this->search.'%')
+                        ->orWhereHas('items', function ($itemsQuery): void {
+                            $itemsQuery->where('name', 'like', '%'.$this->search.'%');
+                        });
+                });
+            })
+            ->orderByDesc('published_at')
+            ->paginate(20);
+
+        $tagOptions = Tag::query()
+            ->where(function ($q) use ($companyId, $isAdmin): void {
+                if ($companyId !== null) {
+                    $q->where('company_id', $companyId);
+
+                    return;
+                }
+
+                if ($isAdmin && $this->companyFilter !== null) {
+                    if ($this->companyFilter === 0) {
+                        $q->whereNull('company_id');
+
+                        return;
+                    }
+
+                    $q->where('company_id', $this->companyFilter);
+
+                    return;
+                }
+
+                if (! $isAdmin) {
+                    $q->whereNull('company_id');
+                }
+            })
+            ->orderBy('name')
+            ->get();
+
+        return view('livewire.admin.tenders.index', [
+            'tenders' => $tenders,
+            'companies' => $isAdmin ? Company::query()->orderBy('name')->get() : collect(),
+            'tagOptions' => $tagOptions,
+            'isAdmin' => $isAdmin,
+        ]);
+    }
 }

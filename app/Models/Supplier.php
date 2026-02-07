@@ -14,62 +14,71 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 final class Supplier extends Model
 {
-	use HasFactory;
-	use LogsActivity;
-	use LogsCompanyActivity;
+    use HasFactory;
+    use LogsActivity;
+    use LogsCompanyActivity;
 
-	protected $fillable = [
-		'company_id',
-		'name',
-		'voen',
-		'contact_name',
-		'phone',
-		'email',
-		'website',
-		'payment_method',
-		'payment_card_number',
-		'payment_routing_number',
-		'photo_path',
-		'comment',
-	];
+    protected $fillable = [
+        'company_id',
+        'name',
+        'voen',
+        'contact_name',
+        'phone',
+        'email',
+        'website',
+        'payment_method',
+        'payment_card_number',
+        'payment_routing_number',
+        'photo_path',
+        'comment',
+    ];
 
-	/**
-	 * @return BelongsToMany<Product>
-	 */
-	public function products(): BelongsToMany
-	{
-		return $this->belongsToMany(Product::class, 'product_supplier')
-			->using(ProductSupplier::class)
-			->withPivot(['status', 'terms'])
-			->withTimestamps();
-	}
+    /**
+     * @return BelongsToMany<Tag>
+     */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'supplier_tag')
+            ->withTimestamps();
+    }
 
-	/**
-	 * @return BelongsToMany<TenderItem>
-	 */
-	public function tenderItems(): BelongsToMany
-	{
-		return $this->belongsToMany(TenderItem::class, 'tender_item_supplier')
-			->using(TenderItemSupplier::class)
-			->withPivot(['status', 'terms'])
-			->withTimestamps();
-	}
+    /**
+     * @return BelongsToMany<Product>
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_supplier')
+            ->using(ProductSupplier::class)
+            ->withPivot(['status', 'terms'])
+            ->withTimestamps();
+    }
 
-	/**
-	 * @return BelongsTo<Company, Supplier>
-	 */
-	public function company(): BelongsTo
-	{
-		return $this->belongsTo(Company::class, 'company_id');
-	}
+    /**
+     * @return BelongsToMany<TenderItem>
+     */
+    public function tenderItems(): BelongsToMany
+    {
+        return $this->belongsToMany(TenderItem::class, 'tender_item_supplier')
+            ->using(TenderItemSupplier::class)
+            ->withPivot(['status', 'terms'])
+            ->withTimestamps();
+    }
 
-	public function getActivitylogOptions(): LogOptions
-	{
-		return LogOptions::defaults()
-			->useLogName('supplier')
-			->logFillable()
-			->logOnlyDirty()
-			->dontLogIfAttributesChangedOnly(['updated_at'])
-			->dontSubmitEmptyLogs();
-	}
+    /**
+     * @return BelongsTo<Company, Supplier>
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('supplier')
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontLogIfAttributesChangedOnly(['updated_at'])
+            ->dontSubmitEmptyLogs();
+    }
 }

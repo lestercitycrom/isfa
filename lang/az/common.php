@@ -355,6 +355,10 @@ return [
 	'account_deleted' => 'Hesab silindi.',
 	'test_email_sent_ok' => 'Test məktubu göndərildi.',
 	'test_email_failed' => 'Test məktubunu göndərmək alınmadı.',
+	'tags' => 'Etiketler',
+	'tag_input_placeholder' => 'Etiket yazin ve Enter basin...',
+	'tag_input_hint' => 'Siyahidan secin ve ya yeni etiket yaratmaq ucun Enter basin.',
+	'tag_create_hint' => 'Uyghunluq tapilmadi. Etiket yaratmaq ucun Enter basin.',
 ];
 
 

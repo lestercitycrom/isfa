@@ -63,6 +63,14 @@
 		</button>
 	</div>
 
+	<x-admin.card :title="__('common.tags')">
+		<x-admin.tag-manager
+			:selected-tags="$tender->tags"
+			:tag-suggestions="$tagSuggestions"
+			:show-tag-dropdown="$showTagDropdown"
+		/>
+	</x-admin.card>
+
 	@if($tab === 'details')
 		<x-admin.card :title="__('common.summary')">
 			<div class="grid grid-cols-1 gap-4 lg:grid-cols-3">

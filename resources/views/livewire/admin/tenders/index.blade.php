@@ -60,7 +60,7 @@
 
 	<div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
 		<div class="border-b border-slate-200 p-4">
-			<div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+			<div class="grid grid-cols-1 gap-3 md:grid-cols-3">
 				<div>
 					<label class="block text-xs font-semibold text-slate-600">{{ __('tenders.filters.search') }}</label>
 					<input
@@ -86,6 +86,19 @@
 						</select>
 					</div>
 				@endif
+
+				<div>
+					<label class="block text-xs font-semibold text-slate-600">{{ __('common.tags') }}</label>
+					<select
+						wire:model.live="tagFilter"
+						class="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
+					>
+						<option value="">{{ __('common.tags') }}</option>
+						@foreach ($tagOptions as $tag)
+							<option value="{{ $tag->id }}">{{ $tag->name }}</option>
+						@endforeach
+					</select>
+				</div>
 			</div>
 		</div>
 
@@ -97,6 +110,7 @@
 						<th class="px-4 py-3">{{ __('tenders.table.title') }}</th>
 						<th class="px-4 py-3">{{ __('common.organization') }}</th>
 						<th class="px-4 py-3">{{ __('tenders.table.published') }}</th>
+						<th class="px-4 py-3">{{ __('common.tags') }}</th>
 						@if ($isAdmin)
 							<th class="px-4 py-3">{{ __('common.company') }}</th>
 						@endif
@@ -129,6 +143,21 @@
 								{{ $tender->published_at?->format('Y-m-d H:i') ?: '—' }}
 							</td>
 
+							<td class="px-4 py-3">
+								@if($tender->tags->isNotEmpty())
+									<div class="flex flex-wrap gap-1">
+										@foreach ($tender->tags->take(3) as $tag)
+											<x-admin.badge variant="slate">{{ $tag->name }}</x-admin.badge>
+										@endforeach
+										@if ($tender->tags->count() > 3)
+											<x-admin.badge variant="slate">+{{ $tender->tags->count() - 3 }}</x-admin.badge>
+										@endif
+									</div>
+								@else
+									<span class="text-slate-400">-</span>
+								@endif
+							</td>
+
 							@if ($isAdmin)
 								<td class="px-4 py-3 text-sm text-slate-700">
 									{{ $tender->company?->company_name ?? $tender->company?->name ?? '—' }}
@@ -157,7 +186,7 @@
 						</tr>
 					@empty
 						<tr>
-							<td colspan="{{ $isAdmin ? 6 : 5 }}" class="px-4 py-8 text-center text-sm text-slate-500">
+							<td colspan="{{ $isAdmin ? 7 : 6 }}" class="px-4 py-8 text-center text-sm text-slate-500">
 								{{ __('tenders.table.empty') }}
 							</td>
 						</tr>

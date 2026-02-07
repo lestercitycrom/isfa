@@ -55,6 +55,18 @@
 				</x-admin.filter-select>
 			</div>
 		@endif
+		<div class="lg:col-span-2">
+			<x-admin.filter-select
+				wire:model.live="tagFilter"
+				:placeholder="__('common.tags')"
+				:label="__('common.tags')"
+			>
+				<option value="">{{ __('common.tags') }}</option>
+				@foreach ($tagOptions as $tag)
+					<option value="{{ $tag->id }}">{{ $tag->name }}</option>
+				@endforeach
+			</x-admin.filter-select>
+		</div>
 	</x-admin.filters-bar>
 
 	<x-admin.card>
@@ -66,6 +78,7 @@
 						<x-admin.th>{{ __('common.company') }}</x-admin.th>
 					@endif
 					<x-admin.th>{{ __('common.contacts') }}</x-admin.th>
+					<x-admin.th>{{ __('common.tags') }}</x-admin.th>
 					<x-admin.th align="right" nowrap>{{ __('common.actions') }}</x-admin.th>
 				</tr>
 			</x-slot>
@@ -101,6 +114,20 @@
 							</div>
 						@endif
 					</x-admin.td>
+					<x-admin.td>
+						@if($supplier->tags->isNotEmpty())
+							<div class="flex flex-wrap gap-1">
+								@foreach ($supplier->tags->take(3) as $tag)
+									<x-admin.badge variant="slate">{{ $tag->name }}</x-admin.badge>
+								@endforeach
+								@if ($supplier->tags->count() > 3)
+									<x-admin.badge variant="slate">+{{ $supplier->tags->count() - 3 }}</x-admin.badge>
+								@endif
+							</div>
+						@else
+							<span class="text-slate-400">-</span>
+						@endif
+					</x-admin.td>
 					<x-admin.td align="right" nowrap>
 						<x-admin.table-actions
 							:viewHref="route('admin.suppliers.show', $supplier)"
@@ -118,7 +145,7 @@
 				</tr>
 			@empty
 				<tr>
-					<x-admin.td colspan="{{ $isAdmin ? 4 : 3 }}" class="text-center py-8 text-slate-500">
+					<x-admin.td colspan="{{ $isAdmin ? 5 : 4 }}" class="text-center py-8 text-slate-500">
 						{{ __('common.no_suppliers') }}
 					</x-admin.td>
 				</tr>
