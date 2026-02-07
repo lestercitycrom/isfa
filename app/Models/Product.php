@@ -23,6 +23,9 @@ final class Product extends Model
 		'category_id',
 		'name',
 		'description',
+		'color',
+		'unit',
+		'characteristics',
 		'photo_path',
 		'comment',
 	];

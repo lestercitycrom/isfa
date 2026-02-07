@@ -27,7 +27,7 @@ final class CsvExportController extends Controller
 			$handle = fopen('php://output', 'wb');
 
 			// Header
-			fputcsv($handle, ['id', 'category_name', 'name', 'description', 'photo_url']);
+			fputcsv($handle, ['id', 'category_name', 'name', 'description', 'color', 'unit', 'characteristics', 'photo_url']);
 
 			Product::query()
 				->with('category')
@@ -40,6 +40,9 @@ final class CsvExportController extends Controller
 							$product->category?->name,
 							$product->name,
 							$product->description,
+							$product->color,
+							$product->unit,
+							$product->characteristics,
 							$this->photoUrl($product->photo_path),
 						]);
 					}
@@ -58,7 +61,20 @@ final class CsvExportController extends Controller
 			$handle = fopen('php://output', 'wb');
 
 			// Header
-			fputcsv($handle, ['id', 'name', 'contact_name', 'phone', 'email', 'website', 'comment', 'photo_url']);
+			fputcsv($handle, [
+				'id',
+				'name',
+				'voen',
+				'contact_name',
+				'phone',
+				'email',
+				'website',
+				'payment_method',
+				'payment_card_number',
+				'payment_routing_number',
+				'comment',
+				'photo_url',
+			]);
 
 			Supplier::query()
 				->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
@@ -68,10 +84,14 @@ final class CsvExportController extends Controller
 						fputcsv($handle, [
 							$supplier->id,
 							$supplier->name,
+							$supplier->voen,
 							$supplier->contact_name,
 							$supplier->phone,
 							$supplier->email,
 							$supplier->website,
+							$supplier->payment_method,
+							$supplier->payment_card_number,
+							$supplier->payment_routing_number,
 							$supplier->comment,
 							$this->photoUrl($supplier->photo_path),
 						]);

@@ -64,6 +64,32 @@
 			</x-admin.card>
 		@endif
 
+		@if ($product->color || $product->unit || $product->characteristics)
+			<x-admin.card>
+				<div class="text-sm font-semibold text-slate-900">{{ __('common.product_details') }}</div>
+				<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+					@if ($product->color)
+						<div>
+							<div class="text-xs font-semibold text-slate-600">{{ __('common.color') }}</div>
+							<div class="mt-1 text-sm text-slate-900">{{ $product->color }}</div>
+						</div>
+					@endif
+					@if ($product->unit)
+						<div>
+							<div class="text-xs font-semibold text-slate-600">{{ __('common.unit') }}</div>
+							<div class="mt-1 text-sm text-slate-900">{{ $product->unit }}</div>
+						</div>
+					@endif
+				</div>
+				@if ($product->characteristics)
+					<div class="mt-4">
+						<div class="text-xs font-semibold text-slate-600">{{ __('common.characteristics') }}</div>
+						<div class="mt-1 text-sm text-slate-900 whitespace-pre-line">{{ $product->characteristics }}</div>
+					</div>
+				@endif
+			</x-admin.card>
+		@endif
+
 		<x-admin.card :title="__('common.suppliers_for_product')">
 			<div class="space-y-4">
 				<x-admin.table :zebra="true">

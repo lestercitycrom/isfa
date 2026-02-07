@@ -100,6 +100,32 @@
 						wire:model="description"
 						:error="$errors->first('description')"
 					/>
+
+					<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+						<div class="text-sm font-semibold text-slate-900">{{ __('common.product_details') }}</div>
+						<div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+							<x-admin.input
+								:label="__('common.color')"
+								type="text"
+								wire:model="color"
+								:error="$errors->first('color')"
+							/>
+							<x-admin.input
+								:label="__('common.unit')"
+								type="text"
+								wire:model="unit"
+								:error="$errors->first('unit')"
+							/>
+						</div>
+						<div class="mt-4">
+							<x-admin.input
+								:label="__('common.characteristics')"
+								type="textarea"
+								wire:model="characteristics"
+								:error="$errors->first('characteristics')"
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
 

@@ -29,7 +29,7 @@ final class ProductsExport implements FromQuery, WithHeadings, WithMapping
 	 */
 	public function headings(): array
 	{
-		return ['id', 'category_name', 'name', 'description', 'photo', 'photo_url'];
+		return ['id', 'category_name', 'name', 'description', 'color', 'unit', 'characteristics', 'photo', 'photo_url'];
 	}
 
 	/**
@@ -45,6 +45,9 @@ final class ProductsExport implements FromQuery, WithHeadings, WithMapping
 			$row->category?->name,
 			$row->name,
 			$row->description,
+			$row->color,
+			$row->unit,
+			$row->characteristics,
 			$this->photoFormula($photoUrl),
 			$photoUrl,
 		];

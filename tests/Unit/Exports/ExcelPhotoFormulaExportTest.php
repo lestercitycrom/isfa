@@ -21,12 +21,26 @@ it('builds image formula for suppliers excel export', function (): void {
 		'photo_path' => 'suppliers/photo.jpg',
 	]);
 
-	expect($export->headings())->toBe(['id', 'name', 'contact_name', 'phone', 'email', 'website', 'comment', 'photo', 'photo_url']);
+	expect($export->headings())->toBe([
+		'id',
+		'name',
+		'voen',
+		'contact_name',
+		'phone',
+		'email',
+		'website',
+		'payment_method',
+		'payment_card_number',
+		'payment_routing_number',
+		'comment',
+		'photo',
+		'photo_url',
+	]);
 
 	$mapped = $export->map($supplier);
 
-	expect($mapped[7])->toBe('=IMAGE("https://example.com/storage/suppliers/photo.jpg")');
-	expect($mapped[8])->toBe('https://example.com/storage/suppliers/photo.jpg');
+	expect($mapped[11])->toBe('=IMAGE("https://example.com/storage/suppliers/photo.jpg")');
+	expect($mapped[12])->toBe('https://example.com/storage/suppliers/photo.jpg');
 });
 
 it('builds image formula for products excel export', function (): void {
@@ -42,12 +56,22 @@ it('builds image formula for products excel export', function (): void {
 	]);
 	$product->setRelation('category', $category);
 
-	expect($export->headings())->toBe(['id', 'category_name', 'name', 'description', 'photo', 'photo_url']);
+	expect($export->headings())->toBe([
+		'id',
+		'category_name',
+		'name',
+		'description',
+		'color',
+		'unit',
+		'characteristics',
+		'photo',
+		'photo_url',
+	]);
 
 	$mapped = $export->map($product);
 
-	expect($mapped[4])->toBe('=IMAGE("https://example.com/storage/products/image.png")');
-	expect($mapped[5])->toBe('https://example.com/storage/products/image.png');
+	expect($mapped[7])->toBe('=IMAGE("https://example.com/storage/products/image.png")');
+	expect($mapped[8])->toBe('https://example.com/storage/products/image.png');
 });
 
 it('keeps photo cells empty when photo path is missing', function (): void {
@@ -71,8 +95,8 @@ it('keeps photo cells empty when photo path is missing', function (): void {
 	$supplierMapped = $suppliersExport->map($supplier);
 	$productMapped = $productsExport->map($product);
 
-	expect($supplierMapped[7])->toBeNull();
-	expect($supplierMapped[8])->toBeNull();
-	expect($productMapped[4])->toBeNull();
-	expect($productMapped[5])->toBeNull();
+	expect($supplierMapped[11])->toBeNull();
+	expect($supplierMapped[12])->toBeNull();
+	expect($productMapped[7])->toBeNull();
+	expect($productMapped[8])->toBeNull();
 });

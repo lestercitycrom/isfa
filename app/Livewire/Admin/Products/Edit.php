@@ -29,6 +29,9 @@ final class Edit extends Component
 	public ?int $category_id = null;
 	public string $name = '';
 	public ?string $description = null;
+	public ?string $color = null;
+	public ?string $unit = null;
+	public ?string $characteristics = null;
 	public mixed $photo = null;
 
 	public int $attachSupplierId = 0;
@@ -61,6 +64,9 @@ final class Edit extends Component
 			$this->category_id = $product->category_id;
 			$this->name = $product->name;
 			$this->description = $product->description;
+			$this->color = $product->color;
+			$this->unit = $product->unit;
+			$this->characteristics = $product->characteristics;
 
 			$this->product->load('suppliers');
 			foreach ($this->product->suppliers as $supplier) {
@@ -116,6 +122,9 @@ final class Edit extends Component
 				$nameRule,
 			],
 			'description' => ['nullable', 'string'],
+			'color' => ['nullable', 'string', 'max:64'],
+			'unit' => ['nullable', 'string', 'max:64'],
+			'characteristics' => ['nullable', 'string'],
 			'photo' => ['nullable', 'image', 'max:4096'],
 		], [
 			'name.unique' => __('common.product_name_already_exists'),
@@ -136,6 +145,9 @@ final class Edit extends Component
 				'category_id' => $this->category_id,
 				'name' => $this->name,
 				'description' => $this->description,
+				'color' => $this->color,
+				'unit' => $this->unit,
+				'characteristics' => $this->characteristics,
 				'photo_path' => $photoPath,
 			]
 		);

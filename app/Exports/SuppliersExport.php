@@ -28,7 +28,21 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping
 	 */
 	public function headings(): array
 	{
-		return ['id', 'name', 'contact_name', 'phone', 'email', 'website', 'comment', 'photo', 'photo_url'];
+		return [
+			'id',
+			'name',
+			'voen',
+			'contact_name',
+			'phone',
+			'email',
+			'website',
+			'payment_method',
+			'payment_card_number',
+			'payment_routing_number',
+			'comment',
+			'photo',
+			'photo_url',
+		];
 	}
 
 	/**
@@ -42,10 +56,14 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping
 		return [
 			$row->id,
 			$row->name,
+			$row->voen,
 			$row->contact_name,
 			$row->phone,
 			$row->email,
 			$row->website,
+			$row->payment_method,
+			$row->payment_card_number,
+			$row->payment_routing_number,
 			$row->comment,
 			$this->photoFormula($photoUrl),
 			$photoUrl,

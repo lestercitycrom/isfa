@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
 	// Navigation
@@ -316,6 +316,10 @@ return [
 	'payment_method_kocurme' => 'Перечисление',
 	'card_number' => 'Номер карты',
 	'routing_number' => 'Routing number',
+	'product_details' => 'Детали товара',
+	'color' => 'Цвет',
+	'unit' => 'Ед. измерения',
+	'characteristics' => 'Характеристики',
 	'export_excel' => 'Export Excel',
 ];
 

@@ -102,16 +102,28 @@ final class CsvImportController extends Controller
 						'category_id' => $categoryId,
 						'name' => $name,
 						'description' => $data['description'] ?? null,
+						'color' => $data['color'] ?? null,
+						'unit' => $data['unit'] ?? null,
+						'characteristics' => $data['characteristics'] ?? null,
 					]);
 					$added++;
 				} else {
-					// Update existing product (merge category and description if provided) â€” ÑÑ‡Ð¸Ñ‚Ð°ÐµÐ¼ ÐºÐ°Ðº Ð¿Ñ€Ð¾Ð¿ÑƒÑÐº Ð´ÑƒÐ±Ð»Ñ
+					// Update existing product (merge category and description if provided) — ñ÷èòàåì êàê ïðîïóñê äóáëÿ
 					$updateData = [];
 					if ($categoryId !== null) {
 						$updateData['category_id'] = $categoryId;
 					}
 					if (isset($data['description']) && $data['description'] !== null && $data['description'] !== '') {
 						$updateData['description'] = $data['description'];
+					}
+					if (isset($data['color']) && $data['color'] !== null && $data['color'] !== '') {
+						$updateData['color'] = $data['color'];
+					}
+					if (isset($data['unit']) && $data['unit'] !== null && $data['unit'] !== '') {
+						$updateData['unit'] = $data['unit'];
+					}
+					if (isset($data['characteristics']) && $data['characteristics'] !== null && $data['characteristics'] !== '') {
+						$updateData['characteristics'] = $data['characteristics'];
 					}
 					if ($companyId !== null) {
 						$updateData['company_id'] = $companyId;
@@ -140,20 +152,20 @@ final class CsvImportController extends Controller
 						$supplier = null;
 						$supplierName = null;
 
-						// Try to find by ID if numeric (Ð² Ñ€Ð°Ð¼ÐºÐ°Ñ… Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ)
+						// Try to find by ID if numeric (â ðàìêàõ òåêóùåãî ïîëüçîâàòåëÿ)
 						if (is_numeric($supplierItem)) {
 							$supplier = Supplier::query()
 								->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 								->whereKey((int) $supplierItem)
 								->first();
 							if ($supplier === null) {
-								// ÐŸÐ¾ÑÑ‚Ð°Ð²Ñ‰Ð¸ÐºÐ° Ñ Ñ‚Ð°ÐºÐ¸Ð¼ ID Ð½ÐµÑ‚ Ñƒ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ â€” Ð±ÐµÑ€Ñ‘Ð¼ Ð¸Ð¼Ñ Ð¸Ð· Ð³Ð»Ð¾Ð±Ð°Ð»ÑŒÐ½Ð¾Ð¹ Ð·Ð°Ð¿Ð¸ÑÐ¸ Ð¸ ÑÐ¾Ð·Ð´Ð°Ñ‘Ð¼ ÑÐ²Ð¾ÐµÐ³Ð¾
+								// Ïîñòàâùèêà ñ òàêèì ID íåò ó ïîëüçîâàòåëÿ — áåð¸ì èìÿ èç ãëîáàëüíîé çàïèñè è ñîçäà¸ì ñâîåãî
 								$existing = Supplier::query()->whereKey((int) $supplierItem)->first();
 								$supplierName = $existing?->name;
 							}
 						}
 
-						// If not found by ID, try to find by name (Ð² Ñ€Ð°Ð¼ÐºÐ°Ñ… Ñ‚ÐµÐºÑƒÑ‰ÐµÐ³Ð¾ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ)
+						// If not found by ID, try to find by name (â ðàìêàõ òåêóùåãî ïîëüçîâàòåëÿ)
 						if ($supplier === null) {
 							$supplier = Supplier::query()
 								->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
@@ -164,7 +176,7 @@ final class CsvImportController extends Controller
 							}
 						}
 
-						// Ð•ÑÐ»Ð¸ Ñƒ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ð¿Ð¾ÑÑ‚Ð°Ð²Ñ‰Ð¸ÐºÐ° Ð½ÐµÑ‚ â€” ÑÐ¾Ð·Ð´Ð°Ñ‘Ð¼ ÐµÐ¼Ñƒ Ð¿Ð¾ÑÑ‚Ð°Ð²Ñ‰Ð¸ÐºÐ° Ñ ÑÑ‚Ð¸Ð¼ Ð¸Ð¼ÐµÐ½ÐµÐ¼
+						// Åñëè ó ïîëüçîâàòåëÿ òàêîãî ïîñòàâùèêà íåò — ñîçäà¸ì åìó ïîñòàâùèêà ñ ýòèì èìåíåì
 						if ($supplier === null && $supplierName !== null && $supplierName !== '') {
 							$supplier = Supplier::query()->firstOrCreate(
 								['name' => $supplierName, 'company_id' => $companyId],
@@ -276,15 +288,30 @@ final class CsvImportController extends Controller
 					}
 				}
 
+				$paymentMethod = isset($data['payment_method']) ? trim((string) $data['payment_method']) : '';
+				if (!in_array($paymentMethod, ['cash', 'card', 'kocurme'], true)) {
+					$paymentMethod = '';
+				}
+				$paymentCardNumber = $paymentMethod === 'card'
+					? ($data['payment_card_number'] ?? null)
+					: null;
+				$paymentRoutingNumber = $paymentMethod === 'kocurme'
+					? ($data['payment_routing_number'] ?? null)
+					: null;
+
 				Supplier::query()->updateOrCreate(
 					['id' => $supplierId],
 					[
 						'company_id' => $companyId,
 						'name' => $name,
+						'voen' => $data['voen'] ?? null,
 						'contact_name' => $data['contact_name'] ?? null,
 						'phone' => $data['phone'] ?? null,
 						'email' => $data['email'] ?? null,
 						'website' => $data['website'] ?? null,
+						'payment_method' => $paymentMethod !== '' ? $paymentMethod : null,
+						'payment_card_number' => $paymentCardNumber,
+						'payment_routing_number' => $paymentRoutingNumber,
 						'comment' => $data['comment'] ?? null,
 					]
 				);
@@ -453,3 +480,4 @@ final class CsvImportController extends Controller
 			->with('status', __('common.links_imported'));
 	}
 }
+
