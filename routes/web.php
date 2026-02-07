@@ -18,6 +18,7 @@ use App\Livewire\Admin\Products\Show as ProductShow;
 use App\Livewire\Admin\Suppliers\Edit as SupplierEdit;
 use App\Livewire\Admin\Suppliers\Index as SuppliersIndex;
 use App\Livewire\Admin\Suppliers\Show as SupplierShow;
+use App\Livewire\Admin\Settings\Notifications as NotificationsSettings;
 use App\Livewire\Admin\Tenders\Create as TenderCreate;
 use App\Livewire\Admin\Tenders\Index as TendersIndex;
 use App\Livewire\Admin\Tenders\Show as TenderShow;
@@ -98,5 +99,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 		Route::get('/companies/create', CompaniesEdit::class)->name('companies.create');
 		Route::get('/companies/{company}/show', CompaniesShow::class)->name('companies.show');
 		Route::get('/companies/{company}/edit', CompaniesEdit::class)->name('companies.edit');
+		Route::get('/settings/notifications', NotificationsSettings::class)->name('settings.notifications');
 	});
 });

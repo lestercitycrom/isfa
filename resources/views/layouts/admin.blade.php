@@ -32,13 +32,63 @@
 							$label = str_starts_with($labelKey, 'common.') ? __($labelKey) : $labelKey;
 							$icon = (string) ($item['icon'] ?? '');
 							$adminOnly = (bool) ($item['admin_only'] ?? false);
+							$children = is_array($item['children'] ?? null) ? $item['children'] : [];
 						@endphp
 
 						@if($adminOnly && (!$user || !$user->isAdmin()))
 							@continue
 						@endif
 
-						@if($route !== '' && $label !== '' && \Illuminate\Support\Facades\Route::has($route))
+						@if(!empty($children))
+							@php
+								$visibleChildren = collect($children)->filter(function ($child) use ($user): bool {
+									$childAdminOnly = (bool) ($child['admin_only'] ?? false);
+									if ($childAdminOnly && (!$user || !$user->isAdmin())) {
+										return false;
+									}
+
+									$childRoute = (string) ($child['route'] ?? '');
+
+									return $childRoute !== '' && \Illuminate\Support\Facades\Route::has($childRoute);
+								})->values();
+								$childActive = $visibleChildren->contains(fn ($child): bool => request()->routeIs((string) $child['route']));
+								$parentActive = ($route !== '' && request()->routeIs($route)) || $childActive;
+							@endphp
+
+							<details class="relative group" @if($parentActive) open @endif>
+								<summary class="list-none cursor-pointer rounded-xl px-3 py-2 text-sm font-semibold transition inline-flex items-center gap-2
+									{{ $parentActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+									@if($icon !== '')
+										<x-admin.icon :name="$icon" class="h-4 w-4" />
+									@endif
+									<span>{{ $label }}</span>
+									<x-admin.icon name="chevron-down" class="h-4 w-4" />
+								</summary>
+								<div class="absolute left-0 mt-2 min-w-52 rounded-xl border border-slate-200 bg-white p-1 shadow-lg z-50">
+									@if($route !== '' && \Illuminate\Support\Facades\Route::has($route))
+										<a href="{{ route($route) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+											<x-admin.icon name="box" class="h-4 w-4 text-slate-500" />
+											<span>{{ __('common.all_products') }}</span>
+										</a>
+									@endif
+									@foreach($visibleChildren as $child)
+										@php
+											$childRoute = (string) ($child['route'] ?? '');
+											$childLabelKey = (string) ($child['label'] ?? '');
+											$childLabel = str_starts_with($childLabelKey, 'common.') ? __($childLabelKey) : $childLabelKey;
+											$childIcon = (string) ($child['icon'] ?? '');
+											$childIsActive = request()->routeIs($childRoute);
+										@endphp
+										<a href="{{ route($childRoute) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ $childIsActive ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50' }}">
+											@if($childIcon !== '')
+												<x-admin.icon :name="$childIcon" class="h-4 w-4 text-slate-500" />
+											@endif
+											<span>{{ $childLabel }}</span>
+										</a>
+									@endforeach
+								</div>
+							</details>
+						@elseif($route !== '' && $label !== '' && \Illuminate\Support\Facades\Route::has($route))
 							@php $isActive = request()->routeIs($route); @endphp
 							<a
 								href="{{ route($route) }}"
@@ -89,16 +139,56 @@
 								$label = str_starts_with($labelKey, 'common.') ? __($labelKey) : $labelKey;
 								$icon = (string) ($item['icon'] ?? '');
 								$adminOnly = (bool) ($item['admin_only'] ?? false);
+								$children = is_array($item['children'] ?? null) ? $item['children'] : [];
 							@endphp
 
 							@if($adminOnly && (!$user || !$user->isAdmin()))
 								@continue
 							@endif
 
-							@if($route !== '' && $label !== '' && \Illuminate\Support\Facades\Route::has($route))
-								@php $isActive = request()->routeIs($route); @endphp
-								<a
-									href="{{ route($route) }}"
+						@if(!empty($children))
+							@php
+								$visibleChildren = collect($children)->filter(function ($child) use ($user): bool {
+									$childAdminOnly = (bool) ($child['admin_only'] ?? false);
+									if ($childAdminOnly && (!$user || !$user->isAdmin())) {
+										return false;
+									}
+									$childRoute = (string) ($child['route'] ?? '');
+									return $childRoute !== '' && \Illuminate\Support\Facades\Route::has($childRoute);
+								})->values();
+							@endphp
+
+							<div class="w-full rounded-xl border border-white/10 bg-white/5 p-2">
+								<div class="px-2 py-1 text-xs uppercase tracking-wide text-slate-300">{{ $label }}</div>
+								@if($route !== '' && \Illuminate\Support\Facades\Route::has($route))
+									<a href="{{ route($route) }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-white/10">
+										<x-admin.icon name="box" class="h-4 w-4" />
+										<span>{{ __('common.all_products') }}</span>
+									</a>
+								@endif
+								@foreach($visibleChildren as $child)
+									@php
+										$childRoute = (string) ($child['route'] ?? '');
+										$childLabelKey = (string) ($child['label'] ?? '');
+										$childLabel = str_starts_with($childLabelKey, 'common.') ? __($childLabelKey) : $childLabelKey;
+										$childIcon = (string) ($child['icon'] ?? '');
+										$childIsActive = request()->routeIs($childRoute);
+									@endphp
+									<a
+										href="{{ route($childRoute) }}"
+										class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm {{ $childIsActive ? 'bg-white/10 text-white' : 'text-slate-200 hover:bg-white/10' }}"
+									>
+										@if($childIcon !== '')
+											<x-admin.icon :name="$childIcon" class="h-4 w-4" />
+										@endif
+										<span>{{ $childLabel }}</span>
+									</a>
+								@endforeach
+							</div>
+						@elseif($route !== '' && $label !== '' && \Illuminate\Support\Facades\Route::has($route))
+							@php $isActive = request()->routeIs($route); @endphp
+							<a
+								href="{{ route($route) }}"
 								class="rounded-xl px-3 py-2 text-sm font-semibold transition inline-flex items-center gap-2
 									{{ $isActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}"
 							>

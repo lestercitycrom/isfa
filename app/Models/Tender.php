@@ -77,6 +77,11 @@ class Tender extends Model
 		return $this->hasMany(TenderPublishHistory::class);
 	}
 
+	public function notificationDeliveries(): HasMany
+	{
+		return $this->hasMany(NotificationDelivery::class);
+	}
+
 	/**
 	 * @return BelongsToMany<Product>
 	 */

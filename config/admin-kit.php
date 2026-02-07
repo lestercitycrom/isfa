@@ -33,12 +33,18 @@ return [
 	 * Each item: ['label' => 'common.products', 'route' => 'admin.products.index', 'icon' => 'list']
 	 */
 	'nav' => [
-		['label' => 'common.dashboard', 'route' => 'admin.dashboard', 'icon' => 'activity'],
 		['label' => 'common.tenders', 'route' => 'admin.tenders.index', 'icon' => 'file-text'],
-		['label' => 'common.products', 'route' => 'admin.products.index', 'icon' => 'box'],
-		['label' => 'common.categories', 'route' => 'admin.categories.index', 'icon' => 'tag'],
-		['label' => 'common.suppliers', 'route' => 'admin.suppliers.index', 'icon' => 'truck'],
-		['label' => 'common.activity_log', 'route' => 'admin.activity_logs.index', 'icon' => 'activity'],
+		[
+			'label' => 'common.products',
+			'route' => 'admin.products.index',
+			'icon' => 'box',
+			'children' => [
+				['label' => 'common.categories', 'route' => 'admin.categories.index', 'icon' => 'tag'],
+				['label' => 'common.suppliers', 'route' => 'admin.suppliers.index', 'icon' => 'truck'],
+			],
+		],
+		['label' => 'common.logs', 'route' => 'admin.activity_logs.index', 'icon' => 'activity'],
 		['label' => 'common.companies', 'route' => 'admin.companies.index', 'icon' => 'building', 'admin_only' => true],
+		['label' => 'common.settings', 'route' => 'admin.settings.notifications', 'icon' => 'settings', 'admin_only' => true],
 	],
 ];

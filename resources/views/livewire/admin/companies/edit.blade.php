@@ -138,13 +138,24 @@
 								<div class="text-sm font-semibold text-slate-900">{{ $account->name }}</div>
 								<div class="text-xs text-slate-500">{{ $account->email }}</div>
 							</div>
-							<x-admin.icon-button
-								icon="trash"
-								:title="__('common.delete')"
-								variant="danger"
-								wire:click="deleteAccount({{ $account->id }})"
-								onclick="if(!confirm('{{ __('common.confirm_delete') }}')){event.preventDefault();event.stopImmediatePropagation();}"
-							/>
+							<div class="flex items-center gap-4">
+								<label class="inline-flex items-center gap-2 text-sm text-slate-700">
+									<input
+										type="checkbox"
+										class="rounded border-slate-300 text-slate-900 focus:ring-slate-300"
+										wire:model.live="accountReminderFlags.{{ $account->id }}"
+									/>
+									<span>{{ __('common.receive_tender_reminders') }}</span>
+								</label>
+
+								<x-admin.icon-button
+									icon="trash"
+									:title="__('common.delete')"
+									variant="danger"
+									wire:click="deleteAccount({{ $account->id }})"
+									onclick="if(!confirm('{{ __('common.confirm_delete') }}')){event.preventDefault();event.stopImmediatePropagation();}"
+								/>
+							</div>
 						</div>
 					@empty
 						<div class="text-sm text-slate-500">{{ __('common.no_accounts') }}</div>

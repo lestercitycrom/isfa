@@ -1,4 +1,4 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
 	<x-admin.page-header
 		:title="__('common.companies')"
 		:subtitle="__('common.companies_subtitle')"
@@ -48,7 +48,7 @@
 						@endif
 						<div class="mt-1 text-xs text-slate-500">
 							@if($primaryUser?->email){{ $primaryUser->email }}@endif
-							@if($primaryUser?->email && $company->phone) • @endif
+							@if($primaryUser?->email && $company->phone) - @endif
 							@if($company->phone){{ $company->phone }}@endif
 						</div>
 					</x-admin.td>
@@ -56,7 +56,7 @@
 						{{ $company->users_count }}
 					</x-admin.td>
 					<x-admin.td>
-						{{ $company->tax_id ?: '—' }}
+						{{ $company->tax_id ?: '-' }}
 					</x-admin.td>
 					<x-admin.td align="right" nowrap>
 						<x-admin.table-actions
@@ -87,3 +87,4 @@
 		</div>
 	</x-admin.card>
 </div>
+

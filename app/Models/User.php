@@ -31,6 +31,7 @@ class User extends Authenticatable
         'company_id',
         'name',
         'email',
+        'receive_tender_reminders',
         'password',
         'role',
         'company_name',
@@ -67,6 +68,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'receive_tender_reminders' => 'bool',
             'password' => 'hashed',
             'password_plain' => 'encrypted',
         ];
@@ -105,6 +107,14 @@ class User extends Authenticatable
 	public function company(): \Illuminate\Database\Eloquent\Relations\BelongsTo
 	{
 		return $this->belongsTo(Company::class, 'company_id');
+	}
+
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany<NotificationDelivery>
+	 */
+	public function notificationDeliveries(): \Illuminate\Database\Eloquent\Relations\HasMany
+	{
+		return $this->hasMany(NotificationDelivery::class);
 	}
 
     /**

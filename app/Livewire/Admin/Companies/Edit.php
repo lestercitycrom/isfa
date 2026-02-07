@@ -34,6 +34,11 @@ final class Edit extends Component
 	public string $account_email = '';
 	public string $account_password = '';
 
+	/**
+	 * @var array<int, bool>
+	 */
+	public array $accountReminderFlags = [];
+
 	public function mount(?Company $company = null): void
 	{
 		$this->company = $company;
@@ -48,6 +53,7 @@ final class Edit extends Component
 			$this->address = $company->address;
 			$this->website = $company->website;
 			$this->notes = $company->notes;
+			$this->syncAccountReminderFlags();
 		}
 	}
 
@@ -137,6 +143,7 @@ final class Edit extends Component
 
 		$this->company->refresh()->load('users');
 		$this->reset('account_name', 'account_email', 'account_password');
+		$this->syncAccountReminderFlags();
 
 		session()->flash('status', __('common.account_saved'));
 	}
@@ -154,11 +161,45 @@ final class Edit extends Component
 
 		$user->delete();
 		$this->company->refresh()->load('users');
+		$this->syncAccountReminderFlags();
 		session()->flash('status', __('common.account_deleted'));
+	}
+
+	public function updatedAccountReminderFlags(mixed $value, mixed $key): void
+	{
+		if (!$this->company?->exists) {
+			return;
+		}
+
+		$userId = (int) $key;
+
+		$user = $this->company->users()->whereKey($userId)->first();
+		if ($user === null) {
+			return;
+		}
+
+		$user->update([
+			'receive_tender_reminders' => (bool) $value,
+		]);
 	}
 
 	public function render(): View
 	{
 		return view('livewire.admin.companies.edit');
+	}
+
+	private function syncAccountReminderFlags(): void
+	{
+		if (!$this->company?->exists) {
+			$this->accountReminderFlags = [];
+
+			return;
+		}
+
+		$this->company->refresh()->load('users');
+
+		$this->accountReminderFlags = $this->company->users
+			->mapWithKeys(fn (User $user): array => [(int) $user->id => (bool) $user->receive_tender_reminders])
+			->all();
 	}
 }
