@@ -45,6 +45,17 @@ final class Supplier extends Model
 	}
 
 	/**
+	 * @return BelongsToMany<TenderItem>
+	 */
+	public function tenderItems(): BelongsToMany
+	{
+		return $this->belongsToMany(TenderItem::class, 'tender_item_supplier')
+			->using(TenderItemSupplier::class)
+			->withPivot(['status', 'terms'])
+			->withTimestamps();
+	}
+
+	/**
 	 * @return BelongsTo<Company, Supplier>
 	 */
 	public function company(): BelongsTo

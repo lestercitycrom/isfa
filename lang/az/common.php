@@ -245,6 +245,7 @@ return [
 	'items' => 'Mövqelər',
 	'unit' => 'Vahid',
 	'quantity' => 'Miqdar',
+	'quantity_unit_compact' => 'Miq. / vahid',
 	'category_code' => 'Kateqoriya kodu',
 
 	'full_name' => 'Ad və soyad',

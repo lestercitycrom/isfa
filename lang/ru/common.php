@@ -245,6 +245,7 @@ return [
 	'items' => 'Позиции',
 	'unit' => 'Ед.',
 	'quantity' => 'Количество',
+	'quantity_unit_compact' => 'Кол-во / ед.',
 	'category_code' => 'Код категории',
 
 	'full_name' => 'ФИО',

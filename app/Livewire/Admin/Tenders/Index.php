@@ -143,7 +143,10 @@ final class Index extends Component
 					$q->where('title', 'like', '%' . $this->search . '%')
 						->orWhere('organization_name', 'like', '%' . $this->search . '%')
 						->orWhere('event_id', 'like', '%' . $this->search . '%')
-						->orWhere('document_number', 'like', '%' . $this->search . '%');
+						->orWhere('document_number', 'like', '%' . $this->search . '%')
+						->orWhereHas('items', function ($itemsQuery): void {
+							$itemsQuery->where('name', 'like', '%' . $this->search . '%');
+						});
 				});
 			})
 			->orderByDesc('published_at')

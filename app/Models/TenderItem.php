@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Concerns\LogsCompanyActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -18,6 +19,7 @@ class TenderItem extends Model
 		'external_id',
 		'name',
 		'description',
+		'photo_path',
 		'unit_of_measure',
 		'quantity',
 		'category_code',
@@ -30,6 +32,17 @@ class TenderItem extends Model
 	public function tender(): BelongsTo
 	{
 		return $this->belongsTo(Tender::class);
+	}
+
+	/**
+	 * @return BelongsToMany<Supplier>
+	 */
+	public function suppliers(): BelongsToMany
+	{
+		return $this->belongsToMany(Supplier::class, 'tender_item_supplier')
+			->using(TenderItemSupplier::class)
+			->withPivot(['status', 'terms'])
+			->withTimestamps();
 	}
 
 	protected function resolveActivityCompanyId(): ?int

@@ -4,20 +4,29 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Tenders;
 
+use App\Enums\ProductSupplierStatus;
 use App\Models\DictionaryValue;
 use App\Models\Product;
+use App\Models\Supplier;
 use App\Models\Tender;
+use App\Models\TenderItem;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Livewire\WithFileUploads;
 use Spatie\Activitylog\Models\Activity;
 
 #[Layout('layouts.admin')]
 final class Show extends Component
 {
+	use WithFileUploads;
+
 	public Tender $tender;
 
 	public string $tab = 'details';
@@ -26,6 +35,23 @@ final class Show extends Component
 	public int $attachProductId = 0;
 	public bool $showProductDropdown = false;
 	public ?string $comment = null;
+	public int $selectedItemId = 0;
+	public mixed $itemPhoto = null;
+	public int $attachSupplierId = 0;
+	public string $attachStatus = 'primary';
+	public ?string $attachTerms = null;
+	public string $supplierSearch = '';
+	public bool $showSupplierDropdown = false;
+
+	/**
+	 * @var array<int, string>
+	 */
+	public array $itemPivotStatus = [];
+
+	/**
+	 * @var array<int, string|null>
+	 */
+	public array $itemPivotTerms = [];
 
 	/**
 	 * @var array<string, array<string, string>>
@@ -42,7 +68,7 @@ final class Show extends Component
 		}
 
 		$this->tender = $tender->load([
-			'items',
+			'items.suppliers',
 			'contacts',
 			'announcements',
 			'publishHistories',
@@ -58,6 +84,9 @@ final class Show extends Component
 			'event_status',
 			'document_view_type',
 		]);
+
+		$this->selectedItemId = (int) ($this->tender->items->first()?->id ?? 0);
+		$this->hydrateItemSupplierPivot();
 	}
 
 	public function render(): View
@@ -66,13 +95,15 @@ final class Show extends Component
 			'originalUrl' => 'https://etender.gov.az/main/competition/detail/' . $this->tender->event_id,
 			'activities' => $this->loadActivities(),
 			'productOptions' => $this->productOptions(),
+			'supplierOptions' => $this->supplierOptions(),
+			'selectedItem' => $this->selectedItem(),
 			'isAdmin' => CompanyContext::isAdmin(),
 		]);
 	}
 
 	public function setTab(string $tab): void
 	{
-		$allowed = ['details', 'products', 'history', 'comments'];
+		$allowed = ['details', 'products', 'history', 'comments', 'item-suppliers'];
 
 		$this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
 	}
@@ -142,6 +173,159 @@ final class Show extends Component
 	{
 		$this->attachProductId = 0;
 		$this->showProductDropdown = true;
+	}
+
+	public function updatedSelectedItemId(): void
+	{
+		$this->itemPhoto = null;
+		$this->resetItemSupplierForm();
+		$this->hydrateItemSupplierPivot();
+	}
+
+	public function updatedItemPhoto(): void
+	{
+		$this->validateOnly('itemPhoto', [
+			'itemPhoto' => ['nullable', 'image', 'max:4096'],
+		]);
+	}
+
+	public function saveItemPhoto(): void
+	{
+		$item = $this->selectedItem();
+
+		if (!$item || !($this->itemPhoto instanceof TemporaryUploadedFile)) {
+			return;
+		}
+
+		$photoPath = $item->photo_path;
+		if ($photoPath) {
+			Storage::disk('public')->delete($photoPath);
+		}
+
+		$photoPath = $this->itemPhoto->store('tender-items', 'public');
+		$item->update(['photo_path' => $photoPath]);
+		$this->itemPhoto = null;
+
+		$this->tender->load('items.suppliers');
+		session()->flash('status', __('common.saved'));
+	}
+
+	public function removeItemPhoto(): void
+	{
+		if ($this->itemPhoto instanceof TemporaryUploadedFile) {
+			$this->itemPhoto = null;
+
+			return;
+		}
+
+		$item = $this->selectedItem();
+		if (!$item || !$item->photo_path) {
+			return;
+		}
+
+		Storage::disk('public')->delete($item->photo_path);
+		$item->update(['photo_path' => null]);
+		$this->tender->load('items.suppliers');
+
+		session()->flash('status', __('common.photo_removed'));
+	}
+
+	public function updatedSupplierSearch(): void
+	{
+		$this->attachSupplierId = 0;
+		$this->showSupplierDropdown = true;
+	}
+
+	public function selectSupplier(int $supplierId): void
+	{
+		$supplier = $this->supplierOptions()
+			->first(fn (Supplier $item) => (int) $item->id === $supplierId);
+
+		if ($supplier === null) {
+			return;
+		}
+
+		$this->attachSupplierId = $supplierId;
+		$this->supplierSearch = $supplier->name . ' (#' . $supplier->id . ')';
+		$this->showSupplierDropdown = false;
+	}
+
+	public function attachItemSupplier(): void
+	{
+		$item = $this->selectedItem();
+
+		if (!$item) {
+			return;
+		}
+
+		if ($this->attachSupplierId === 0) {
+			$first = $this->supplierOptions()->first();
+			if ($first !== null) {
+				$this->attachSupplierId = (int) $first->id;
+			}
+		}
+
+		$companyId = $this->tender->company_id;
+		$existsRule = Rule::exists('suppliers', 'id');
+		if ($companyId !== null) {
+			$existsRule->where('company_id', $companyId);
+		}
+
+		$this->validate([
+			'attachSupplierId' => ['required', 'integer', $existsRule],
+			'attachStatus' => ['required', 'in:primary,reserve'],
+			'attachTerms' => ['nullable', 'string'],
+		]);
+
+		$item->suppliers()->syncWithoutDetaching([
+			$this->attachSupplierId => [
+				'status' => $this->attachStatus,
+				'terms' => $this->attachTerms,
+			],
+		]);
+
+		$this->tender->load('items.suppliers');
+		$this->resetItemSupplierForm();
+		$this->hydrateItemSupplierPivot();
+
+		session()->flash('status', __('common.supplier_linked'));
+	}
+
+	public function saveItemSupplierPivot(int $supplierId): void
+	{
+		$item = $this->selectedItem();
+
+		if (!$item) {
+			return;
+		}
+
+		$status = ProductSupplierStatus::tryFrom($this->itemPivotStatus[$supplierId] ?? 'primary')
+			?? ProductSupplierStatus::Primary;
+
+		$item->suppliers()->updateExistingPivot($supplierId, [
+			'status' => $status->value,
+			'terms' => $this->itemPivotTerms[$supplierId] ?? null,
+		]);
+
+		$this->tender->load('items.suppliers');
+		$this->hydrateItemSupplierPivot();
+		session()->flash('status', __('common.link_updated'));
+	}
+
+	public function detachItemSupplier(int $supplierId): void
+	{
+		$item = $this->selectedItem();
+
+		if (!$item) {
+			return;
+		}
+
+		$item->suppliers()->detach($supplierId);
+		unset($this->itemPivotStatus[$supplierId], $this->itemPivotTerms[$supplierId]);
+
+		$this->tender->load('items.suppliers');
+		$this->hydrateItemSupplierPivot();
+		session()->flash('status', __('common.supplier_unlinked'));
 	}
 
 	public function selectProduct(int $productId): void
@@ -247,6 +431,71 @@ final class Show extends Component
 		}
 
 		return $query->limit(20)->get();
+	}
+
+	/**
+	 * @return Collection<int, Supplier>
+	 */
+	private function supplierOptions(): Collection
+	{
+		$item = $this->selectedItem();
+
+		if (!$item) {
+			return collect();
+		}
+
+		$search = trim($this->supplierSearch);
+
+		$query = Supplier::query()
+			->when($this->tender->company_id !== null, fn ($q) => $q->where('company_id', $this->tender->company_id))
+			->whereDoesntHave('tenderItems', function ($query) use ($item): void {
+				$query->whereKey($item->id);
+			})
+			->orderBy('name');
+
+		if ($search !== '') {
+			$query->where('name', 'like', '%' . $search . '%');
+		}
+
+		return $query->limit(20)->get();
+	}
+
+	private function selectedItem(): ?TenderItem
+	{
+		if ($this->selectedItemId <= 0) {
+			return null;
+		}
+
+		$item = $this->tender->items->firstWhere('id', $this->selectedItemId);
+
+		return $item instanceof TenderItem ? $item : null;
+	}
+
+	private function resetItemSupplierForm(): void
+	{
+		$this->attachSupplierId = 0;
+		$this->attachStatus = 'primary';
+		$this->attachTerms = null;
+		$this->supplierSearch = '';
+		$this->showSupplierDropdown = false;
+	}
+
+	private function hydrateItemSupplierPivot(): void
+	{
+		$this->itemPivotStatus = [];
+		$this->itemPivotTerms = [];
+
+		$item = $this->selectedItem();
+		if (!$item) {
+			return;
+		}
+
+		foreach ($item->suppliers as $supplier) {
+			$this->itemPivotStatus[(int) $supplier->id] = $supplier->pivot->status instanceof ProductSupplierStatus
+				? $supplier->pivot->status->value
+				: (string) $supplier->pivot->status;
+			$this->itemPivotTerms[(int) $supplier->id] = $supplier->pivot->terms;
+		}
 	}
 
 	/**
