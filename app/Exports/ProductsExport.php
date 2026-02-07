@@ -29,7 +29,7 @@ final class ProductsExport implements FromQuery, WithHeadings, WithMapping
 	 */
 	public function headings(): array
 	{
-		return ['id', 'category_name', 'name', 'description', 'color', 'unit', 'characteristics', 'photo', 'photo_url'];
+		return ['ID', 'Kateqoriya', 'Mehsul adi', 'Tesvir', 'Reng', 'Olcu vahidi', 'Xususiyyetler', 'Sekil', 'Sekil URL'];
 	}
 
 	/**

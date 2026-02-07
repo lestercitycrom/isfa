@@ -29,7 +29,7 @@ final class ProductSupplierLinksExport implements FromQuery, WithHeadings, WithM
 	 */
 	public function headings(): array
 	{
-		return ['product_id', 'supplier_id', 'status', 'terms'];
+		return ['Mehsul ID', 'Techizatci ID', 'Status', 'Sertler'];
 	}
 
 	/**

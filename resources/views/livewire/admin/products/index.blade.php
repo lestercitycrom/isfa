@@ -5,26 +5,10 @@
 	>
 		<x-slot name="actions">
 			<a class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 transition"
-				href="{{ route('admin.export.products') }}">
-				<x-admin.icon name="upload" class="h-4 w-4" />
-				{{ __('common.export_csv') }}
-			</a>
-			<a class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 transition"
 				href="{{ route('admin.export.products.excel') }}">
 				<x-admin.icon name="file-text" class="h-4 w-4" />
 				{{ __('common.export_excel') }}
 			</a>
-
-			<form method="POST" action="{{ route('admin.import.products') }}" enctype="multipart/form-data" class="inline-flex">
-				@csrf
-				<input id="productsImportFile" name="file" type="file" accept=".csv,.txt" class="hidden"
-					onchange="this.form.submit()">
-
-				<label for="productsImportFile" class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition">
-					<x-admin.icon name="download" class="h-4 w-4" />
-					{{ __('common.import_csv') }}
-				</label>
-			</form>
 
 			<x-admin.button variant="primary" :href="route('admin.products.create')">
 				<x-admin.icon name="plus" class="h-4 w-4" />

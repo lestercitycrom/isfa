@@ -29,19 +29,19 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping
 	public function headings(): array
 	{
 		return [
-			'id',
-			'name',
-			'voen',
-			'contact_name',
-			'phone',
-			'email',
-			'website',
-			'payment_method',
-			'payment_card_number',
-			'payment_routing_number',
-			'comment',
-			'photo',
-			'photo_url',
+			'ID',
+			'Techizatci adi',
+			'VOEN',
+			'Elaqedar sexs',
+			'Telefon',
+			'Email',
+			'Veb sayt',
+			'Odenis novu',
+			'Kart nomresi',
+			'Routing nomresi',
+			'Qeyd',
+			'Sekil',
+			'Sekil URL',
 		];
 	}
 

@@ -21,6 +21,7 @@ use App\Livewire\Admin\Suppliers\Show as SupplierShow;
 use App\Livewire\Admin\Settings\Notifications as NotificationsSettings;
 use App\Livewire\Admin\Tenders\Create as TenderCreate;
 use App\Livewire\Admin\Tenders\Index as TendersIndex;
+use App\Livewire\Admin\Tenders\Subscriptions as TenderSubscriptions;
 use App\Livewire\Admin\Tenders\Show as TenderShow;
 use Illuminate\Support\Facades\Route;
 
@@ -76,6 +77,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function ():
 	Route::get('/tenders', TendersIndex::class)->name('tenders.index');
 	Route::get('/tenders/create', TenderCreate::class)->name('tenders.create');
 	Route::get('/tenders/{tender}/show', TenderShow::class)->name('tenders.show');
+	Route::get('/tenders/subscriptions', TenderSubscriptions::class)->name('tenders.subscriptions');
 
 	Route::get('/import-export', ImportExportIndex::class)->name('import_export.index');
 	Route::get('/activity-logs', ActivityLogsIndex::class)->name('activity_logs.index');

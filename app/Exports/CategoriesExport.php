@@ -28,7 +28,7 @@ final class CategoriesExport implements FromQuery, WithHeadings, WithMapping
 	 */
 	public function headings(): array
 	{
-		return ['id', 'name', 'description'];
+		return ['ID', 'Kateqoriya adi', 'Tesvir'];
 	}
 
 	/**

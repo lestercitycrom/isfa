@@ -378,4 +378,7 @@ return [
     'from' => 'Gonderen',
     'type' => 'Nov',
     'keywords_hint' => 'Bir nece sozu bosluqla yaza bilersiniz, meselen: "ofis mebeli" veya "lazer printer".',
+    'my_keyword_subscriptions' => 'Acar soz aboneliklerim',
+    'my_keyword_subscriptions_subtitle' => 'Acar sozlere gore yeni tender bildirisleri sizin emailinize gonderilir.',
+    'keyword_email_bound_hint' => 'Email profilinizden goturulur.',
 ];

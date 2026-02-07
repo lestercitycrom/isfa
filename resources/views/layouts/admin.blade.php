@@ -32,10 +32,14 @@
 							$label = str_starts_with($labelKey, 'common.') ? __($labelKey) : $labelKey;
 							$icon = (string) ($item['icon'] ?? '');
 							$adminOnly = (bool) ($item['admin_only'] ?? false);
+							$companyOnly = (bool) ($item['company_only'] ?? false);
 							$children = is_array($item['children'] ?? null) ? $item['children'] : [];
 						@endphp
 
 						@if($adminOnly && (!$user || !$user->isAdmin()))
+							@continue
+						@endif
+						@if($companyOnly && (!$user || $user->isAdmin()))
 							@continue
 						@endif
 
@@ -43,7 +47,11 @@
 							@php
 								$visibleChildren = collect($children)->filter(function ($child) use ($user): bool {
 									$childAdminOnly = (bool) ($child['admin_only'] ?? false);
+									$childCompanyOnly = (bool) ($child['company_only'] ?? false);
 									if ($childAdminOnly && (!$user || !$user->isAdmin())) {
+										return false;
+									}
+									if ($childCompanyOnly && (!$user || $user->isAdmin())) {
 										return false;
 									}
 
@@ -155,10 +163,14 @@
 								$label = str_starts_with($labelKey, 'common.') ? __($labelKey) : $labelKey;
 								$icon = (string) ($item['icon'] ?? '');
 								$adminOnly = (bool) ($item['admin_only'] ?? false);
+								$companyOnly = (bool) ($item['company_only'] ?? false);
 								$children = is_array($item['children'] ?? null) ? $item['children'] : [];
 							@endphp
 
 							@if($adminOnly && (!$user || !$user->isAdmin()))
+								@continue
+							@endif
+							@if($companyOnly && (!$user || $user->isAdmin()))
 								@continue
 							@endif
 
@@ -166,7 +178,11 @@
 							@php
 								$visibleChildren = collect($children)->filter(function ($child) use ($user): bool {
 									$childAdminOnly = (bool) ($child['admin_only'] ?? false);
+									$childCompanyOnly = (bool) ($child['company_only'] ?? false);
 									if ($childAdminOnly && (!$user || !$user->isAdmin())) {
+										return false;
+									}
+									if ($childCompanyOnly && (!$user || $user->isAdmin())) {
 										return false;
 									}
 									$childRoute = (string) ($child['route'] ?? '');

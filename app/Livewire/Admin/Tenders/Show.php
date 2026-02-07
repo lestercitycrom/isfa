@@ -121,7 +121,7 @@ final class Show extends Component
 
     public function setTab(string $tab): void
     {
-        $allowed = ['details', 'products', 'history', 'comments', 'item-suppliers'];
+        $allowed = ['details', 'history', 'comments', 'item-suppliers'];
 
         $this->tab = in_array($tab, $allowed, true) ? $tab : 'details';
     }
