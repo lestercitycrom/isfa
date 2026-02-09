@@ -22,19 +22,19 @@ it('builds image formula for suppliers excel export', function (): void {
 	]);
 
 	expect($export->headings())->toBe([
-		'id',
-		'name',
-		'voen',
-		'contact_name',
-		'phone',
-		'email',
-		'website',
-		'payment_method',
-		'payment_card_number',
-		'payment_routing_number',
-		'comment',
-		'photo',
-		'photo_url',
+		'ID',
+		'Techizatci adi',
+		'VOEN',
+		'Elaqedar sexs',
+		'Telefon',
+		'Email',
+		'Veb sayt',
+		'Odenis novu',
+		'Kart nomresi',
+		'Routing nomresi',
+		'Qeyd',
+		'Sekil',
+		'Sekil URL',
 	]);
 
 	$mapped = $export->map($supplier);
@@ -57,15 +57,15 @@ it('builds image formula for products excel export', function (): void {
 	$product->setRelation('category', $category);
 
 	expect($export->headings())->toBe([
-		'id',
-		'category_name',
-		'name',
-		'description',
-		'color',
-		'unit',
-		'characteristics',
-		'photo',
-		'photo_url',
+		'ID',
+		'Kateqoriya',
+		'Mehsul adi',
+		'Tesvir',
+		'Reng',
+		'Olcu vahidi',
+		'Xususiyyetler',
+		'Sekil',
+		'Sekil URL',
 	]);
 
 	$mapped = $export->map($product);

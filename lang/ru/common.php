@@ -295,7 +295,7 @@ return [
     'notes' => 'Заметки',
     'password' => 'Пароль',
     'accounts' => 'Accounts',
-    'account_name' => 'Account name',
+    'account_name' => 'Название аккаунта',
     'add_account' => 'Add account',
     'no_accounts' => 'No accounts yet.',
     'account_details' => 'Account details',

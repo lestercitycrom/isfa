@@ -295,7 +295,7 @@ return [
     'notes' => 'Qeydlər',
     'password' => 'Şifrə',
     'accounts' => 'Accounts',
-    'account_name' => 'Account name',
+    'account_name' => 'Hesab adı',
     'add_account' => 'Add account',
     'no_accounts' => 'No accounts yet.',
     'account_details' => 'Account details',

@@ -84,6 +84,23 @@
 						<div>
 							<div class="text-sm font-semibold text-slate-900">{{ $account->name }}</div>
 							<div class="text-xs text-slate-500">{{ $account->email }}</div>
+							<div class="mt-2" x-data="{ showPassword: false }">
+								<div class="text-[11px] uppercase tracking-wide text-slate-500">{{ __('common.password') }}</div>
+								<div class="mt-1 flex items-center gap-2">
+									<input
+										:type="showPassword ? 'text' : 'password'"
+										class="h-9 w-56 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900"
+										value="{{ $account->password_plain ?? '' }}"
+										readonly
+									/>
+									<x-admin.icon-button
+										icon="eye"
+										:title="__('common.view')"
+										variant="secondary"
+										x-on:click="showPassword = !showPassword"
+									/>
+								</div>
+							</div>
 						</div>
 					</div>
 				@empty

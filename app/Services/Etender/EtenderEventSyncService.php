@@ -320,8 +320,10 @@ class EtenderEventSyncService
 			return null;
 		}
 
-		// Store timestamps in UTC to avoid timezone double-shifts.
-		return CarbonImmutable::createFromTimestampUTC($seconds);
+		$tz = (string) config('app.timezone', 'UTC');
+
+		// Use application timezone for TIMESTAMP columns so MySQL conversion preserves the original Unix seconds.
+		return CarbonImmutable::createFromTimestamp($seconds, $tz);
 	}
 
 	private function toCode(mixed $value): ?string

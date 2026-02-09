@@ -114,8 +114,12 @@ final class Index extends Component
 		$companyId = CompanyContext::companyId();
 		$isAdmin = CompanyContext::isAdmin();
 
-		if (!$isAdmin && $companyId !== null) {
-			$query->where('company_id', $companyId);
+		if (!$isAdmin) {
+			if ($companyId === null) {
+				$query->whereRaw('1 = 0');
+			} else {
+				$query->where('company_id', $companyId);
+			}
 		}
 
 		if ($this->event !== '') {
