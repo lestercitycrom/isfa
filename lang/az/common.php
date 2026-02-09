@@ -2,7 +2,7 @@
 
 return [
     // Navigation
-    'products' => 'Məhsullar',
+    'products' => 'Kataloq',
     'dashboard' => 'Panel',
     'suppliers' => 'Təchizatçılar',
     'categories' => 'Kateqoriyalar',
@@ -137,7 +137,7 @@ return [
     'creating_supplier_subtitle' => 'Yeni təchizatçının əlavə edilməsi',
     'product_suppliers_management' => 'Məhsul və təchizatçı əlaqələrinin idarə edilməsi',
     'suppliers_for_product' => 'Bu məhsul üçün təchizatçılar',
-    'products_for_supplier' => 'Bu təchizatçı üçün məhsullar',
+    'products_for_supplier' => 'Bu təchizatçı-nin məhsullari',
 
     // Actions
     'link' => 'Əlaqələndir',
@@ -241,7 +241,7 @@ return [
 
     'address' => 'Ünvan',
 
-    'items' => 'Mövqelər',
+    'items' => 'Tenderin mallari',
     'unit' => 'Vahid',
     'quantity' => 'Miqdar',
     'quantity_unit_compact' => 'Miq. / vahid',
@@ -358,7 +358,7 @@ return [
     'tag_input_placeholder' => 'Etiket yazin ve Enter basin...',
     'tag_input_hint' => 'Siyahidan secin ve ya yeni etiket yaratmaq ucun Enter basin.',
     'tag_create_hint' => 'Uyghunluq tapilmadi. Etiket yaratmaq ucun Enter basin.',
-    'keyword_subscriptions' => 'Acar soz abonelikleri',
+    'keyword_subscriptions' => 'Tender Bildirişi',
     'keyword_send_log' => 'Acar soz gonderis jurnali',
     'keywords' => 'Acar sozler',
     'add' => 'Elave et',
@@ -378,7 +378,7 @@ return [
     'from' => 'Gonderen',
     'type' => 'Nov',
     'keywords_hint' => 'Bir nece sozu bosluqla yaza bilersiniz, meselen: "ofis mebeli" veya "lazer printer".',
-    'my_keyword_subscriptions' => 'Acar soz aboneliklerim',
+    'my_keyword_subscriptions' => 'Tender Bildirişi',
     'my_keyword_subscriptions_subtitle' => 'Acar sozlere gore yeni tender bildirisleri sizin emailinize gonderilir.',
     'keyword_email_bound_hint' => 'Email profilinizden goturulur.',
 ];
