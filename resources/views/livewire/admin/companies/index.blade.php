@@ -1,4 +1,4 @@
-﻿<div class="space-y-6">
+<div class="space-y-6">
 	<x-admin.page-header
 		:title="__('common.companies')"
 		:subtitle="__('common.companies_subtitle')"
@@ -68,7 +68,7 @@
 								:title="__('common.delete')"
 								variant="danger"
 								wire:click="delete({{ $company->id }})"
-								onclick="if(!confirm('{{ __('common.confirm_delete_company', ['name' => $company->name]) }}')){event.preventDefault();event.stopImmediatePropagation();}"
+								onclick="return confirm({{ \Illuminate\Support\Js::from(__('common.confirm_delete_company', ['name' => $company->name])) }});"
 							/>
 						</x-admin.table-actions>
 					</x-admin.td>
@@ -87,4 +87,3 @@
 		</div>
 	</x-admin.card>
 </div>
-

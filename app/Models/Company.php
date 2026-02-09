@@ -39,6 +39,10 @@ final class Company extends Model
 
 	protected function resolveActivityCompanyId(): ?int
 	{
+		if (! $this->exists) {
+			return null;
+		}
+
 		return $this->id !== null ? (int) $this->id : null;
 	}
 
