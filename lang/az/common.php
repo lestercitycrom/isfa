@@ -219,7 +219,7 @@ return [
     'tab_history' => 'Tarixçə',
     'activity_history' => 'Dəyişikliklər tarixi',
 
-    'event_id' => 'eventId',
+    'event_id' => 'ID',
     'document_number' => 'Sənəd nömrəsi',
     'organization' => 'Təşkilat',
     'voen' => 'VOEN',

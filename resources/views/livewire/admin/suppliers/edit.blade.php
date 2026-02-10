@@ -134,7 +134,7 @@
 						<div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
 							<x-admin.select
 								:label="__('common.payment_method')"
-								wire:model="payment_method"
+								wire:model.live="payment_method"
 								:error="$errors->first('payment_method')"
 							>
 								<option value="cash">{{ __('common.payment_method_cash') }}</option>

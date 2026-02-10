@@ -219,7 +219,7 @@ return [
     'tab_history' => 'История',
     'activity_history' => 'История изменений',
 
-    'event_id' => 'eventId',
+    'event_id' => 'ID',
     'document_number' => 'Номер документа',
     'organization' => 'Организация',
     'voen' => 'VOEN',

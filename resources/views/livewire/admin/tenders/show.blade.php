@@ -178,7 +178,7 @@
 			@endif
 		</x-admin.card>
 
-		<details class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+		<details class="rounded-2xl border border-slate-200 bg-white shadow-sm" open>
 	<summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-slate-900">
 		{{ __('common.items') }}
 	</summary>
@@ -250,6 +250,7 @@
 	</div>
 </details>
 
+		@if(false)
 		<x-admin.card :title="__('common.contacts')">
 			<x-admin.table :zebra="true">
 				<x-slot name="head">
@@ -321,6 +322,7 @@
 				@endforelse
 			</div>
 		</x-admin.card>
+		@endif
 	@endif
 
 	@if($tab === 'item-suppliers')

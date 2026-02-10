@@ -120,7 +120,7 @@ final class Edit extends Component
             'email' => ['nullable', 'string', 'max:255'],
             'website' => ['nullable', 'string', 'max:255'],
             'payment_method' => ['required', 'in:cash,card,kocurme'],
-            'payment_card_number' => ['nullable', 'string', 'max:64', 'required_if:payment_method,card'],
+            'payment_card_number' => ['nullable', 'string', 'max:64'],
             'payment_routing_number' => ['nullable', 'string', 'max:64', 'required_if:payment_method,kocurme'],
             'payment_requisites' => ['nullable', 'string', 'max:2000'],
             'photo' => ['nullable', 'image', 'max:4096'],
