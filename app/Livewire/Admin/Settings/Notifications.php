@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Settings;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Mail\TenderReminderMail;
 use App\Models\NotificationDelivery;
 use App\Models\NotificationTemplate;
@@ -23,6 +24,8 @@ use Throwable;
 #[Layout('layouts.admin')]
 final class Notifications extends Component
 {
+    use InteractsWithNotifications;
+
     public string $tab = 'templates';
 
     public string $subject7d = '';
@@ -151,6 +154,7 @@ final class Notifications extends Component
         }
 
         $subscription->update(['is_active' => ! $subscription->is_active]);
+        $this->notifySuccess(__('common.saved'));
     }
 
     public function removeKeywordSubscription(int $subscriptionId): void
@@ -169,6 +173,7 @@ final class Notifications extends Component
                 $query->where('company_id', $companyId);
             })
             ->delete();
+        $this->notifySuccess(__('common.saved'));
     }
 
     public function saveTemplates(): void
@@ -264,6 +269,12 @@ final class Notifications extends Component
                 ? __('common.keyword_test_completed')
                 : __('common.keyword_test_failed');
             $this->keywordTestResultDetails = $output !== '' ? $output : null;
+
+            if ($exitCode === 0) {
+                $this->notifySuccess((string) $this->keywordTestResultMessage);
+            } else {
+                $this->notifyError((string) $this->keywordTestResultMessage);
+            }
         } catch (Throwable $e) {
             Log::error('Keyword alerts test run failed', [
                 'exception' => $e::class,
@@ -273,6 +284,7 @@ final class Notifications extends Component
             $this->keywordTestResultStatus = 'error';
             $this->keywordTestResultMessage = __('common.keyword_test_failed');
             $this->keywordTestResultDetails = $e->getMessage();
+            $this->notifyError((string) $this->keywordTestResultMessage);
         }
     }
 

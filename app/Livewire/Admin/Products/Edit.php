@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Products;
 
 use App\Enums\ProductSupplierStatus;
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\Company;
 use App\Models\Product;
 use App\Models\ProductAttributeDefinition;
@@ -25,6 +26,7 @@ use Livewire\WithFileUploads;
 final class Edit extends Component
 {
 	use WithFileUploads;
+	use InteractsWithNotifications;
 
 	public ?Product $product = null;
 	public string $tab = 'details';
@@ -175,7 +177,7 @@ final class Edit extends Component
 		$this->product = $product;
 		$this->syncAttributeValues();
 
-		session()->flash('status', __('common.product_saved'));
+		$this->flashSuccessToast(__('common.product_saved'));
 
 		$this->redirectRoute('admin.products.index');
 	}
@@ -202,7 +204,7 @@ final class Edit extends Component
 		$this->product->update(['photo_path' => null]);
 		$this->product->refresh();
 
-		session()->flash('status', __('common.photo_removed'));
+		$this->notifySuccess(__('common.photo_removed'));
 	}
 
 	public function createAttributeDefinition(): void
@@ -270,7 +272,7 @@ final class Edit extends Component
 		]);
 
 		if (!$this->product?->exists) {
-			session()->flash('status', __('common.product_saved'));
+			$this->notifySuccess(__('common.product_saved'));
 			return;
 		}
 
@@ -319,7 +321,7 @@ final class Edit extends Component
 		$this->attachStatus = 'primary';
 		$this->attachTerms = null;
 
-		session()->flash('status', __('common.supplier_linked'));
+		$this->notifySuccess(__('common.supplier_linked'));
 	}
 
 	public function savePivot(int $supplierId): void
@@ -335,7 +337,7 @@ final class Edit extends Component
 			'terms' => $this->pivotTerms[$supplierId] ?? null,
 		]);
 
-		session()->flash('status', __('common.link_updated'));
+		$this->notifySuccess(__('common.link_updated'));
 	}
 
 	public function detach(int $supplierId): void
@@ -349,7 +351,7 @@ final class Edit extends Component
 
 		$this->product->refresh()->load('suppliers');
 
-		session()->flash('status', __('common.supplier_unlinked'));
+		$this->notifySuccess(__('common.supplier_unlinked'));
 	}
 
 	public function render(): View

@@ -107,24 +107,32 @@
 			</x-admin.card>
 		@endif
 
-		@if ($supplier->payment_method)
+		@if ($supplier->payment_method || $supplier->payment_requisites)
 			<x-admin.card>
 				<div class="text-sm font-semibold text-slate-900">{{ __('common.payment_details') }}</div>
 				<div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-					<div>
-						<div class="text-xs font-semibold text-slate-600">{{ __('common.payment_method') }}</div>
-						<div class="mt-1 text-sm text-slate-900">
-							@if ($supplier->payment_method === 'cash')
-								{{ __('common.payment_method_cash') }}
-							@elseif ($supplier->payment_method === 'card')
-								{{ __('common.payment_method_card') }}
-							@elseif ($supplier->payment_method === 'kocurme')
-								{{ __('common.payment_method_kocurme') }}
-							@else
-								{{ $supplier->payment_method }}
-							@endif
+					@if ($supplier->payment_method)
+						<div>
+							<div class="text-xs font-semibold text-slate-600">{{ __('common.payment_method') }}</div>
+							<div class="mt-1 text-sm text-slate-900">
+								@if ($supplier->payment_method === 'cash')
+									{{ __('common.payment_method_cash') }}
+								@elseif ($supplier->payment_method === 'card')
+									{{ __('common.payment_method_card') }}
+								@elseif ($supplier->payment_method === 'kocurme')
+									{{ __('common.payment_method_kocurme') }}
+								@else
+									{{ $supplier->payment_method }}
+								@endif
+							</div>
 						</div>
-					</div>
+					@endif
+					@if ($supplier->payment_requisites)
+						<div>
+							<div class="text-xs font-semibold text-slate-600">{{ __('common.payment_requisites') }}</div>
+							<div class="mt-1 text-sm text-slate-900 whitespace-pre-line">{{ $supplier->payment_requisites }}</div>
+						</div>
+					@endif
 					@if ($supplier->payment_method === 'card' && $supplier->payment_card_number)
 						<div>
 							<div class="text-xs font-semibold text-slate-600">{{ __('common.card_number') }}</div>

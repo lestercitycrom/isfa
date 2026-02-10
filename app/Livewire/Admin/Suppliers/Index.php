@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Suppliers;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\Company;
 use App\Models\Supplier;
 use App\Models\Tag;
@@ -17,6 +18,7 @@ use Livewire\WithPagination;
 final class Index extends Component
 {
     use WithPagination;
+    use InteractsWithNotifications;
 
     public string $search = '';
 
@@ -48,7 +50,7 @@ final class Index extends Component
             ->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
             ->whereKey($id)
             ->delete();
-        session()->flash('status', __('common.supplier_deleted'));
+        $this->notifySuccess(__('common.supplier_deleted'));
         $this->resetPage();
     }
 
@@ -59,7 +61,7 @@ final class Index extends Component
         Supplier::query()
             ->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
             ->delete();
-        session()->flash('status', __('common.all_suppliers_deleted'));
+        $this->notifySuccess(__('common.all_suppliers_deleted'));
         $this->resetPage();
     }
 

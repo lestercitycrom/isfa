@@ -29,6 +29,7 @@ final class Supplier extends Model
         'payment_method',
         'payment_card_number',
         'payment_routing_number',
+        'payment_requisites',
         'photo_path',
         'comment',
     ];

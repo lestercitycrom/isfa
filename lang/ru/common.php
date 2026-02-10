@@ -316,6 +316,7 @@ return [
     'payment_method_kocurme' => 'Перечисление',
     'card_number' => 'Номер карты',
     'routing_number' => 'Routing number',
+    'payment_requisites' => 'Реквизиты',
     'product_details' => 'Детали товара',
     'color' => 'Цвет',
     'unit' => 'Ед. измерения',

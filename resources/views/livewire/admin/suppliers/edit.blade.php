@@ -142,6 +142,13 @@
 								<option value="kocurme">{{ __('common.payment_method_kocurme') }}</option>
 							</x-admin.select>
 
+							<x-admin.input
+								:label="__('common.payment_requisites')"
+								type="text"
+								wire:model="payment_requisites"
+								:error="$errors->first('payment_requisites')"
+							/>
+
 							@if ($payment_method === 'card')
 								<x-admin.input
 									:label="__('common.card_number')"

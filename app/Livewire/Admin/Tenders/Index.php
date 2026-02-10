@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Tenders;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\Company;
 use App\Models\Tag;
 use App\Models\Tender;
@@ -20,6 +21,7 @@ use Throwable;
 final class Index extends Component
 {
     use WithPagination;
+    use InteractsWithNotifications;
 
     public string $search = '';
 
@@ -57,7 +59,7 @@ final class Index extends Component
             ->whereKey($id)
             ->delete();
 
-        session()->flash('status', __('tenders.flash.deleted'));
+        $this->notifySuccess(__('tenders.flash.deleted'));
     }
 
     public function syncFromUrl(EtenderEventSyncService $syncService): void
@@ -83,7 +85,7 @@ final class Index extends Component
         try {
             $tender = $syncService->sync($eventId, CompanyContext::companyId());
 
-            session()->flash('status', __('tenders.flash.synced', ['id' => $tender->event_id]));
+            $this->flashSuccessToast(__('tenders.flash.synced', ['id' => $tender->event_id]));
 
             $this->redirectRoute('admin.tenders.show', ['tender' => $tender->getKey()]);
         } catch (Throwable $e) {

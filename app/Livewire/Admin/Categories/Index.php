@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Categories;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\ProductCategory;
 use App\Models\Company;
 use App\Support\CompanyContext;
@@ -16,6 +17,7 @@ use Livewire\WithPagination;
 final class Index extends Component
 {
 	use WithPagination;
+	use InteractsWithNotifications;
 
 	public string $search = '';
 	public ?int $companyFilter = null;
@@ -39,7 +41,7 @@ final class Index extends Component
 			->whereKey($id)
 			->delete();
 
-		session()->flash('status', __('common.category_deleted'));
+		$this->notifySuccess(__('common.category_deleted'));
 	}
 
 	public function deleteAllCategories(): void
@@ -49,7 +51,7 @@ final class Index extends Component
 		ProductCategory::query()
 			->when($companyId !== null, fn ($q) => $q->where('company_id', $companyId))
 			->delete();
-		session()->flash('status', __('common.all_categories_deleted'));
+		$this->notifySuccess(__('common.all_categories_deleted'));
 		$this->resetPage();
 	}
 

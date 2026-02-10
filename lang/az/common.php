@@ -316,6 +316,7 @@ return [
     'payment_method_kocurme' => 'Köçürmə',
     'card_number' => 'Kart nömrəsi',
     'routing_number' => 'Routing number',
+    'payment_requisites' => 'Rekvizitlər',
     'product_details' => 'Məhsul detalları',
     'color' => 'Rəng',
     'unit' => 'Ölçü vahidi',

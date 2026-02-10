@@ -134,25 +134,20 @@
 				<div class="grid grid-cols-1 gap-3">
 					@forelse ($company->users as $account)
 						<div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3">
-							<div>
+							<div x-data="{ showPassword: false }">
 								<div class="text-sm font-semibold text-slate-900">{{ $account->name }}</div>
-								<div class="text-xs text-slate-500">{{ $account->email }}</div>
-								<div class="mt-2" x-data="{ showPassword: false }">
-									<div class="text-[11px] uppercase tracking-wide text-slate-500">{{ __('common.password') }}</div>
-									<div class="mt-1 flex items-center gap-2">
-										<input
-											:type="showPassword ? 'text' : 'password'"
-											class="h-9 w-56 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900"
-											value="{{ $account->password_plain ?? '' }}"
-											readonly
-										/>
-										<x-admin.icon-button
-											icon="eye"
-											:title="__('common.view')"
-											variant="secondary"
-											x-on:click="showPassword = !showPassword"
-										/>
-									</div>
+								<div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+									<span>{{ $account->email }}</span>
+									<span class="text-slate-300">/</span>
+									<span class="font-medium text-slate-700" x-text="showPassword ? @js((string) ($account->password_plain ?? '')) : '••••••'"></span>
+									<button
+										type="button"
+										class="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-600 transition hover:bg-slate-100"
+										x-on:click="showPassword = !showPassword"
+										title="{{ __('common.view') }}"
+									>
+										<x-admin.icon name="eye" class="h-3.5 w-3.5" />
+									</button>
 								</div>
 							</div>
 							<div class="flex items-center gap-4">

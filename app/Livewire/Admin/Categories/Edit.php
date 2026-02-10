@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Categories;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\ProductCategory;
 use App\Models\Company;
 use App\Support\CompanyContext;
@@ -18,6 +19,8 @@ use Illuminate\Support\Collection;
 #[Layout('layouts.admin')]
 final class Edit extends Component
 {
+	use InteractsWithNotifications;
+
 	public ?ProductCategory $category = null;
 
 	public string $tab = 'details';
@@ -97,7 +100,7 @@ final class Edit extends Component
 			$payload
 		);
 
-		session()->flash('status', __('common.category_saved'));
+		$this->flashSuccessToast(__('common.category_saved'));
 
 		$this->redirectRoute('admin.categories.index');
 	}
@@ -120,7 +123,7 @@ final class Edit extends Component
 		}
 
 		if (!Schema::hasColumn($this->category->getTable(), 'comment')) {
-			session()->flash('status', __('common.comment_column_missing'));
+			$this->notifyError(__('common.comment_column_missing'));
 
 			return;
 		}
@@ -130,6 +133,7 @@ final class Edit extends Component
 		]);
 
 		$this->dispatch('comment-saved');
+		$this->notifySuccess(__('common.saved'));
 	}
 
 	/**

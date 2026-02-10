@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Settings;
 
 use App\Concerns\PasswordValidationRules;
+use App\Livewire\Concerns\InteractsWithNotifications;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
@@ -14,6 +15,7 @@ use Livewire\Component;
 final class PasswordPage extends Component
 {
 	use PasswordValidationRules;
+	use InteractsWithNotifications;
 
 	public string $current_password = '';
 	public string $password = '';
@@ -41,7 +43,7 @@ final class PasswordPage extends Component
 
 		$this->reset('current_password', 'password', 'password_confirmation');
 
-		session()->flash('status', __('common.password_updated'));
+		$this->notifySuccess(__('common.password_updated'));
 	}
 
 	public function render()

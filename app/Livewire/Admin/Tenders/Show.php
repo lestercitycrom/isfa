@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Admin\Tenders;
 
 use App\Enums\ProductSupplierStatus;
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\DictionaryValue;
 use App\Models\Product;
 use App\Models\Supplier;
@@ -28,6 +29,7 @@ use Spatie\Activitylog\Models\Activity;
 final class Show extends Component
 {
     use WithFileUploads;
+    use InteractsWithNotifications;
 
     public Tender $tender;
 
@@ -164,7 +166,7 @@ final class Show extends Component
         $this->showProductDropdown = false;
         $this->tender->load('products.category');
         $this->tender->load('products.suppliers', 'products.company');
-        session()->flash('status', __('common.product_attached'));
+        $this->notifySuccess(__('common.product_attached'));
     }
 
     public function attachSelectedProduct(): void
@@ -225,7 +227,7 @@ final class Show extends Component
         $this->itemPhoto = null;
 
         $this->tender->load('items.suppliers');
-        session()->flash('status', __('common.saved'));
+        $this->notifySuccess(__('common.saved'));
     }
 
     public function removeItemPhoto(): void
@@ -245,7 +247,7 @@ final class Show extends Component
         $item->update(['photo_path' => null]);
         $this->tender->load('items.suppliers');
 
-        session()->flash('status', __('common.photo_removed'));
+        $this->notifySuccess(__('common.photo_removed'));
     }
 
     public function updatedSupplierSearch(): void
@@ -376,7 +378,7 @@ final class Show extends Component
         $this->resetItemSupplierForm();
         $this->hydrateItemSupplierPivot();
 
-        session()->flash('status', __('common.supplier_linked'));
+        $this->notifySuccess(__('common.supplier_linked'));
     }
 
     public function saveItemSupplierPivot(int $supplierId): void
@@ -397,7 +399,7 @@ final class Show extends Component
 
         $this->tender->load('items.suppliers');
         $this->hydrateItemSupplierPivot();
-        session()->flash('status', __('common.link_updated'));
+        $this->notifySuccess(__('common.link_updated'));
     }
 
     public function detachItemSupplier(int $supplierId): void
@@ -413,7 +415,7 @@ final class Show extends Component
 
         $this->tender->load('items.suppliers');
         $this->hydrateItemSupplierPivot();
-        session()->flash('status', __('common.supplier_unlinked'));
+        $this->notifySuccess(__('common.supplier_unlinked'));
     }
 
     public function selectProduct(int $productId): void
@@ -458,7 +460,7 @@ final class Show extends Component
 
         $this->tender->load('products.category');
         $this->tender->load('products.suppliers', 'products.company');
-        session()->flash('status', __('common.product_detached'));
+        $this->notifySuccess(__('common.product_detached'));
     }
 
     public function saveComment(): void
@@ -468,6 +470,7 @@ final class Show extends Component
             $raw['comment'] = $this->comment;
             $this->tender->update(['raw' => $raw]);
             $this->dispatch('comment-saved');
+            $this->notifySuccess(__('common.saved'));
 
             return;
         }
@@ -477,6 +480,7 @@ final class Show extends Component
         ]);
 
         $this->dispatch('comment-saved');
+        $this->notifySuccess(__('common.saved'));
     }
 
     /**

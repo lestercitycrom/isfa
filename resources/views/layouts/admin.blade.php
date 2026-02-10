@@ -15,6 +15,28 @@
 	<title>@yield('title', config('app.name', 'Admin'))</title>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+	@php
+		$initialToast = session('toast');
+		if ($initialToast === null && session('status')) {
+			$initialToast = [
+				'type' => 'success',
+				'message' => session('status'),
+				'timeout' => 3500,
+			];
+		}
+
+		$eventToMessage = [
+			'comment-saved' => __('common.saved'),
+			'attributes-saved' => __('common.saved'),
+			'profile-updated' => __('common.profile_updated'),
+			'password-updated' => __('common.password_updated'),
+			'company-updated' => __('common.company_saved'),
+			'keyword-subscription-saved' => __('common.saved'),
+			'templates-saved' => __('common.saved'),
+			'test-email-sent' => __('common.test_email_sent_ok'),
+		];
+	@endphp
+
 	<header class="sticky top-0 z-40 bg-gradient-to-r from-slate-900 to-slate-800 text-slate-100 border-b border-white/10">
 		<div class="mx-auto {{ config('admin-kit.layout.container', 'max-w-7xl') }} px-4">
 			<div class="h-16 flex items-center justify-between gap-4">
@@ -237,15 +259,11 @@
 	</header>
 
 	<main class="mx-auto {{ config('admin-kit.layout.container', 'max-w-7xl') }} px-4 py-6">
-		@if (session('status'))
-			<x-admin.alert variant="success" :autohide="true" class="mb-6">
-				{{ session('status') }}
-			</x-admin.alert>
-		@endif
-
 		{{ $slot ?? '' }}
 		@yield('content')
 	</main>
+
+	<x-admin.toast-stack :initial-toast="$initialToast" :event-to-message="$eventToMessage" />
 
 	@livewireScripts
 </body>

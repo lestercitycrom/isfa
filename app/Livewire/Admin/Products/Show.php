@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Products;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Support\CompanyContext;
@@ -17,6 +18,8 @@ use Illuminate\Support\Collection;
 #[Layout('layouts.admin')]
 final class Show extends Component
 {
+	use InteractsWithNotifications;
+
 	public Product $product;
 	public string $tab = 'details';
 	public ?string $comment = null;
@@ -55,7 +58,7 @@ final class Show extends Component
 	public function saveComment(): void
 	{
 		if (!Schema::hasColumn($this->product->getTable(), 'comment')) {
-			session()->flash('status', __('common.comment_column_missing'));
+			$this->notifyError(__('common.comment_column_missing'));
 
 			return;
 		}
@@ -65,6 +68,7 @@ final class Show extends Component
 		]);
 
 		$this->dispatch('comment-saved');
+		$this->notifySuccess(__('common.saved'));
 	}
 
 	/**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Companies;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\Company;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -14,6 +15,7 @@ use Livewire\WithPagination;
 final class Index extends Component
 {
 	use WithPagination;
+	use InteractsWithNotifications;
 
 	public string $search = '';
 
@@ -31,7 +33,7 @@ final class Index extends Component
 
 		$company->users()->delete();
 		$company->delete();
-		session()->flash('status', __('common.company_deleted'));
+		$this->notifySuccess(__('common.company_deleted'));
 		$this->resetPage();
 	}
 

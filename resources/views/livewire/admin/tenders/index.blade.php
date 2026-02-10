@@ -4,12 +4,6 @@
 		:subtitle="__('tenders.index.subtitle')"
 	/>
 
-	@if (session('status'))
-		<div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-			{{ session('status') }}
-		</div>
-	@endif
-
 	<div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
 	<form wire:submit.prevent="syncFromUrl" class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_auto] md:items-end">
 		<div>

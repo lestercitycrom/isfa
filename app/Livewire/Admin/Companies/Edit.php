@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Companies;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -15,6 +16,8 @@ use Livewire\Component;
 #[Layout('layouts.admin')]
 final class Edit extends Component
 {
+	use InteractsWithNotifications;
+
 	public ?Company $company = null;
 
 	public string $company_name = '';
@@ -111,7 +114,7 @@ final class Edit extends Component
 			});
 		}
 
-		session()->flash('status', __('common.company_saved'));
+		$this->flashSuccessToast(__('common.company_saved'));
 
 		$this->redirectRoute('admin.companies.index');
 	}
@@ -145,7 +148,7 @@ final class Edit extends Component
 		$this->reset('account_name', 'account_email', 'account_password');
 		$this->syncAccountReminderFlags();
 
-		session()->flash('status', __('common.account_saved'));
+		$this->notifySuccess(__('common.account_saved'));
 	}
 
 	public function deleteAccount(int $id): void
@@ -162,7 +165,7 @@ final class Edit extends Component
 		$user->delete();
 		$this->company->refresh()->load('users');
 		$this->syncAccountReminderFlags();
-		session()->flash('status', __('common.account_deleted'));
+		$this->notifySuccess(__('common.account_deleted'));
 	}
 
 	public function updatedAccountReminderFlags(mixed $value, mixed $key): void

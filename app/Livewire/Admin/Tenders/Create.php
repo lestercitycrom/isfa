@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Tenders;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Services\Etender\EtenderEventSyncService;
 use App\Support\CompanyContext;
 use Illuminate\Contracts\View\View;
@@ -14,6 +15,8 @@ use Throwable;
 #[Layout('layouts.admin')]
 final class Create extends Component
 {
+	use InteractsWithNotifications;
+
 	public string $eventId = '';
 
 	public bool $isSyncing = false;
@@ -36,7 +39,7 @@ final class Create extends Component
 		try {
 			$tender = $syncService->sync($eventId, CompanyContext::companyId());
 
-			session()->flash('status', __('tenders.flash.synced', ['id' => $tender->event_id]));
+			$this->flashSuccessToast(__('tenders.flash.synced', ['id' => $tender->event_id]));
 
 			$this->redirectRoute('admin.tenders.show', ['tender' => $tender]);
 		} catch (Throwable $e) {

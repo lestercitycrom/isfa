@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Suppliers;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\Company;
 use App\Models\Supplier;
 use App\Models\Tag;
@@ -22,6 +23,7 @@ use Livewire\WithFileUploads;
 final class Edit extends Component
 {
     use WithFileUploads;
+    use InteractsWithNotifications;
 
     public ?Supplier $supplier = null;
 
@@ -44,6 +46,8 @@ final class Edit extends Component
     public ?string $payment_card_number = null;
 
     public ?string $payment_routing_number = null;
+
+    public ?string $payment_requisites = null;
 
     public mixed $photo = null;
 
@@ -80,6 +84,7 @@ final class Edit extends Component
             $this->payment_method = $supplier->payment_method ?: 'cash';
             $this->payment_card_number = $supplier->payment_card_number;
             $this->payment_routing_number = $supplier->payment_routing_number;
+            $this->payment_requisites = $supplier->payment_requisites;
             $this->comment = $supplier->comment;
             $this->selectedTagIds = $supplier->tags()->pluck('tags.id')->map(static fn (mixed $id): int => (int) $id)->all();
         } elseif (! $isAdmin && $companyId !== null) {
@@ -117,6 +122,7 @@ final class Edit extends Component
             'payment_method' => ['required', 'in:cash,card,kocurme'],
             'payment_card_number' => ['nullable', 'string', 'max:64', 'required_if:payment_method,card'],
             'payment_routing_number' => ['nullable', 'string', 'max:64', 'required_if:payment_method,kocurme'],
+            'payment_requisites' => ['nullable', 'string', 'max:2000'],
             'photo' => ['nullable', 'image', 'max:4096'],
             'comment' => ['nullable', 'string'],
             'selectedTagIds' => ['array'],
@@ -159,6 +165,7 @@ final class Edit extends Component
                 'payment_method' => $this->payment_method,
                 'payment_card_number' => $this->payment_method === 'card' ? $this->payment_card_number : null,
                 'payment_routing_number' => $this->payment_method === 'kocurme' ? $this->payment_routing_number : null,
+                'payment_requisites' => $this->payment_requisites,
                 'photo_path' => $photoPath,
                 'comment' => $this->comment,
             ]
@@ -166,7 +173,7 @@ final class Edit extends Component
 
         $supplier->tags()->sync($this->selectedTagIds);
 
-        session()->flash('status', __('common.supplier_saved'));
+        $this->flashSuccessToast(__('common.supplier_saved'));
 
         $this->redirectRoute('admin.suppliers.index');
     }
@@ -293,7 +300,7 @@ final class Edit extends Component
         $this->supplier->update(['photo_path' => null]);
         $this->supplier->refresh();
 
-        session()->flash('status', __('common.photo_removed'));
+        $this->notifySuccess(__('common.photo_removed'));
     }
 
     public function render(): View

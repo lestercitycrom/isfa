@@ -31,9 +31,6 @@
 					</span>
 				</x-admin.button>
 
-				@if(session('status'))
-					<span class="text-sm text-emerald-700">{{ session('status') }}</span>
-				@endif
 			</div>
 
 			@if($lastOutput)

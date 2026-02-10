@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin\Tenders;
 
+use App\Livewire\Concerns\InteractsWithNotifications;
 use App\Models\TenderKeywordDelivery;
 use App\Models\TenderKeywordSubscription;
 use App\Support\CompanyContext;
@@ -16,6 +17,8 @@ use Livewire\Component;
 #[Layout('layouts.admin')]
 final class Subscriptions extends Component
 {
+    use InteractsWithNotifications;
+
     public string $subscriptionKeyword = '';
 
     public bool $subscriptionActive = true;
@@ -79,6 +82,7 @@ final class Subscriptions extends Component
         }
 
         $subscription->update(['is_active' => ! $subscription->is_active]);
+        $this->notifySuccess(__('common.saved'));
     }
 
     public function removeKeywordSubscription(int $subscriptionId): void
@@ -86,6 +90,7 @@ final class Subscriptions extends Component
         $this->subscriptionsQuery()
             ->whereKey($subscriptionId)
             ->delete();
+        $this->notifySuccess(__('common.saved'));
     }
 
     public function render(): View
