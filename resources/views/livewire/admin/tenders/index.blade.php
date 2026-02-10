@@ -191,7 +191,7 @@
 
 		@if ($tenders->hasPages())
 			<div class="border-t border-slate-200 p-4">
-				{{ $tenders->links() }}
+				{{ $tenders->links('pagination.admin') }}
 			</div>
 		@endif
 	</div>

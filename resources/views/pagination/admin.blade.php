@@ -18,7 +18,11 @@
 					{{ __('common.pagination_prev') }}
 				</span>
 			@else
-				<a href="{{ $paginator->previousPageUrl() }}" rel="prev"
+				@php
+					$prevUrl = $paginator->previousPageUrl();
+					$prevUrl = is_string($prevUrl) ? preg_replace('#/admin/admin/#', '/admin/', $prevUrl) : $prevUrl;
+				@endphp
+				<a href="{{ $prevUrl }}" rel="prev"
 					class="inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white text-slate-900 hover:bg-slate-50">
 					{{ __('common.pagination_prev') }}
 				</a>
@@ -34,13 +38,16 @@
 
 				@if (is_array($element))
 					@foreach ($element as $page => $url)
+						@php
+							$fixedUrl = is_string($url) ? preg_replace('#/admin/admin/#', '/admin/', $url) : $url;
+						@endphp
 						@if ($page == $paginator->currentPage())
 							<span aria-current="page"
 								class="inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold bg-slate-900 text-white">
 								{{ $page }}
 							</span>
 						@else
-							<a href="{{ $url }}"
+							<a href="{{ $fixedUrl }}"
 								class="inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
 								aria-label="{{ __('common.pagination_go_to_page', ['page' => $page]) }}">
 								{{ $page }}
@@ -52,7 +59,11 @@
 
 			{{-- Next --}}
 			@if ($paginator->hasMorePages())
-				<a href="{{ $paginator->nextPageUrl() }}" rel="next"
+				@php
+					$nextUrl = $paginator->nextPageUrl();
+					$nextUrl = is_string($nextUrl) ? preg_replace('#/admin/admin/#', '/admin/', $nextUrl) : $nextUrl;
+				@endphp
+				<a href="{{ $nextUrl }}" rel="next"
 					class="inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold border border-slate-200 bg-white text-slate-900 hover:bg-slate-50">
 					{{ __('common.pagination_next') }}
 				</a>
