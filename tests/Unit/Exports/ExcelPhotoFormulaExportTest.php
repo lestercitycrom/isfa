@@ -6,7 +6,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
 
-it('builds image formula for suppliers excel export', function (): void {
+it('maps suppliers photo url for excel export', function (): void {
 	config()->set('app.url', 'https://example.com');
 
 	$export = new SuppliersExport(null);
@@ -32,6 +32,7 @@ it('builds image formula for suppliers excel export', function (): void {
 		'Odenis novu',
 		'Kart nomresi',
 		'Routing nomresi',
+		'Rekvizitlər',
 		'Qeyd',
 		'Sekil',
 		'Sekil URL',
@@ -39,11 +40,11 @@ it('builds image formula for suppliers excel export', function (): void {
 
 	$mapped = $export->map($supplier);
 
-	expect($mapped[11])->toBe('=IMAGE("https://example.com/storage/suppliers/photo.jpg")');
-	expect($mapped[12])->toBe('https://example.com/storage/suppliers/photo.jpg');
+	expect($mapped[12])->toBeNull();
+	expect($mapped[13])->toBe('https://example.com/storage/suppliers/photo.jpg');
 });
 
-it('builds image formula for products excel export', function (): void {
+it('maps products photo url for excel export', function (): void {
 	config()->set('app.url', 'https://example.com');
 
 	$export = new ProductsExport(null);
@@ -70,7 +71,7 @@ it('builds image formula for products excel export', function (): void {
 
 	$mapped = $export->map($product);
 
-	expect($mapped[7])->toBe('=IMAGE("https://example.com/storage/products/image.png")');
+	expect($mapped[7])->toBeNull();
 	expect($mapped[8])->toBe('https://example.com/storage/products/image.png');
 });
 
@@ -95,8 +96,8 @@ it('keeps photo cells empty when photo path is missing', function (): void {
 	$supplierMapped = $suppliersExport->map($supplier);
 	$productMapped = $productsExport->map($product);
 
-	expect($supplierMapped[11])->toBeNull();
 	expect($supplierMapped[12])->toBeNull();
+	expect($supplierMapped[13])->toBeNull();
 	expect($productMapped[7])->toBeNull();
 	expect($productMapped[8])->toBeNull();
 });

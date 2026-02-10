@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Exports;
 
+use App\Exports\Concerns\ResolvesExcelImagePath;
 use App\Models\TenderItem;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -24,6 +24,8 @@ final class TenderItemsExport implements
     WithDrawings,
     WithEvents
 {
+    use ResolvesExcelImagePath;
+
     /** @var array<int, string> Excel row number => local image path to embed */
     private array $rowImagePaths = [];
 
@@ -178,55 +180,6 @@ final class TenderItemsExport implements
         $escaped = str_replace('"', '""', $photoUrl);
 
         return sprintf('=HYPERLINK("%s","View")', $escaped);
-    }
-
-    /**
-     * Returns local filesystem path that PhpSpreadsheet can embed.
-     * - Uses public disk: storage/app/public/{path}
-     * - If WEBP: converts to a temp PNG using Imagick (your server supports it).
-     */
-    private function localPhotoPathForExcel(?string $path): ?string
-    {
-        if ($path === null || $path === '') {
-            return null;
-        }
-
-        $disk = Storage::disk('public');
-
-        if (!$disk->exists($path)) {
-            return null;
-        }
-
-        $fullPath = $disk->path($path);
-
-        $ext = strtolower((string) pathinfo($fullPath, PATHINFO_EXTENSION));
-        if ($ext !== 'webp') {
-            return $fullPath;
-        }
-
-        return $this->convertWebpToPngTemp($fullPath);
-    }
-
-    private function convertWebpToPngTemp(string $webpPath): ?string
-    {
-        $tmpPng = sys_get_temp_dir() . '/excel_img_' . md5($webpPath) . '.png';
-
-        if (is_file($tmpPng)) {
-            return $tmpPng;
-        }
-
-        try {
-            $img = new \Imagick($webpPath);
-            $img->setImageFormat('png');
-            $img->setImageCompressionQuality(85);
-            $img->writeImage($tmpPng);
-            $img->clear();
-            $img->destroy();
-        } catch (\Throwable $e) {
-            return null;
-        }
-
-        return is_file($tmpPng) ? $tmpPng : null;
     }
 
     private function formatQuantity(float $quantity): string
