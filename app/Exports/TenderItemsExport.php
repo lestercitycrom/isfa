@@ -52,13 +52,12 @@ final class TenderItemsExport implements
     {
         return [
             'ID',            // A
-            'Nomre',         // B
-            'Sekil',         // C (embedded image)
-            'Sekil URL',     // D (clickable link)
-            'Pozisiya adi',  // E
-            'Tesvir',        // F (hidden)
-            'Miq. / vahid',  // G
-            'Techizatcilar', // H
+            'Sekil',         // B (embedded image)
+            'Nomre',         // C
+            'Pozisiya adi',  // D
+            'Tesvir',        // E (hidden)
+            'Miq. / vahid',  // F
+            'Techizatcilar', // G
         ];
     }
 
@@ -75,8 +74,6 @@ final class TenderItemsExport implements
             $this->rowImagePaths[$this->excelRow] = $localPath;
         }
 
-        $photoUrl = $this->photoUrl($row->photo_path);
-
         $quantityUnit = $row->quantity !== null
             ? trim($this->formatQuantity((float) $row->quantity) . ' ' . (string) ($row->unit_of_measure ?? ''))
             : null;
@@ -90,12 +87,8 @@ final class TenderItemsExport implements
 
         return [
             (string) $row->id,
+            null, // B: image will be inserted via drawings()
             $row->external_id !== null ? (string) $row->external_id : null,
-
-            null, // C: image will be inserted via drawings()
-
-            $photoUrl ? $this->photoHyperlinkFormula($photoUrl) : null,
-
             $row->name,
             $row->description,
             $quantityUnit,
@@ -121,7 +114,7 @@ final class TenderItemsExport implements
             $drawing->setName('Photo');
             $drawing->setDescription('Photo');
             $drawing->setPath($path);
-            $drawing->setCoordinates('C' . $rowNumber);
+            $drawing->setCoordinates('B' . $rowNumber);
             $drawing->setOffsetX(5);
             $drawing->setOffsetY(5);
 
@@ -141,45 +134,27 @@ final class TenderItemsExport implements
                 /** @var Worksheet $sheet */
                 $sheet = $event->sheet->getDelegate();
 
-                // Hide Tesvir column (F)
-                $sheet->getColumnDimension('F')->setVisible(false);
+                // Hide Tesvir column (E)
+                $sheet->getColumnDimension('E')->setVisible(false);
 
                 // Freeze header
                 $sheet->freezePane('A2');
 
                 // Filters
-                $sheet->setAutoFilter('A1:H1');
+                $sheet->setAutoFilter('A1:G1');
 
                 // Prevent Excel auto-format for IDs
                 $sheet->getStyle('A:A')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
-                $sheet->getStyle('B:B')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
+                $sheet->getStyle('C:C')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
 
                 // Make image column wide enough + set row heights so images are visible
-                $sheet->getColumnDimension('C')->setWidth(14);
+                $sheet->getColumnDimension('B')->setWidth(14);
 
                 foreach (array_keys($this->rowImagePaths) as $rowNumber) {
                     $sheet->getRowDimension((int) $rowNumber)->setRowHeight(55);
                 }
             },
         ];
-    }
-
-    private function photoUrl(?string $path): ?string
-    {
-        if ($path === null || $path === '') {
-            return null;
-        }
-
-        $base = rtrim((string) config('app.url'), '/');
-
-        return $base . '/storage/' . ltrim($path, '/');
-    }
-
-    private function photoHyperlinkFormula(string $photoUrl): string
-    {
-        $escaped = str_replace('"', '""', $photoUrl);
-
-        return sprintf('=HYPERLINK("%s","View")', $escaped);
     }
 
     private function formatQuantity(float $quantity): string

@@ -6,9 +6,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Supplier;
 
-it('maps suppliers photo url for excel export', function (): void {
-	config()->set('app.url', 'https://example.com');
-
+it('maps suppliers photo placeholder column for excel export', function (): void {
 	$export = new SuppliersExport(null);
 	$supplier = new Supplier([
 		'id' => 9,
@@ -23,6 +21,7 @@ it('maps suppliers photo url for excel export', function (): void {
 
 	expect($export->headings())->toBe([
 		'ID',
+		'Sekil',
 		'Techizatci adi',
 		'VOEN',
 		'Elaqedar sexs',
@@ -34,19 +33,14 @@ it('maps suppliers photo url for excel export', function (): void {
 		'Routing nomresi',
 		'Rekvizitlər',
 		'Qeyd',
-		'Sekil',
-		'Sekil URL',
 	]);
 
 	$mapped = $export->map($supplier);
 
-	expect($mapped[12])->toBeNull();
-	expect($mapped[13])->toBe('https://example.com/storage/suppliers/photo.jpg');
+	expect($mapped[1])->toBeNull();
 });
 
-it('maps products photo url for excel export', function (): void {
-	config()->set('app.url', 'https://example.com');
-
+it('maps products photo placeholder column for excel export', function (): void {
 	$export = new ProductsExport(null);
 	$category = new ProductCategory(['name' => 'Category']);
 	$product = new Product([
@@ -59,25 +53,21 @@ it('maps products photo url for excel export', function (): void {
 
 	expect($export->headings())->toBe([
 		'ID',
+		'Sekil',
 		'Kateqoriya',
 		'Mehsul adi',
 		'Tesvir',
 		'Reng',
 		'Olcu vahidi',
 		'Xususiyyetler',
-		'Sekil',
-		'Sekil URL',
 	]);
 
 	$mapped = $export->map($product);
 
-	expect($mapped[7])->toBeNull();
-	expect($mapped[8])->toBe('https://example.com/storage/products/image.png');
+	expect($mapped[1])->toBeNull();
 });
 
 it('keeps photo cells empty when photo path is missing', function (): void {
-	config()->set('app.url', 'https://example.com');
-
 	$suppliersExport = new SuppliersExport(null);
 	$productsExport = new ProductsExport(null);
 
@@ -96,8 +86,6 @@ it('keeps photo cells empty when photo path is missing', function (): void {
 	$supplierMapped = $suppliersExport->map($supplier);
 	$productMapped = $productsExport->map($product);
 
-	expect($supplierMapped[12])->toBeNull();
-	expect($supplierMapped[13])->toBeNull();
-	expect($productMapped[7])->toBeNull();
-	expect($productMapped[8])->toBeNull();
+	expect($supplierMapped[1])->toBeNull();
+	expect($productMapped[1])->toBeNull();
 });

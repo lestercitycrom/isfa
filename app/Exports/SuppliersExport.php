@@ -43,6 +43,7 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping, Wit
 	{
 		return [
 			'ID',
+			'Sekil',
 			'Techizatci adi',
 			'VOEN',
 			'Elaqedar sexs',
@@ -54,8 +55,6 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping, Wit
 			'Routing nomresi',
 			'Rekvizitlər',
 			'Qeyd',
-			'Sekil',
-			'Sekil URL',
 		];
 	}
 
@@ -72,10 +71,9 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping, Wit
 			$this->rowImagePaths[$this->excelRow] = $localPath;
 		}
 
-		$photoUrl = $this->photoUrl($row->photo_path);
-
 		return [
 			$row->id,
+			null,
 			$row->name,
 			$row->voen,
 			$row->contact_name,
@@ -87,8 +85,6 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping, Wit
 			$row->payment_routing_number,
 			$row->payment_requisites,
 			$row->comment,
-			null,
-			$photoUrl,
 		];
 	}
 
@@ -108,7 +104,7 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping, Wit
 			$drawing->setName('Photo');
 			$drawing->setDescription('Photo');
 			$drawing->setPath($path);
-			$drawing->setCoordinates('M' . $rowNumber);
+			$drawing->setCoordinates('B' . $rowNumber);
 			$drawing->setOffsetX(5);
 			$drawing->setOffsetY(5);
 			$drawing->setHeight(60);
@@ -125,24 +121,13 @@ final class SuppliersExport implements FromQuery, WithHeadings, WithMapping, Wit
 			AfterSheet::class => function (AfterSheet $event): void {
 				/** @var Worksheet $sheet */
 				$sheet = $event->sheet->getDelegate();
-				$sheet->getColumnDimension('M')->setWidth(14);
+				$sheet->getColumnDimension('B')->setWidth(14);
 
 				foreach (array_keys($this->rowImagePaths) as $rowNumber) {
 					$sheet->getRowDimension((int) $rowNumber)->setRowHeight(55);
 				}
 			},
 		];
-	}
-
-	private function photoUrl(?string $path): ?string
-	{
-		if ($path === null || $path === '') {
-			return null;
-		}
-
-		$base = rtrim((string) config('app.url'), '/');
-
-		return $base . '/storage/' . ltrim($path, '/');
 	}
 
 }
