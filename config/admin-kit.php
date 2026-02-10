@@ -33,6 +33,7 @@ return [
 	 * Each item: ['label' => 'common.products', 'route' => 'admin.products.index', 'icon' => 'list']
 	 */
 	'nav' => [
+		['label' => 'common.dashboard', 'route' => 'admin.dashboard', 'icon' => 'home'],
 		['label' => 'common.tenders', 'route' => 'admin.tenders.index', 'icon' => 'file-text'],
 		['label' => 'common.my_keyword_subscriptions', 'route' => 'admin.tenders.subscriptions', 'icon' => 'bell', 'company_only' => true],
 		[
