@@ -72,12 +72,6 @@
                 deleted: 'error',
             },
             init() {
-                this.push({
-                    type: 'success',
-                    message: 'Item moved successfully.',
-                    timeout: 0,
-                });
-
                 if (initialToast && initialToast.message) {
                     this.push(initialToast);
                 }

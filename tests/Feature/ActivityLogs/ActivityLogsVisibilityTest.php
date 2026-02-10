@@ -122,3 +122,42 @@ it('shows no logs for company users without company binding', function (): void 
 	Livewire::test(ActivityLogsIndex::class)
 		->assertViewHas('activities', fn ($activities) => $activities->total() === 0);
 });
+
+it('hides admin-caused logs for company users', function (): void {
+	$companyAId = DB::table('companies')->insertGetId([
+		'name' => 'Company A',
+		'created_at' => now(),
+		'updated_at' => now(),
+	]);
+
+	$companyUser = User::factory()->create([
+		'role' => User::ROLE_COMPANY,
+		'company_id' => $companyAId,
+	]);
+
+	$admin = User::factory()->create([
+		'role' => User::ROLE_ADMIN,
+		'company_id' => null,
+	]);
+
+	DB::table((string) config('activitylog.table_name', 'activity_log'))->delete();
+
+	seedActivity([
+		'description' => 'company log from company user',
+		'company_id' => $companyAId,
+		'causer_type' => User::class,
+		'causer_id' => $companyUser->id,
+	]);
+
+	seedActivity([
+		'description' => 'company log from admin',
+		'company_id' => $companyAId,
+		'causer_type' => User::class,
+		'causer_id' => $admin->id,
+	]);
+
+	$this->actingAs($companyUser);
+
+	Livewire::test(ActivityLogsIndex::class)
+		->assertViewHas('activities', fn ($activities) => $activities->total() === 1);
+});

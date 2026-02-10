@@ -119,6 +119,23 @@ final class Index extends Component
 				$query->whereRaw('1 = 0');
 			} else {
 				$query->where('company_id', $companyId);
+				$adminEmail = (string) env('ADMIN_EMAIL', '');
+				$query->where(function (Builder $builder) use ($adminEmail): void {
+					$builder
+						->whereNull('causer_type')
+						->orWhere('causer_type', '!=', User::class)
+						->orWhereHasMorph('causer', [User::class], function (Builder $sub) use ($adminEmail): void {
+							$sub->where(function (Builder $roles): void {
+								$roles
+									->where('role', '!=', User::ROLE_ADMIN)
+									->orWhereNull('role');
+							});
+
+							if ($adminEmail !== '') {
+								$sub->where('email', '!=', $adminEmail);
+							}
+						});
+				});
 			}
 		}
 
