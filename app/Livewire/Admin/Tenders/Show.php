@@ -291,6 +291,7 @@ final class Show extends Component
         $this->tender->load('tags');
         $this->tagInput = '';
         $this->showTagDropdown = false;
+        $this->notifySuccess(__('common.tag_added'));
     }
 
     public function selectTag(int $tagId): void
@@ -318,12 +319,14 @@ final class Show extends Component
         $this->tender->load('tags');
         $this->tagInput = '';
         $this->showTagDropdown = false;
+        $this->notifySuccess(__('common.tag_added'));
     }
 
     public function removeTag(int $tagId): void
     {
         $this->tender->tags()->detach($tagId);
         $this->tender->load('tags');
+        $this->notifySuccess(__('common.tag_removed'));
     }
 
     public function selectSupplier(int $supplierId): void
